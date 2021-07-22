@@ -82,19 +82,19 @@
         <a href="/archives" class="header-toolbar-left"><i
                   class="fa fa-file-text"></i> 文章 </a>
         <a href="/archives"
-           class="header-toolbar-right"> 1 </a>
+           class="header-toolbar-right"> 2 </a>
       </li>
       <li>
         <a href="/tags" class="header-toolbar-left"><i
                   class="fa fa-tags"></i> 标签 </a>
         <a href="/tags"
-           class="header-toolbar-right"> 2 </a>
+           class="header-toolbar-right"> 5 </a>
       </li>
       <li>
         <a href="/categories" class="header-toolbar-left"><i
                   class="fa fa-folder-open"></i> 归档 </a>
         <a href="/categories"
-           class="header-toolbar-right"> 1 </a>
+           class="header-toolbar-right"> 2 </a>
       </li>
     </ul>
     
@@ -123,15 +123,13 @@
         redis面试
       </h1>
       <p>[TOC]</p>
-<blockquote>
-<p>为什么redis能这么快？</p>
-</blockquote>
-<ul>
-<li>完全基于内存，绝大部份请求是存粹的内存操作，执行效率高。</li>
-<li>数据结构简单，对数据操作也简单。</li>
-<li>采用单线程，单线程也能处理高并发请求，想多核也可启动多实例。</li>
-<li>使用多路I/O复用模型，非阻塞IO</li>
-</ul>
+<h2 id="redis为什么那么快？"><a href="#redis为什么那么快？" class="headerlink" title="redis为什么那么快？"></a>redis为什么那么快？</h2><p>Redis是一个单线程应用，所说的单线程指的是<strong>Redis使用单个线程处理客户端的请求</strong>。</p>
+<ol>
+<li>主线程是单线程 避免的频繁上下文切换和锁竞争使得redis 执行起来效率更高。</li>
+<li> 使用多路I/O复用模型 非阻塞IO</li>
+<li> 数据结构简单，操作节省时间。</li>
+<li>Redis使用单个线程处理请求。<em>避免了多个线程之间线程切换和锁资源争用的开销</em></li>
+</ol>
 <blockquote>
 <p>redis的常用数据</p>
 </blockquote>

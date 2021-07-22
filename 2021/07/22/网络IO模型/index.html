@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>
+      网络IO模型 | YangXudong&#39;s Blog
+    </title>
+    <meta name="description" content="“ 君子藏剑于身，待时而动 ”">
+    
+      <meta name="keywords" content="
+  IO模型,Java,网络
+  ">
+      
+        <meta name="author" content="旭东同学">
+
+        <meta http-equiv="Cache-Control" content="no-transform" />
+        <meta http-equiv="Cache-Control" content="no-siteapp">
+        <meta name="theme-color" content="#1e2327">
+        <link rel="apple-touch-icon" href="https://github.githubassets.com/apple-touch-icon.png">
+        <link rel="apple-touch-icon" sizes="180x180"
+          href="https://github.githubassets.com/apple-touch-icon-180x180.png">
+
+        <link rel="icon" type="image/x-icon" href="https://gitee.com/StuartYang/bpic/raw/master/20210722154537.png">
+
+        <link rel="stylesheet" href="/css/main.css">
+        
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+        <link rel="stylesheet" href="//at.alicdn.com/t/font_2570198_c1noxsh7ksn.css">
+        </link>
+
+        <script src="//cdnjs.cloudflare.com/ajax/libs/vue/1.0.25-csp/vue.min.js"></script>
+        <!-- JavaScript 日期处理类库 -->
+        <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.11.2/moment.min.js"></script>
+  <meta name="generator" content="Hexo 5.4.0"></head>
+
+<body id="replica-app">
+
+<nav class="navbar-wrapper">
+  <div class="navbar">
+    <div class="container clearfix">
+      <a href="/" class="navbar-logo"><i class="fa iconfont icon-baiyangzuo" style="font-size: 32px;"></i></a>
+
+      <ul class="navbar-nav float-left">
+        
+        <li><a href="/archives">文章</a></li>
+        
+        
+        <li><a href="/categories">归档</a></li>
+        
+        
+        <li><a href="/tags">标签</a></li>
+        
+      </ul>
+
+      <ul class="navbar-nav user-nav float-right desktop-only">
+        <li class="user-nav-notification">
+          <a><span class="user-nav-unread"></span><i class="fa fa-bell"></i></a>
+        </li>
+        <li>
+          <a><i class="fa fa-plus"></i> <i class="fa fa-caret-down"></i></a>
+        </li>
+        <li class="user-nav-logo">
+          <a><img src="https://gitee.com/StuartYang/bpic/raw/master/20210722154532.jpg"> <i class="fa fa-caret-down"></i></i></a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="main-container">
+
+  <header class="header-wrapper desktop-only">
+  <div class="container header-site-detail">
+    <ul class="header-toolbar">
+      <li class="clearfix">
+        <a href="/archives" class="header-toolbar-left"><i
+                  class="fa fa-file-text"></i> 文章 </a>
+        <a href="/archives"
+           class="header-toolbar-right"> 2 </a>
+      </li>
+      <li>
+        <a href="/tags" class="header-toolbar-left"><i
+                  class="fa fa-tags"></i> 标签 </a>
+        <a href="/tags"
+           class="header-toolbar-right"> 5 </a>
+      </li>
+      <li>
+        <a href="/categories" class="header-toolbar-left"><i
+                  class="fa fa-folder-open"></i> 归档 </a>
+        <a href="/categories"
+           class="header-toolbar-right"> 2 </a>
+      </li>
+    </ul>
+    
+    <h2 class="header-title">
+      <i class="fa fa-book text-muted"></i>
+      <a href="/">YangXudong&#39;s Blog</a>
+    </h2>
+  </div>
+</header>
+
+
+  <div class="post-container container">
+    <h3>
+      <i class="fa fa-user-o"></i>
+      旭东同学
+
+        <span class="post-date float-right"
+          title="{{moment(1626957496000).format('MMM DD, YYYY, h:mm:ss A')}}">
+          <i class="fa fa-pencil-square-o"></i>
+          {{moment(1626957496000).fromNow()}}
+        </span>
+    </h3>
+
+    <article class="post-content">
+      <h1>
+        网络IO模型
+      </h1>
+      <p>[toc]</p>
+<h2 id="案例：应用A-发消息给应用B-的过程"><a href="#案例：应用A-发消息给应用B-的过程" class="headerlink" title="案例：应用A 发消息给应用B 的过程"></a>案例：应用A 发消息给应用B 的过程</h2><img src="https://gitee.com/StuartYang/bpic/raw/master/20210722205427.png" alt="未命名文件-2" style="zoom:100%;" />
+
+<p><strong>第一步</strong>：应用A把消息发送到 TCP发送缓冲区。</p>
+<p><strong>第二步：</strong> TCP发送缓冲区再把消息发送出去，经过网络传递后，消息会发送到B服务器的TCP接收缓冲区。</p>
+<p><strong>第三步：</strong>B再从TCP接收缓冲区去读取属于自己的数据。</p>
+<p><em>如果理解了上面的消息发送流程，那么我们下面开始进入文章的主题；</em></p>
+<h2 id="网络IO模型"><a href="#网络IO模型" class="headerlink" title="网络IO模型"></a>网络IO模型</h2><h3 id="什么是同步阻塞IO"><a href="#什么是同步阻塞IO" class="headerlink" title="什么是同步阻塞IO"></a>什么是同步阻塞IO</h3><blockquote>
+<p>所谓阻塞IO：就是当进程B发起读取数据申请时，在内核数据没有准备好之前，进程B会一直处于等待数据状态，直到内核把数据准备好了交给应用B才结束。<strong>进程从调用到数据返回这段时间内都是被阻塞的称为阻塞IO；</strong></p>
+</blockquote>
+<p><strong>流程：</strong></p>
+<ol>
+<li>应用进程向内核发起recfrom读取数据。</li>
+<li>准备数据报（应用进程阻塞）。</li>
+<li>将数据从内核负责到应用空间。</li>
+<li>复制完成后，返回成功提示</li>
+</ol>
+<img src="https://gitee.com/StuartYang/bpic/raw/master/20210722211413.png" alt="未命名文件-4"  />
+
+
+
+<h3 id="什么是同步非阻塞IO"><a href="#什么是同步非阻塞IO" class="headerlink" title="什么是同步非阻塞IO"></a>什么是同步非阻塞IO</h3><blockquote>
+<p>非阻塞IO：就是当应用B发起读取数据申请时，如果内核数据没有准备好会即刻告诉应用B，不会让B在这里等待</p>
+</blockquote>
+<p><strong>流程：</strong></p>
+<ol>
+<li>应用进程向内核发起recvfrom读取数据。</li>
+<li>没有数据报准备好，即刻返回EWOULDBLOCK错误码。</li>
+<li>应用进程向内核发起recvfrom读取数据。</li>
+<li>已有数据包准备好就进行一下步骤，否则还是返回EWOULDBLOCK错误码。</li>
+<li>将数据从内核拷贝到用户空间。</li>
+<li>完成后，返回成功提示。</li>
+</ol>
+<img src="https://gitee.com/StuartYang/bpic/raw/master/20210722211215.png" alt="未命名文件-3" />
+
+<h3 id="什么是IO复用模型"><a href="#什么是IO复用模型" class="headerlink" title="什么是IO复用模型"></a>什么是IO复用模型</h3><p><strong>思考一个问题：</strong></p>
+<p>在并发的环境下：有N个人给B发来消息：</p>
+<ul>
+<li>A——&gt;B</li>
+<li>C——&gt;B</li>
+<li>D——&gt;B</li>
+<li>E——&gt;B</li>
+<li>F——&gt;B</li>
+<li>G——&gt;B</li>
+<li>….</li>
+</ul>
+<p>这种情况下，应用B就必须创建多个线程去读取数据，<strong>每个线程都会自己调用recvfrom 去读取数据</strong>。那么此时情况可能如下图：</p>
+<p><img src="https://gitee.com/StuartYang/bpic/raw/master/20210722212349.png" alt="未命名文件-6"></p>
+<p>那么问题来了，多个线程不断调用recvfrom 请求数据，先不说服务器能不能扛得住这么多线程，就算扛得住那么很明显这种方式是不是<strong>太浪费资源了</strong>，线程是我们操作系统的宝贵资源，<strong>大量的线程用来去读取数据了，那么就意味着能做其它事情的线程就会少。</strong></p>
+<p>所以，有人就提出了一个思路，可以由<strong>少量的线程</strong>==监控==多个线程的请求（<strong>我们后面将称这些请求称做为文件描述符FD(File Descriptor)，Linux系统把所有网络请求用FD来标识</strong>），当有数据准备就绪之后再分配对应的线程去读取数据，这么做就可以节省出大量的线程资源出来，这个就是IO复用模型的思路。</p>
+<blockquote>
+<p><strong>进程通过将一个或多个fd传递给select，</strong>阻塞在select操作上，select帮我们侦测多个fd是否准备就绪，当有fd准备就绪时，select返回数据可读状态，应用程序再调用recvfrom读取数据。</p>
+</blockquote>
+<p><img src="https://gitee.com/StuartYang/bpic/raw/master/20210722214721.png" alt="未命名文件-7"></p>
+<p><strong>总结：</strong>复用IO的基本思路就是通过slect或poll、epoll函数 来监控多fd ，来达到不必为每个fd创建一个对应的监控线程，<strong>从而减少线程资源创建的目的。</strong></p>
+<h3 id="什么是信号驱动IO模型"><a href="#什么是信号驱动IO模型" class="headerlink" title="什么是信号驱动IO模型"></a>什么是信号驱动IO模型</h3><p>复用IO模型解决了一个线程可以监控多个fd的问题，但是select是采用轮询的方式来监控多个fd的，通过不断的轮询fd的可读状态来知道是否就可读的数据，而无脑的轮询就显得有点暴力，因为大部分情况下的轮询都是无效的，所以有人就想，能不能不要我总是去问你是否数据准备就绪，能不能我发出请求后等你数据准备好了就通知我，所以就衍生了信号驱动IO模型。</p>
+<blockquote>
+<p>首先开启套接口信号驱动IO功能，并通过系统调用sigaction执行一个信号处理函数。当数据准备就绪时，就生成对应进程的SIGIO信号，通过信号回调通知应用线程调用recvfrom来读取数据。</p>
+</blockquote>
+<p><img src="https://gitee.com/StuartYang/bpic/raw/master/20210722215459.png" alt="未命名文件-8"></p>
+<p><strong>总结：</strong>信号驱动IO意在通过这种建立信号关联的方式，实现了发出请求后只需要等待数据就绪的通知即可，这样就可以<strong>避免大量无效的数据状态轮询操作</strong>。</p>
+<h3 id="什么是异步IO"><a href="#什么是异步IO" class="headerlink" title="什么是异步IO"></a>什么是异步IO</h3><p><strong>思考一个问题：</strong></p>
+<p>也许你一开始就有一个疑问，为什么我们明明是想读取数据，<strong>为什么非得要先发起一个select询问数据状态的请求，然后再发起真正的读取数据请求</strong>, 能不能有一种一劳永逸的方式，我只要发送一个请求我告诉内核我要读取数据，然后我就什么都不管了，然后内核去帮我去完成剩下的所有事情？</p>
+<blockquote>
+<p> 有人设计了一种方案，应用只需要向内核发送一个read 请求,告诉内核它要读取数据后即刻返回；内核收到请求后会建立一个信号联系，当数据准备就绪，内核会主动把数据从内核复制到用户空间，等所有操作都完成之后，内核会发起一个通知告诉应用，我们称这种一劳永逸的模式为异步IO模型。</p>
+</blockquote>
+<p><img src="https://gitee.com/StuartYang/bpic/raw/master/20210722220207.png" alt="未命名文件-9"></p>
+<p><strong>总结：</strong>在异步IO的模式下，只需要向内核发送一次请求就可以完成状态询问和数拷贝的所有操作。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><table>
+<thead>
+<tr>
+<th align="center">I/O模型</th>
+<th align="center">问题or解决</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">同步阻塞I/O</td>
+<td align="center">线程陷入阻塞，等待IO完成才能恢复</td>
+</tr>
+<tr>
+<td align="center">同步非阻塞I/O</td>
+<td align="center">采用反复recvfrom查询的方式，解决阻塞问题</td>
+</tr>
+<tr>
+<td align="center">I/O复用模型</td>
+<td align="center">采用select函数+少量询问线程的方式，减少大量线程对资源的访问。</td>
+</tr>
+<tr>
+<td align="center">信号驱动I/O模型</td>
+<td align="center">采用sigaction+sigin的方式，避免大量无效的数据状态轮询操作</td>
+</tr>
+<tr>
+<td align="center">异步I/O</td>
+<td align="center">只需要向内核发送一次read请求就可以完成状态询问和数拷贝的所有操作。</td>
+</tr>
+</tbody></table>
+
+    </article>
+  </div>
+
+</div>
+
+
+<div class="footer-wrapper container">
+  <footer class="footer clearfix">
+    <div class="clearfix">
+      <a href="https://www.yangxudong.site" class="footer-logo">
+        <i class="fa iconfont icon-baiyangzuo" style="font-size: 24px;"></i>
+      </a>
+      <ul class="footer-social-link">
+        <li>© 2019 旭东同学</li>
+        <li><a href="https://www.yangxudong.site">Home</a></li>
+        
+        <li><a target="_blank" rel="noopener" href="https://github.com/StuartYang">Github</a></li>
+        
+      </ul>
+      <div class="footer-theme-info">
+        Theme Based on <a target="_blank" rel="noopener" href="//github.com/sabrinaluo/hexo-theme-replica">Replica</a> ❤ Powered by Hexo
+      </div>
+    </div>
+  </footer>
+</div>
+<script src="/js/main.js"></script>
+
+</body>
+</html>

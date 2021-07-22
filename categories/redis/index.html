@@ -162,17 +162,17 @@
       </li>
       <li class="">
         <a href="/archives">文章 <span class="counter">
-            1
+            2
           </span></a>
       </li>
       <li class="selected">
         <a href="/categories">归档 <span class="counter">
-            1
+            2
           </span></a>
       </li>
       <li class="">
         <a href="/tags">标签 <span class="counter">
-            2
+            5
           </span></a>
       </li>
     </ul>
@@ -185,18 +185,11 @@
           <h2><a href="/2021/07/22/redis%E9%9D%A2%E8%AF%95/">redis面试</a></h2>
           <p>
              [TOC] 
+   redis为什么那么快？  Redis是一个单线程应用，所说的单线程指的是 Redis使用单个线程处理客户端的请求 。 
  
- 为什么redis能这么快？ 
- 
- 
- 完全基于内存，绝大部份请求是存粹的内存操作，执行效率高。 
- 数据结构简单，对数据操作也简单。 
- 采用单线程，单线程也能处理高并发请求，想多核也可启动多实例。 
- 使用多路I/O复用模型，非阻塞IO 
- 
- 
- redis的常用数据 
-...
+ 主线程是单线程 避免的频繁上下文切换和锁竞争使得redis 执行起来效率更高。 
+  使用多路I/O复用模型 非阻塞IO 
+  数据结构简单，操作节省...
           </p>
           <ul class="tag-list clearfix">
             
