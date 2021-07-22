@@ -162,17 +162,17 @@
       </li>
       <li class="">
         <a href="/archives">文章 <span class="counter">
-            0
+            1
           </span></a>
       </li>
       <li class="">
         <a href="/categories">归档 <span class="counter">
-            0
+            1
           </span></a>
       </li>
       <li class="">
         <a href="/tags">标签 <span class="counter">
-            0
+            2
           </span></a>
       </li>
     </ul>
@@ -181,6 +181,30 @@
     <div class="body-secondary">
       <p class="right-title">最近更新</p>
       <ul class="recent-post clearfix">
+        
+        <li class="recent-post-item">
+          <div class="clearfix">
+            <h5 class="post-title text-ellipsis">
+              <i class="fa fa-bars"></i>
+              <a href="/2021/07/22/redis%E9%9D%A2%E8%AF%95/">redis面试</a>
+            </h5>
+            <p class="post-description text-ellipsis desktop-only">
+               
+ 为什么redis能这么快？ 
+ 
+ 
+ 完全基于内存，绝大部份请求是存粹的内存操作，执行效率高
+            </p>
+            <p class="post-info desktop-only">
+              <span>
+                
+                  <a class="category-link" href="/categories/redis/"><i class="fa fa-folder-open"></i> redis</a>
+                
+              </span>
+              <span><i class="fa fa-tag"></i> 2 </span>
+            </p>
+          </div>
+        </li>
         
       </ul>
       <div class="calendar-container" id="calendar">
@@ -266,7 +290,7 @@
 
 
 <script>
-  var posts = [];
+  var posts = [{"date":"2021-07-22","title":"redis面试","url":"https://www.yangxudong.site/2021/07/22/redis%E9%9D%A2%E8%AF%95/"}];
   var today = moment().format('YYYY-MM-DD');
   var oneYearAgo = moment(today).subtract(1, 'years');
   posts = posts.filter(function(post) {
