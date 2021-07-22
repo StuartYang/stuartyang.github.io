@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>
+      redis的持久化 | YangXudong&#39;s Blog
+    </title>
+    <meta name="description" content="“ 君子藏剑于身，待时而动 ”">
+    
+      <meta name="keywords" content="
+  redis,持久化,RDB,AOF
+  ">
+      
+        <meta name="author" content="旭东同学">
+
+        <meta http-equiv="Cache-Control" content="no-transform" />
+        <meta http-equiv="Cache-Control" content="no-siteapp">
+        <meta name="theme-color" content="#1e2327">
+        <link rel="apple-touch-icon" href="https://github.githubassets.com/apple-touch-icon.png">
+        <link rel="apple-touch-icon" sizes="180x180"
+          href="https://github.githubassets.com/apple-touch-icon-180x180.png">
+
+        <link rel="icon" type="image/x-icon" href="https://gitee.com/StuartYang/bpic/raw/master/20210722154537.png">
+
+        <link rel="stylesheet" href="/css/main.css">
+        
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+        <link rel="stylesheet" href="//at.alicdn.com/t/font_2570198_c1noxsh7ksn.css">
+        </link>
+
+        <script src="//cdnjs.cloudflare.com/ajax/libs/vue/1.0.25-csp/vue.min.js"></script>
+        <!-- JavaScript 日期处理类库 -->
+        <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.11.2/moment.min.js"></script>
+  <meta name="generator" content="Hexo 5.4.0"></head>
+
+<body id="replica-app">
+
+<nav class="navbar-wrapper">
+  <div class="navbar">
+    <div class="container clearfix">
+      <a href="/" class="navbar-logo"><i class="fa iconfont icon-baiyangzuo" style="font-size: 32px;"></i></a>
+
+      <ul class="navbar-nav float-left">
+        
+        <li><a href="/archives">文章</a></li>
+        
+        
+        <li><a href="/categories">归档</a></li>
+        
+        
+        <li><a href="/tags">标签</a></li>
+        
+      </ul>
+
+      <ul class="navbar-nav user-nav float-right desktop-only">
+        <li class="user-nav-notification">
+          <a><span class="user-nav-unread"></span><i class="fa fa-bell"></i></a>
+        </li>
+        <li>
+          <a><i class="fa fa-plus"></i> <i class="fa fa-caret-down"></i></a>
+        </li>
+        <li class="user-nav-logo">
+          <a><img src="https://gitee.com/StuartYang/bpic/raw/master/20210722154532.jpg"> <i class="fa fa-caret-down"></i></i></a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="main-container">
+
+  <header class="header-wrapper desktop-only">
+  <div class="container header-site-detail">
+    <ul class="header-toolbar">
+      <li class="clearfix">
+        <a href="/archives" class="header-toolbar-left"><i
+                  class="fa fa-file-text"></i> 文章 </a>
+        <a href="/archives"
+           class="header-toolbar-right"> 3 </a>
+      </li>
+      <li>
+        <a href="/tags" class="header-toolbar-left"><i
+                  class="fa fa-tags"></i> 标签 </a>
+        <a href="/tags"
+           class="header-toolbar-right"> 8 </a>
+      </li>
+      <li>
+        <a href="/categories" class="header-toolbar-left"><i
+                  class="fa fa-folder-open"></i> 归档 </a>
+        <a href="/categories"
+           class="header-toolbar-right"> 2 </a>
+      </li>
+    </ul>
+    
+    <h2 class="header-title">
+      <i class="fa fa-book text-muted"></i>
+      <a href="/">YangXudong&#39;s Blog</a>
+    </h2>
+  </div>
+</header>
+
+
+  <div class="post-container container">
+    <h3>
+      <i class="fa fa-user-o"></i>
+      旭东同学
+
+        <span class="post-date float-right"
+          title="{{moment(1626979943000).format('MMM DD, YYYY, h:mm:ss A')}}">
+          <i class="fa fa-pencil-square-o"></i>
+          {{moment(1626979943000).fromNow()}}
+        </span>
+    </h3>
+
+    <article class="post-content">
+      <h1>
+        redis的持久化
+      </h1>
+      <p><img src="https://gitee.com/StuartYang/bpic/raw/master/20210723030523.png" alt="背景"></p>
+<h2 id="绪"><a href="#绪" class="headerlink" title="绪"></a>绪</h2><blockquote>
+<p>参考：</p>
+<p>BGM：《稻香》— 周杰伦</p>
+</blockquote>
+<h2 id="引子"><a href="#引子" class="headerlink" title="引子"></a>引子</h2><p>Redis是一个内存数据库，数据保存在内存中，我们都知道内存的数据变化是很快的，也容易发生丢失。幸好Redis还为我们提供了持久化的机制，分别是RDB(Redis DataBase)和AOF(Append Only File)。持久化功能有效地避免因Redis意外宕机退出造成的数据丢失问题，当下次重启时利用之前持久化的文件即可实现数据恢复。</p>
+<h2 id="Redis持久化的流程"><a href="#Redis持久化的流程" class="headerlink" title="Redis持久化的流程"></a>Redis持久化的流程</h2><p><img src="https://gitee.com/StuartYang/bpic/raw/master/20210723032801.png" alt="持久化流程"></p>
+<ol>
+<li><p>客户端向服务端发送写操作(数据在客户端的<strong>内存</strong>中)。</p>
+</li>
+<li><p>数据库服务端接收到写请求的数据(数据在服务端的<strong>内存</strong>中)。</p>
+</li>
+<li><p>服务端调用write这个系统调用，将数据往磁盘上写(数据在<strong>内存缓冲区</strong>中)。</p>
+</li>
+<li><p>操作系统将缓冲区中的数据转移到磁盘控制器上(数据在<strong>磁盘缓存</strong>中)。</p>
+</li>
+<li><p>磁盘控制器将数据写到磁盘的物理介质中(数据真正落到<strong>磁盘</strong>上)。</p>
+</li>
+</ol>
+<p>这5个过程是在理想条件下一个正常的保存流程，但是在大多数情况下，我们的机器等等都会有各种各样的故障，这里划分了两种情况：</p>
+<ul>
+<li>Redis数据库发生故障（前三步），导致不能持久化。</li>
+<li>操作系统发生故障（后两步），导致不能持久化。</li>
+</ul>
+<p><strong>这里我们着重强调redis持久化过程中的前三步的容灾机制。</strong>它提供了两种策略机制，也就是RDB和AOF。</p>
+<h2 id="RDB（Redis-DataBase）机制"><a href="#RDB（Redis-DataBase）机制" class="headerlink" title="RDB（Redis DataBase）机制"></a>RDB（Redis DataBase）机制</h2><blockquote>
+<p>RDB持久化是指在指定的时间间隔内将内存中的数据集快照写入磁盘。也是默认的持久化方式，这种方式是就是将内存中数据以快照的方式写入到二进制文件(磁盘)中,默认的文件名为dump.rdb。</p>
+</blockquote>
+<p>既然RDB机制是通过把某个时刻的所有数据生成一个快照来保存，那么就应该有一种触发机制，是实现这个过程。对于RDB来说，提供了三种机制：save、bgsave、自动化。</p>
+<h3 id="1-save触发方式"><a href="#1-save触发方式" class="headerlink" title="1.save触发方式"></a>1.save触发方式</h3><p>该命令<strong>会阻塞当前Redis服务器</strong>，执行save命令期间，Redis不能处理其他命令，直到RDB过程完成为止。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">redis&gt;</span><span class="bash"> save</span></span><br></pre></td></tr></table></figure>
+
+
+
+<p><img src="https://gitee.com/StuartYang/bpic/raw/master/20210723034234.png" alt="未命名文件-13"></p>
+<p>问题：我们的客户端可能都是几万或者是几十万个，阻塞导致的风险太大。这种方式显然不可取。</p>
+<h3 id="2-bgsave触发方式"><a href="#2-bgsave触发方式" class="headerlink" title="2.bgsave触发方式"></a>2.bgsave触发方式</h3><p>执行该命令时，Redis会在后台异步进行快照操作，快照同时还可以响应客户端请求</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">redis&gt;</span><span class="bash"> bgsave</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="https://gitee.com/StuartYang/bpic/raw/master/20210723035631.png" alt="未命名文件-14"></p>
+<p>具体操作是Redis进程执行fork操作创建子进程，<strong>fork出来的子线程和主线程占用内存大小相同</strong>。RDB持久化过程由子进程负责，完成后自动结束。阻塞只发生在fork阶段，一般时间很短。基本上 Redis 内部所有的RDB操作都是采用 bgsave 命令。</p>
+<h3 id="3-自动触发"><a href="#3-自动触发" class="headerlink" title="3.自动触发"></a>3.自动触发</h3><p>自动触发是由我们的配置文件来完成的。在redis.conf配置文件中，里面有如下配置，我们可以去设置：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">save</span> <span class="number">900</span> <span class="number">1</span>           <span class="comment">#在900秒(15分钟)之后，如果至少有1个key发生变化，则dump内存快照。</span></span><br><span class="line"><span class="string">save</span> <span class="number">300</span> <span class="number">10</span>          <span class="comment">#在300秒(5分钟)之后，如果至少有10个key发生变化，则dump内存快照。</span></span><br><span class="line"><span class="string">save</span> <span class="number">60</span> <span class="number">10000</span>        <span class="comment">#在60秒(1分钟)之后，如果至少有10000个key发生变化，则dump内存快照。</span></span><br><span class="line">  </span><br><span class="line"><span class="string">stop-writes-on-bgsave-error：默认值是yes</span> <span class="comment"># 当bgsave快照操作出错时停止写数据到磁盘，一般设置no</span></span><br><span class="line"></span><br><span class="line"><span class="string">rdbcompression</span> <span class="string">；默认值是yes</span> <span class="comment"># 对于存储到磁盘中的快照，可以设置是否进行压缩存储。</span></span><br><span class="line"></span><br><span class="line"><span class="string">rdbchecksum</span> <span class="string">：默认值是yes。</span> <span class="comment"># 在存储快照后，我们还可以让redis使用CRC64算法来进行数据校验，但是这样做会增加大约10%的性能消耗，如果希望获取到最大的性能提升，可以关闭此功能。</span></span><br><span class="line"></span><br><span class="line"><span class="string">dbfilename</span> <span class="string">：</span> <span class="comment"># 设置快照的文件名，默认是 dump.rdb</span></span><br><span class="line"><span class="string">dir：</span>	<span class="comment"># 设置快照文件的存放路径，这个配置项一定是个目录，而不能是文件名。</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="save和bgsave的对比"><a href="#save和bgsave的对比" class="headerlink" title="save和bgsave的对比"></a>save和bgsave的对比</h3><table>
+<thead>
+<tr>
+<th align="center">命令</th>
+<th align="center">save</th>
+<th align="center">bgsave</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">IO类型</td>
+<td align="center">同步</td>
+<td align="center">异步</td>
+</tr>
+<tr>
+<td align="center">是否阻塞客户端</td>
+<td align="center">是</td>
+<td align="center">fork阶段阻塞</td>
+</tr>
+<tr>
+<td align="center">复杂度</td>
+<td align="center">O（n）</td>
+<td align="center">O（n）</td>
+</tr>
+<tr>
+<td align="center">优势</td>
+<td align="center">不会消耗额外的内存</td>
+<td align="center">不阻塞客户端</td>
+</tr>
+<tr>
+<td align="center">缺点</td>
+<td align="center">阻塞客户端</td>
+<td align="center">消耗额外的内存</td>
+</tr>
+</tbody></table>
+<h3 id="优缺点"><a href="#优缺点" class="headerlink" title="优缺点"></a>优缺点</h3><ul>
+<li><p>优势</p>
+<ul>
+<li>RDB文件紧凑，全量备份，非常适合用于进行备份和灾难恢复。</li>
+<li>生成RDB文件的时候，redis主进程会fork()一个子进程来处理所有保存工作，主进程不需要进行任何磁盘IO操作。</li>
+<li>RDB 在恢复大数据集时的速度比 AOF 的恢复速度要快。</li>
+</ul>
+</li>
+<li><p>劣势</p>
+<ul>
+<li>RDB快照是一次全量备份；</li>
+<li>fork出的子进程会拥有和父进程相同的内存数据，父进程修改时内存子进程不会反应出来，所以在快照持久化期间修改的数据不会被保存，可能丢失数据。</li>
+</ul>
+</li>
+</ul>
+<h2 id="AOF（Append-Only-File）机制"><a href="#AOF（Append-Only-File）机制" class="headerlink" title="AOF（Append Only File）机制"></a>AOF（Append Only File）机制</h2><blockquote>
+<p>Redis会将每一个收到的<strong>写命令</strong>都通过write函数追加到文件中。通俗的理解就是日志记录。</p>
+</blockquote>
+<h3 id="持久化原理"><a href="#持久化原理" class="headerlink" title="持久化原理"></a>持久化原理</h3><p><img src="https://gitee.com/StuartYang/bpic/raw/master/20210723041913.png" alt="未命名文件-15"></p>
+<p>每当有一个写命令过来时，就直接保存在我们的AOF文件中。</p>
+<h3 id="AOF的触发机制"><a href="#AOF的触发机制" class="headerlink" title="AOF的触发机制"></a>AOF的触发机制</h3><ol>
+<li><p>always：每次发生数据变更会被立即记录到磁盘</p>
+<ul>
+<li>IO开销大。但数据完整性比较好</li>
+</ul>
+</li>
+<li><p>everysec：每秒记录一次</p>
+<ul>
+<li>如果一秒内宕机，有数据丢失</li>
+</ul>
+</li>
+<li><p>不同no：看操作系统心情</p>
+</li>
+</ol>
+<h3 id="文件重写原理"><a href="#文件重写原理" class="headerlink" title="文件重写原理"></a>文件重写原理</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">redis 127.0.0.1:6379&gt; bgrewriteaof </span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>AOF的方式也同时带来了另一个问题。持久化文件会变的越来越大。为了压缩aof的持久化文件。redis提供了bgrewriteaof命令<strong>异步</strong>执行一个 AOF文件重写操作。重写会创建一个当前 AOF 文件的体积优化版本。</p>
+</blockquote>
+<ul>
+<li>即使 bgrewriteaof 执行失败，也不会有任何数据丢失，因为旧的 AOF 文件在 Bgrewriteaof 成功之前不会被修改。</li>
+<li>重写aof文件的操作，并没有读取旧的aof文件，而是将整个内存中的数据库内容用命令的方式重写了一个新的aof文件，这点和快照有点类似</li>
+</ul>
+<p><strong>注意：</strong>从 Redis 2.4 开始， AOF 重写由 Redis 自行触发， <strong>BGREWRITEAOF 仅仅用于手动触发重写操作</strong>。</p>
+<p><img src="https://gitee.com/StuartYang/bpic/raw/master/20210723043208.png" alt="未命名文件-16"></p>
+<h3 id="优缺点-1"><a href="#优缺点-1" class="headerlink" title="优缺点"></a>优缺点</h3><ul>
+<li><p>优点</p>
+<ul>
+<li>AOF可以更好的保护数据不丢失，一般AOF会每隔1秒，通过一个后台线程执行一次fsync操作，最多丢失1秒钟的数据。</li>
+<li>AOF日志文件没有任何磁盘寻址的开销，写入性能非常高，文件不容易破损。</li>
+<li>AOF日志文件即使过大的时候，出现后台重写操作，也不会影响客户端的读写。</li>
+<li>AOF日志文件的命令通过非常可读的方式进行记录，这个特性非常适合做灾难性的误删除的紧急恢复。</li>
+</ul>
+</li>
+<li><p>缺点</p>
+<ul>
+<li>对于同一份数据来说，AOF日志文件通常比RDB数据快照文件更大</li>
+<li>AOF开启后，支持的写QPS会比RDB支持的写QPS低，因为AOF一般会配置成每秒fsync一次日志文件，当然，每秒一次fsync，性能也还是很高的</li>
+<li>以前AOF发生过bug，就是通过AOF记录的日志，进行数据恢复的时候，没有恢复一模一样的数据出来。</li>
+</ul>
+</li>
+</ul>
+<h2 id="RDB和AOF到底该如何选择"><a href="#RDB和AOF到底该如何选择" class="headerlink" title="RDB和AOF到底该如何选择"></a>RDB和AOF到底该如何选择</h2><table>
+<thead>
+<tr>
+<th align="center">命令</th>
+<th align="center">RDB</th>
+<th align="center">AOF</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">启动优先级</td>
+<td align="center">低</td>
+<td align="center">高</td>
+</tr>
+<tr>
+<td align="center">体积</td>
+<td align="center">小</td>
+<td align="center">大</td>
+</tr>
+<tr>
+<td align="center">恢复速度</td>
+<td align="center">快</td>
+<td align="center">慢</td>
+</tr>
+<tr>
+<td align="center">数据安全性</td>
+<td align="center">丢数据</td>
+<td align="center">看策略</td>
+</tr>
+<tr>
+<td align="center">轻重</td>
+<td align="center">重</td>
+<td align="center">轻</td>
+</tr>
+</tbody></table>
+<p>选择的话，两者加一起才更好</p>
+<h2 id="RDB-AOF混合持久化"><a href="#RDB-AOF混合持久化" class="headerlink" title="RDB-AOF混合持久化"></a>RDB-AOF混合持久化</h2><p>redis4.0之后才支持，默认开启</p>
+<h3 id="混合持久化过程"><a href="#混合持久化过程" class="headerlink" title="混合持久化过程"></a>混合持久化过程</h3><p>混合持久化也是通过bgrewriteaof完成的。</p>
+<p><img src="https://gitee.com/StuartYang/bpic/raw/master/20210723044622.png" alt="img"></p>
+<ul>
+<li>aof_rewrite_buf：rewrite(重写)缓冲区。</li>
+<li>aof_buf：写命令存放的缓冲区</li>
+</ul>
+<p>流程：</p>
+<ol>
+<li>开始bgrewriteaof的时候，判断当前有没有bgsave/bgrewriteaof在执行，若有，则不执行，这个再rdb篇幅也有提到，以及下面很多fork()知识在rdb都有提到。</li>
+<li>主进程fork()出子进程，在执行fork()这个方法的时候是阻塞的，子进程创建完毕后就不阻塞了</li>
+<li>主进程fork完子进程后，主进程能继续接收客户端的请求，所有写命令依然是写入AOF文件缓冲区并根据配置文件的策略同步到磁盘的。</li>
+<li>因为fork的子进程仅仅共享主进程fork()时的内存，后期主进程在更改内存数据，子进程是不可见的。因此Redis采取重写缓冲区（aof_rewite_buf）保存fork之后的客户端请求。防止新AOF文件生成期间丢失主进程执行的新命令所生成的数据。所以此时客户端的写请求不仅仅写入原来的aof_buf缓冲区，还写入了aof_rewrite_buf重写缓冲区。</li>
+<li>子进程通过内存快照的形式，开始生成新的aof文件。</li>
+<li>新aof文件生成完后，子进程向主进程发信号。</li>
+<li>主进程收到信号后，会把重写缓冲区(aof_rewite_buf)中的数据写入到新的AOF文件（主要是避免这部分数据丢失）</li>
+<li>使用新的AOF文件覆盖旧的AOF文件，且标记AOF重写完成。</li>
+</ol>
+<h3 id="数据恢复"><a href="#数据恢复" class="headerlink" title="数据恢复"></a>数据恢复</h3><p>当我们开启了混合持久化时，启动redis依然优先加载aof文件，aof文件加载可能有两种情况如下：</p>
+<p>aof文件开头是rdb的格式, 先加载 rdb内容再加载剩余的 aof。</p>
+<p>aof文件开头不是rdb的格式，直接以aof格式加载整个文件。</p>
+<h3 id="优缺点-2"><a href="#优缺点-2" class="headerlink" title="优缺点"></a>优缺点</h3><ul>
+<li><p>优点</p>
+<ul>
+<li>混合持久化结合了RDB持久化 和 AOF 持久化的优点,采取了rdb的文件小易于灾难恢复，同时结合AOF，增量的数据以AOF方式保存了，数据更少的丢失。</li>
+</ul>
+</li>
+<li><p>缺点</p>
+<ul>
+<li>兼容性差，一旦开启了混合持久化，在4.0之前版本都不识别该aof文件，同时由于前部分是RDB格式，需要专业的工具来阅读，因为是二进制，所以阅读性较差。</li>
+</ul>
+</li>
+</ul>
+<h2 id="持久化套路"><a href="#持久化套路" class="headerlink" title="持久化套路"></a>持久化套路</h2><p>一般我们在生产上采用的持久化策略为 -</p>
+<ul>
+<li>master关闭持久化 <ul>
+<li>在测试中发现，fork函数在虚拟机上较慢，真机上较快。考虑到现在都是部署在docker容器中，很少部署在真机上，为了性能，master不建议打开RDB持久化！</li>
+</ul>
+</li>
+<li>slave开RDB即可，必要的时候AOF和RDB都开启</li>
+</ul>
+
+    </article>
+  </div>
+
+</div>
+
+
+<div class="footer-wrapper container">
+  <footer class="footer clearfix">
+    <div class="clearfix">
+      <a href="https://www.yangxudong.site" class="footer-logo">
+        <i class="fa iconfont icon-baiyangzuo" style="font-size: 24px;"></i>
+      </a>
+      <ul class="footer-social-link">
+        <li>© 2019 旭东同学</li>
+        <li><a href="https://www.yangxudong.site">Home</a></li>
+        
+        <li><a target="_blank" rel="noopener" href="https://github.com/StuartYang">Github</a></li>
+        
+      </ul>
+      <div class="footer-theme-info">
+        Theme Based on <a target="_blank" rel="noopener" href="//github.com/sabrinaluo/hexo-theme-replica">Replica</a> ❤ Powered by Hexo
+      </div>
+    </div>
+  </footer>
+</div>
+<script src="/js/main.js"></script>
+
+</body>
+</html>

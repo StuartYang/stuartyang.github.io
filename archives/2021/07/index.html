@@ -162,7 +162,7 @@
       </li>
       <li class="selected">
         <a href="/archives">文章 <span class="counter">
-            2
+            3
           </span></a>
       </li>
       <li class="">
@@ -172,7 +172,7 @@
       </li>
       <li class="">
         <a href="/tags">标签 <span class="counter">
-            5
+            8
           </span></a>
       </li>
     </ul>
@@ -180,6 +180,38 @@
 
     <div class="body-secondary">
       <ul class="archive-list">
+        
+        <li class="archive-list-item">
+          <h2><a href="/2021/07/23/redis%E7%9A%84%E6%8C%81%E4%B9%85%E5%8C%96/">redis的持久化</a></h2>
+          <p>
+               
+   绪  
+ 参考： 
+ BGM：《稻香》— 周杰伦 
+ 
+   引子  Redis是一个内存数据库，数据保存在内存中，我们都知道内存的数据变化是很快的，也容易发生丢失。幸好Redis还为我们提供了持久化的机制，分别是RDB(Redis DataBase)和AOF(Append Only ...
+          </p>
+          <ul class="tag-list clearfix">
+            
+            <li class="tag-list-item"><a href="/tags/redis/">redis</a></li>
+            
+            <li class="tag-list-item"><a href="/tags/%E6%8C%81%E4%B9%85%E5%8C%96/">持久化</a></li>
+            
+            <li class="tag-list-item"><a href="/tags/RDB/">RDB</a></li>
+            
+            <li class="tag-list-item"><a href="/tags/AOF/">AOF</a></li>
+            
+          </ul>
+          <div class="post-info">
+            <span>
+              
+              <a class="category-link" href="/categories/redis/"><i class="fa fa-folder-open"></i> redis</a>
+              
+            </span>
+            <span><i class="fa fa-tag"></i> 4 </span>
+            <span>Published {{moment(1626979943000).fromNow()}}</span>
+          </div>
+        </li>
         
         <li class="archive-list-item">
           <h2><a href="/2021/07/22/%E7%BD%91%E7%BB%9CIO%E6%A8%A1%E5%9E%8B/">网络IO模型</a></h2>
@@ -215,12 +247,11 @@
         <li class="archive-list-item">
           <h2><a href="/2021/07/22/redis%E9%9D%A2%E8%AF%95/">redis面试</a></h2>
           <p>
-             [TOC] 
-   redis为什么那么快？  Redis是一个单线程应用，所说的单线程指的是 Redis使用单个线程处理客户端的请求 。 
+              什么是redis  
  
- 主线程是单线程 避免的频繁上下文切换和锁竞争使得redis 执行起来效率更高。 
-  使用多路I/O复用模型 非阻塞IO 
-  数据结构简单，操作节省...
+ 
+ Redis就是一种运行速度快，基于内存运行的NoSql数据库。支持多种key-value类型的存储，可持久化。 
+ Redis支持五种数据类型：string（字符串），hash（哈希），list（列表），set（集合）及zset(sorted set：有序集合)。...
           </p>
           <ul class="tag-list clearfix">
             
