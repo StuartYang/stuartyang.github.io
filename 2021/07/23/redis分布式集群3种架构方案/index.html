@@ -242,6 +242,7 @@
 </ul>
 <h3 id="Redis-Cluster"><a href="#Redis-Cluster" class="headerlink" title="Redis Cluster"></a>Redis Cluster</h3><p>Redis哨兵模式实现了高可用，读写分离，<strong>但是其主节点仍然只有一个</strong>，即写入操作都是在主节点中，这也成为了性能的瓶颈。</p>
 <p>因此Redis在3.0后加入了Cluster模式，它采用去去中心化节点方式实现，集群将会通过分片方式保存数据库中的键值对</p>
+<p><img src="https://gitee.com/StuartYang/bpic/raw/master/20210723231016.png" alt="未命名文件-4"></p>
 <ul>
 <li><p>节点：一个Redis集群中会由多个节点组成，每个节点都是互相连接的，会保存自己与其他节点的信息。节点之间通过gossip协议交换互相的状态，以及保新加入的节点信息。</p>
 </li>
