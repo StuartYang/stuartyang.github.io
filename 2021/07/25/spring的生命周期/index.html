@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>
+      spring面试 | YangXudong&#39;s Blog
+    </title>
+    <meta name="description" content="“ 君子藏剑于身，待时而动 ”">
+    
+      <meta name="keywords" content="
+  面试,spring
+  ">
+      
+        <meta name="author" content="旭东同学">
+
+        <meta http-equiv="Cache-Control" content="no-transform" />
+        <meta http-equiv="Cache-Control" content="no-siteapp">
+        <meta name="theme-color" content="#1e2327">
+        <link rel="apple-touch-icon" href="https://github.githubassets.com/apple-touch-icon.png">
+        <link rel="apple-touch-icon" sizes="180x180"
+          href="https://github.githubassets.com/apple-touch-icon-180x180.png">
+
+        <link rel="icon" type="image/x-icon" href="https://gitee.com/StuartYang/bpic/raw/master/20210722154537.png">
+
+        <link rel="stylesheet" href="/css/main.css">
+        
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+        <link rel="stylesheet" href="//at.alicdn.com/t/font_2570198_c1noxsh7ksn.css">
+        </link>
+
+        <script src="//cdnjs.cloudflare.com/ajax/libs/vue/1.0.25-csp/vue.min.js"></script>
+        <!-- JavaScript 日期处理类库 -->
+        <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.11.2/moment.min.js"></script>
+  <meta name="generator" content="Hexo 5.4.0"></head>
+
+<body id="replica-app">
+
+<nav class="navbar-wrapper">
+  <div class="navbar">
+    <div class="container clearfix">
+      <a href="/" class="navbar-logo"><i class="fa iconfont icon-baiyangzuo" style="font-size: 32px;"></i></a>
+
+      <ul class="navbar-nav float-left">
+        
+        <li><a href="/archives">文章</a></li>
+        
+        
+        <li><a href="/categories">归档</a></li>
+        
+        
+        <li><a href="/tags">标签</a></li>
+        
+      </ul>
+
+      <ul class="navbar-nav user-nav float-right desktop-only">
+        <li class="user-nav-notification">
+          <a><span class="user-nav-unread"></span><i class="fa fa-bell"></i></a>
+        </li>
+        <li>
+          <a><i class="fa fa-plus"></i> <i class="fa fa-caret-down"></i></a>
+        </li>
+        <li class="user-nav-logo">
+          <a><img src="https://gitee.com/StuartYang/bpic/raw/master/20210722154532.jpg"> <i class="fa fa-caret-down"></i></i></a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="main-container">
+
+  <header class="header-wrapper desktop-only">
+  <div class="container header-site-detail">
+    <ul class="header-toolbar">
+      <li class="clearfix">
+        <a href="/archives" class="header-toolbar-left"><i
+                  class="fa fa-file-text"></i> 文章 </a>
+        <a href="/archives"
+           class="header-toolbar-right"> 10 </a>
+      </li>
+      <li>
+        <a href="/tags" class="header-toolbar-left"><i
+                  class="fa fa-tags"></i> 标签 </a>
+        <a href="/tags"
+           class="header-toolbar-right"> 16 </a>
+      </li>
+      <li>
+        <a href="/categories" class="header-toolbar-left"><i
+                  class="fa fa-folder-open"></i> 归档 </a>
+        <a href="/categories"
+           class="header-toolbar-right"> 6 </a>
+      </li>
+    </ul>
+    
+    <h2 class="header-title">
+      <i class="fa fa-book text-muted"></i>
+      <a href="/">YangXudong&#39;s Blog</a>
+    </h2>
+  </div>
+</header>
+
+
+  <div class="post-container container">
+    <h3>
+      <i class="fa fa-user-o"></i>
+      旭东同学
+
+        <span class="post-date float-right"
+          title="{{moment(1627146874000).format('MMM DD, YYYY, h:mm:ss A')}}">
+          <i class="fa fa-pencil-square-o"></i>
+          {{moment(1627146874000).fromNow()}}
+        </span>
+    </h3>
+
+    <article class="post-content">
+      <h1>
+        spring面试
+      </h1>
+      <p><img src="https://gitee.com/StuartYang/bpic/raw/master/20210725212537.png" alt="image-20210725212536112"></p>
+<p><strong>Spring IOC支持的功能</strong></p>
+<ol>
+<li><p><strong>依赖注入</strong></p>
+</li>
+<li><p><strong>依赖检查</strong></p>
+</li>
+<li><p>自动装配</p>
+</li>
+<li><p>支持集合</p>
+</li>
+<li><p>指定初始化方法和销毁方法</p>
+</li>
+<li><p>支持回调：需要实现spring接口</p>
+</li>
+</ol>
+<p><strong>Spring IOC容器的核心接口</strong></p>
+<ol>
+<li><p>BeanFactory接口：Spring最核心的接口（主要通AbstractBeanFactory实现）</p>
+<ol>
+<li>提供IOC的配置机制</li>
+<li>包含Bean的各种定义，便于实例化Bean</li>
+<li>建立Bean之间的依赖关系</li>
+<li>Bean生命周期的控制</li>
+<li>getBean方法，从容器中获取Bean</li>
+<li>isSingleton方法，默认是单例的</li>
+</ol>
+</li>
+<li><p>ApplicationContext接口： 继承了多个接口</p>
+<ol>
+<li>BeanFactory：能够管理，装载Bean</li>
+<li>ResourcePatternResolver：能够加载资源文件</li>
+<li>MessageSource：能够实现国际化等功能</li>
+<li>ApplicationEventPulisher：能够组册监听器，实现监听机制</li>
+</ol>
+</li>
+<li><p>BeanDefinition接口：主要用来描述Bean的定义</p>
+</li>
+<li><p>BeanDefinitionRegistry接口：提供向IOC容器注册BeanDefinifition对象的方法</p>
+<ol>
+<li>registerBeanDefinition方法：主要负责BeanDefinifition对象注册到IOC容器中<ol>
+<li>注册到&lt;BeanName , BeanDefinition&gt;BeanDefinitionMap中 </li>
+<li>将BeanName存储到BeanDfinitionNames的Arraylist中</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+<p><strong>BeanFactory和ApplicationContext的比较</strong></p>
+<ul>
+<li>ApplicationContext是BeanFactory重要的子接口之一</li>
+<li>BeanFactory是Spring框架的基础设施，面向Spring</li>
+<li>ApplicationCOntext面向Spring框架的开发者</li>
+<li>BeanFactory相当于发动机，ApplicationContext相当于汽车</li>
+</ul>
+<p><strong>GetBean方法的代码逻辑</strong></p>
+<ol>
+<li>调用transfrom方法转换beanName</li>
+<li>尝试从缓存（工厂）中加载实例</li>
+<li>初始化Bean</li>
+<li>检查paretBeanFactory</li>
+<li>初始化依赖的Bean</li>
+<li>创建Bean</li>
+</ol>
+<p><strong>springBean的作用域</strong></p>
+<ul>
+<li>singleton：spring的默认作用域，容器里拥有唯一的Bean实例<ul>
+<li>适合无状态的bean</li>
+</ul>
+</li>
+<li>prototype：针对每个getBean请求，容器都会创建一个Bean实例<ul>
+<li>适合有状态的bean</li>
+</ul>
+</li>
+<li>如果是Web应用还支持以下3种<ul>
+<li>request：每个http请求创建一个Bean</li>
+<li>session：会为每个session创建一个Bean实例</li>
+<li>globalSession：回味每个全局http Session创建一个Bean实例，该作用域仅对potlet有效</li>
+</ul>
+</li>
+</ul>
+<p><strong>springBean的生命周期</strong></p>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/zrtqsk/p/3735273.html">https://www.cnblogs.com/zrtqsk/p/3735273.html</a></p>
+<ol>
+<li>实例化Bean<ol>
+<li>构造器实例化对象</li>
+<li>设置bean属性</li>
+</ol>
+</li>
+<li>如果通过<strong>Aware接口</strong>声明了依赖关系，就会注入对Bean基础设施的依赖<ol>
+<li>Aware接口是为感知到自身的一些属性</li>
+<li>例如BeanNameAware的setBeanName()，Bean就能在IOC中感知到自己的BeanName</li>
+<li>BeanFactoryAware接口的setBeanFactory方法</li>
+</ol>
+</li>
+<li>调用<strong>BeanPostProcessor</strong>的前置初始化方法postProcessBeforeInitiazation<ol>
+<li>spring对Bean完成实例化之后，对Bean完成一些自定义的处理逻辑</li>
+</ol>
+</li>
+<li>调用<strong>InitializingBean</strong>接口afterPropertiesSet方法<ol>
+<li>做一些属性被设值之后的处理逻辑</li>
+</ol>
+</li>
+<li>调用定制Bean init-method属性，执行一些初始化之后的工作</li>
+<li>调用BeanPostProcessor的前置初始化方法postProcessAfterInitiazation方法<ol>
+<li>spring对Bean完成自定义实例化之后，对Bean完成一些自定义的处理逻辑</li>
+<li>AOP</li>
+</ol>
+</li>
+<li>Bean初始化成功，投入使用</li>
+<li>销毁<ol>
+<li>如果实现了DisposableBean接口，就会调用destroy方法</li>
+<li>如果配置了destry-method属性，就会调用其配置的销毁方法</li>
+</ol>
+</li>
+</ol>
+<p><strong>AOP的意义</strong></p>
+<ul>
+<li>关注点分离：不同的问题交给不同的部分区解决<ul>
+<li>通用化的代码实现就是所谓的且main（Aspect）</li>
+<li>业务员代码和切面代码分开，代码架构变得高内聚低耦合</li>
+<li>也确保了功能的完整性：切面最终被合并到业务中（Weave）</li>
+</ul>
+</li>
+</ul>
+<p><strong>AOP的三种织入方式</strong></p>
+<ol>
+<li>编译时织入：需要特殊的Java编译器，如AspectJ</li>
+<li>类加载时织入：需要特殊的Java编译器，如AspectJ和AspectWerkz</li>
+<li>运行时织入：SPring采用的方式，通过动态代理的方式，实现简单<ol>
+<li>缺点：有性能上的开销</li>
+<li>好处：不需要特殊的Java编译器，安按照写普通的Java类方式进行</li>
+</ol>
+</li>
+</ol>
+<p><strong>AOP的主要名称解释</strong></p>
+<ul>
+<li>Aspect：通用功能的代码实现</li>
+<li>Target：被织入Aspect的对象</li>
+<li>Join Point ：可以作为切入点的机会，所有方法都可以作为切入点</li>
+<li>Pointcut：Aspect实际被应用在Join Point，支持正则</li>
+<li>Advice ：类里的方法以及这个方法如何织入到目标方法的方式<ul>
+<li>前置通知</li>
+<li>后置通知</li>
+<li>异常通知</li>
+<li>最终通知</li>
+<li>环绕通知</li>
+</ul>
+</li>
+<li>Weaing：Aop的实现方式</li>
+</ul>
+<p><strong>AOP的原理</strong></p>
+<ul>
+<li>动态代理<ul>
+<li>JDKproxy</li>
+<li>Cglib</li>
+</ul>
+</li>
+<li>由AopprixyFactory根据AdvisedSupport对象的配置来决定</li>
+<li>默认策略如果目标类是接口，则采用JDKProxy来实现，否则用后者Cglib</li>
+<li>JDKProxy的核心：Invocationhandler接口和Proxy类<ul>
+<li>通过Java的内部反射机制来实现</li>
+</ul>
+</li>
+<li>Cglib：以继承的方式动态生成目标类的代理<ul>
+<li>如果一个类被标记为final是没有办法使用cglib做动态代理的</li>
+<li>借助ASM【可以操作字节码的框架】实现</li>
+</ul>
+</li>
+<li>反射机制在生成类的过程中比较高效 </li>
+<li>ASM在生成类之后的执行过程中比较高效</li>
+</ul>
+<p><strong>代理模式</strong></p>
+<p>代理模式 = 接口+真实实现类 + 代理类</p>
+<ul>
+<li>接口</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Payment</span> </span>&#123;</span><br><span class="line">   <span class="function"><span class="keyword">void</span> <span class="title">pay</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>真实的实现类</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RealPay</span> <span class="keyword">implements</span> <span class="title">Payment</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">   <span class="meta">@Override</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">pay</span><span class="params">()</span> </span>&#123;</span><br><span class="line">      System.out.println(<span class="string">&quot;真实支付 &quot;</span>);</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>代理类</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Alipay</span> <span class="keyword">implements</span> <span class="title">Payment</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">private</span> Payment payment;</span><br><span class="line">  </span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="title">Alipay</span><span class="params">(Payment payment)</span></span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.payment = payment;</span><br><span class="line">  &#125;</span><br><span class="line">   </span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">beforePay</span><span class="params">()</span> </span>&#123;</span><br><span class="line">     System.out.println(<span class="string">&quot;从招行取款 &quot;</span>);</span><br><span class="line">   &#125;</span><br><span class="line">  </span><br><span class="line">   <span class="meta">@Override</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">pay</span><span class="params">()</span> </span>&#123;</span><br><span class="line">      beforePay();</span><br><span class="line">     payment.pay();</span><br><span class="line">     afterPay();</span><br><span class="line">   &#125;</span><br><span class="line">  </span><br><span class="line">     <span class="meta">@Override</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">afterPay</span><span class="params">()</span> </span>&#123;</span><br><span class="line">     System.out.println(<span class="string">&quot;支付XXX公司完成 &quot;</span>);</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>测试类</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ProxyPatternDemo</span> </span>&#123;</span><br><span class="line">  </span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">  		<span class="comment">// 绑定银行卡的过程</span></span><br><span class="line">       Alipay alipay = <span class="keyword">new</span> Alipay(<span class="keyword">new</span> Payment());   </span><br><span class="line">     <span class="comment">// 代理支付</span></span><br><span class="line">     		alipay.pay();</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>Spring里的代理模式的实现</strong></p>
+<ul>
+<li>真实实现类的逻辑包含在类个体Bean方法中</li>
+<li>GetBean方法返回的实际是代理的实例对象</li>
+<li>代理的实例对象是Spring采用JDK Proxy或者CGlib动态生成的</li>
+</ul>
+<blockquote>
+<ol>
+<li><p>在 AbstractBeanFactory中doGetBean中 会调用AbstractAutowireCapableBeanFactory中的doCreateBean中有调用initlizeBean方法</p>
+</li>
+<li><p>Spring的AOP是在后置处理的的postProcessAfterInitialzation中实现的</p>
+</li>
+</ol>
+</blockquote>
+<p> <strong>Spring的事务</strong></p>
+<p>事务：是逻辑上的一组操作，组成这组操作的各个逻辑单元，要么一起成功，要么一起失败。</p>
+<p> 事务的特性（ACID）</p>
+<ul>
+<li>原子性（Atomicity）：事务是一个原子操作，由一系列动作组成。事务的原子性确保动作要么全部完成，要么完全不起作用。</li>
+<li>一致性（Consistency）：一旦事务完成（不管成功还是失败），系统必须确保它所建模的业务处于一致的状态，而不会是部分完成部分失败。在现实中的数据不应该被破坏。</li>
+<li>隔离性（Isolation）：可能有许多事务会同时处理相同的数据，因此每个事务都应该与其他事务隔离开来，防止数据损坏。</li>
+<li>持久性（Durability）：一旦事务完成，无论发生什么系统错误，它的结果都不应该受到影响，这样就能从任何系统崩溃中恢复过来。通常情况下，事务的结果被写到持久化存储器中。</li>
+</ul>
+<p> 事务的隔离级别</p>
+<ul>
+<li>未提交读：脏读，不可重复读，虚读都有可能发生</li>
+<li>已提交读：避免脏读。但是不可重复读和虚读都有可能发生</li>
+<li>可重复读：避免脏读和不可重复读。但是虚读有可能发生</li>
+<li>串行化的：避免以上所有读问题</li>
+</ul>
+<p>事务的传播行为</p>
+<ul>
+<li>REQUIRED： 如果存在当前事务则用当前事务，如果不存在当前事务，则新建一个事务</li>
+<li>REQUIRES_NEW ：挂起当前事务，开启一个新事务，新事务执行完毕后，唤醒之前挂起的事务，继续执行。如果不存在当前事务，则新建一个事务。</li>
+</ul>
+<p> <strong>Spring进行事务管理的常用API</strong></p>
+<ul>
+<li> PlatformTransactionManager接口：事务管理器</li>
+<li>DataSourceTransactionManager ：使用 Spring JDBC或iBatis 进行持久化数据时使用</li>
+<li>HibernateTransactionManager ：使用 Hibernate版本进行持久化数据时使用</li>
+<li>事务管理的过程中十五产生一些状态，将这些状态记录到TrancactionStatus里面。<ul>
+<li> PlatformTransactionManager 接口有一个方法getTransaction()，这个方法返回的是 TransactionStatus对象</li>
+<li>setRollbackOnly() //设置回滚</li>
+<li>isRollbackOnly()  // 是否回滚</li>
+<li>isCompleted()   // 是否完成事务</li>
+<li>hasSavepoint() // 是否保存断点</li>
+</ul>
+</li>
+</ul>
+<p>Spring进行事务操作的方式</p>
+<ul>
+<li>编程式事务管理</li>
+<li>声明式事务管理<ul>
+<li>基于xml配置文件方式</li>
+<li>基于注解方式</li>
+</ul>
+</li>
+</ul>
+<ol>
+<li>xml注解配置</li>
+</ol>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- 配置 Spring 的 jdbcTemplate --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">&quot;jdbcTemplate&quot;</span> <span class="attr">class</span>=<span class="string">&quot;org.springframework.jdbc.core.JdbcTemplate&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">&quot;dataSource&quot;</span> <span class="attr">ref</span>=<span class="string">&quot;dataSource&quot;</span>/&gt;</span>    </span><br><span class="line"><span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!-- 1.配置事务的管理器 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">&quot;transactionManager&quot;</span>  <span class="attr">class</span>=<span class="string">&quot;org.springframework.jdbc.datasource.DataSourceTransactionManager&quot;</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- 指定要对哪个数据库进行事务操作 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">&quot;dataSource&quot;</span> <span class="attr">ref</span>=<span class="string">&quot;dataSource&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!-- 2.开启事务的注解 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">tx:annotation-driven</span> <span class="attr">transaction-manager</span>=<span class="string">&quot;transactionManager&quot;</span>&gt;</span>	<span class="tag">&lt;/<span class="name">tx:annotation-driven</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>​         2. 在具体使用事务的方法所在的类上面添加注解：@Transactional</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Service</span><span class="comment">//业务层注解</span></span><br><span class="line"><span class="meta">@Transactional</span><span class="comment">//事务控制注解</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AccountServiceImpl</span> <span class="keyword">implements</span> <span class="title">AccountService</span></span>&#123;</span><br><span class="line">  <span class="meta">@Autowired</span><span class="comment">//依赖注入</span></span><br><span class="line">  AccountDao accountDao;</span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">accountBalance</span><span class="params">(<span class="keyword">int</span> lessenId, <span class="keyword">int</span> addId, <span class="keyword">double</span> balance)</span> </span>&#123;</span><br><span class="line">    <span class="comment">//某个账号减少金额</span></span><br><span class="line">    accountDao.lessenBalance(lessenId, balance);</span><br><span class="line">    <span class="comment">//模拟出现异常</span></span><br><span class="line">    <span class="keyword">int</span> a=<span class="number">5</span>/<span class="number">0</span>;</span><br><span class="line">    <span class="comment">//走个账号增加金额</span></span><br><span class="line">    accountDao.addBalance(addId, balance);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p> <strong>Filter与Interceptor区别</strong></p>
+<ul>
+<li>执行顺序：过滤前-拦截前-Action处理-拦截后-过滤后。</li>
+<li>拦截对象不同：<ul>
+<li>拦截器只能对action【Java处理代码】起作用</li>
+<li>过滤器对几乎所有的请求起作用（可以保护资源）。</li>
+</ul>
+</li>
+<li>实现原理不同<ul>
+<li>拦截器是基于java的反射机制，使用代理模式；</li>
+<li>过滤器是基于函数回调。</li>
+</ul>
+</li>
+<li>作用域不同<ul>
+<li>过滤器依赖于servlet容器，只能在 servlet容器，web环境下使用</li>
+<li>拦截器依赖于spring容器，可以在spring容器中调用，不管此时Spring处于什么环境</li>
+</ul>
+</li>
+<li>细粒度的不同<ul>
+<li>过滤器的控制比较粗，只能在请求进来时进行处理，对请求和响应进行包装</li>
+<li>拦截器提供更精细的控制，可以在controller对请求处理之前或之后被调用，也可以在渲染视图呈现给用户之后调用</li>
+</ul>
+</li>
+<li>中断链执行的难易程度不同<ul>
+<li>拦截器可以 <code>preHandle</code>方法内返回 false 进行中断</li>
+<li>过滤器就比较复杂，需要处理请求和响应对象来引发中断，需要额外的动作，比如将用户重定向到错误页面。</li>
+</ul>
+</li>
+</ul>
+<p><strong>过滤器 拦截器 AOP区别</strong></p>
+<table>
+<thead>
+<tr>
+<th align="left">名称</th>
+<th align="center">过滤器</th>
+<th align="center">拦截器</th>
+<th align="center">AOP</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">拦截对象</td>
+<td align="center">URL</td>
+<td align="center">URL</td>
+<td align="center">类的元数据（包、类、方法名、参数等</td>
+</tr>
+<tr>
+<td align="left">方法</td>
+<td align="center">一个（返回值void）</td>
+<td align="center">三个</td>
+<td align="center">五个</td>
+</tr>
+<tr>
+<td align="left">说明</td>
+<td align="center">filter只是适用于web中，依赖于Servlet容器，利用<strong>Java的回调机制</strong>进行实现。和框架无关。调用真实的业务逻辑时，至此过滤器任务完成。</td>
+<td align="center">不依赖Servlet容器，Interfactor是基于<strong>Java的反射机制</strong>（APO思想）进行实现。可以控制请求的控制器和方法，但控制不了请求方法里的参数</td>
+<td align="center">最大的优势在于他可以获取执行方法的参数，对方法进行统一的处理。<strong>但是拿不到http请求，可以通过其他方式如RequestContextHolder</strong>获得</td>
+</tr>
+<tr>
+<td align="left">使用范围</td>
+<td align="center">比如<strong>设置字符编码，鉴权操作</strong>等</td>
+<td align="center">做国际化，做主题更换，过滤</td>
+<td align="center">使用日志，事务，请求参数安全验证</td>
+</tr>
+</tbody></table>
+<p>拦截器的方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">preHandle</span><span class="params">(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o)</span> <span class="comment">// 表示被拦截的URL对应的方法执行前的自定义处理</span></span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">postHandle</span><span class="params">(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o, ModelAndView modelAndView)</span> <span class="comment">// 表示此时还未将modelAndView进行渲染，被拦截的URL对应的方法执行后的自定义处理，。</span></span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">afterCompletion</span><span class="params">(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o, Exception e)</span>  <span class="comment">// 表示此时modelAndView已被渲染，执行拦截器的自定义处理。</span></span></span><br></pre></td></tr></table></figure>
+
+<p>拦截器  = 部分的过滤器 + 部分的AOP</p>
+<p><img src="https://gitee.com/StuartYang/bpic/raw/master/20210725231825.png" alt="image-20210725231824002"></p>
+<p>执行顺序依次是过滤器—&gt;拦截器—&gt;切面</p>
+
+    </article>
+  </div>
+
+</div>
+
+
+<div class="footer-wrapper container">
+  <footer class="footer clearfix">
+    <div class="clearfix">
+      <a href="https://www.yangxudong.site" class="footer-logo">
+        <i class="fa iconfont icon-baiyangzuo" style="font-size: 24px;"></i>
+      </a>
+      <ul class="footer-social-link">
+        <li>© 2019 旭东同学</li>
+        <li><a href="https://www.yangxudong.site">Home</a></li>
+        
+        <li><a target="_blank" rel="noopener" href="https://github.com/StuartYang">Github</a></li>
+        
+      </ul>
+      <div class="footer-theme-info">
+        Theme Based on <a target="_blank" rel="noopener" href="//github.com/sabrinaluo/hexo-theme-replica">Replica</a> ❤ Powered by Hexo
+      </div>
+    </div>
+  </footer>
+</div>
+<script src="/js/main.js"></script>
+
+</body>
+</html>
