@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>
+      linux常见命令 | YangXudong&#39;s Blog
+    </title>
+    <meta name="description" content="“ 君子藏剑于身，待时而动 ”">
+    
+      <meta name="keywords" content="
+  Linux,工具
+  ">
+      
+        <meta name="author" content="旭东同学">
+
+        <meta http-equiv="Cache-Control" content="no-transform" />
+        <meta http-equiv="Cache-Control" content="no-siteapp">
+        <meta name="theme-color" content="#1e2327">
+        <link rel="apple-touch-icon" href="https://github.githubassets.com/apple-touch-icon.png">
+        <link rel="apple-touch-icon" sizes="180x180"
+          href="https://github.githubassets.com/apple-touch-icon-180x180.png">
+
+        <link rel="icon" type="image/x-icon" href="https://gitee.com/StuartYang/bpic/raw/master/20210722154537.png">
+
+        <link rel="stylesheet" href="/css/main.css">
+        
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+        <link rel="stylesheet" href="//at.alicdn.com/t/font_2570198_c1noxsh7ksn.css">
+        </link>
+
+        <script src="//cdnjs.cloudflare.com/ajax/libs/vue/1.0.25-csp/vue.min.js"></script>
+        <!-- JavaScript 日期处理类库 -->
+        <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.11.2/moment.min.js"></script>
+  <meta name="generator" content="Hexo 5.4.0"></head>
+
+<body id="replica-app">
+
+<nav class="navbar-wrapper">
+  <div class="navbar">
+    <div class="container clearfix">
+      <a href="/" class="navbar-logo"><i class="fa iconfont icon-baiyangzuo" style="font-size: 32px;"></i></a>
+
+      <ul class="navbar-nav float-left">
+        
+        <li><a href="/archives">文章</a></li>
+        
+        
+        <li><a href="/categories">归档</a></li>
+        
+        
+        <li><a href="/tags">标签</a></li>
+        
+      </ul>
+
+      <ul class="navbar-nav user-nav float-right desktop-only">
+        <li class="user-nav-notification">
+          <a><span class="user-nav-unread"></span><i class="fa fa-bell"></i></a>
+        </li>
+        <li>
+          <a><i class="fa fa-plus"></i> <i class="fa fa-caret-down"></i></a>
+        </li>
+        <li class="user-nav-logo">
+          <a><img src="https://gitee.com/StuartYang/bpic/raw/master/20210722154532.jpg"> <i class="fa fa-caret-down"></i></i></a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="main-container">
+
+  <header class="header-wrapper desktop-only">
+  <div class="container header-site-detail">
+    <ul class="header-toolbar">
+      <li class="clearfix">
+        <a href="/archives" class="header-toolbar-left"><i
+                  class="fa fa-file-text"></i> 文章 </a>
+        <a href="/archives"
+           class="header-toolbar-right"> 11 </a>
+      </li>
+      <li>
+        <a href="/tags" class="header-toolbar-left"><i
+                  class="fa fa-tags"></i> 标签 </a>
+        <a href="/tags"
+           class="header-toolbar-right"> 18 </a>
+      </li>
+      <li>
+        <a href="/categories" class="header-toolbar-left"><i
+                  class="fa fa-folder-open"></i> 归档 </a>
+        <a href="/categories"
+           class="header-toolbar-right"> 7 </a>
+      </li>
+    </ul>
+    
+    <h2 class="header-title">
+      <i class="fa fa-book text-muted"></i>
+      <a href="/">YangXudong&#39;s Blog</a>
+    </h2>
+  </div>
+</header>
+
+
+  <div class="post-container container">
+    <h3>
+      <i class="fa fa-user-o"></i>
+      旭东同学
+
+        <span class="post-date float-right"
+          title="{{moment(1627227619000).format('MMM DD, YYYY, h:mm:ss A')}}">
+          <i class="fa fa-pencil-square-o"></i>
+          {{moment(1627227619000).fromNow()}}
+        </span>
+    </h3>
+
+    <article class="post-content">
+      <h1>
+        linux常见命令
+      </h1>
+      <p><strong>查找文件</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 根据名称查找/目录下的 file开头的文件。</span></span><br><span class="line">find / -name &quot;file*&quot;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 忽略大小写</span></span><br><span class="line">find / -iname &quot;file*&quot;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查使用手册</span></span><br><span class="line">man find</span><br></pre></td></tr></table></figure>
+
+<p><strong>检索文件内容</strong></p>
+<p>语法：<code>grep [options] pattern file</code></p>
+<blockquote>
+<p>grep全称：Globel Regular  Expression Print</p>
+<p>作用：查找文件中符合条件的字符串，符合条件的行返回</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 在file开头的文件中查找moon打头的行</span></span><br><span class="line">grep &quot;moon&quot; file*</span><br><span class="line"><span class="meta">#</span><span class="bash"> 只显示匹配部分</span></span><br><span class="line">grep -o [正则表达式] 文件名</span><br><span class="line"><span class="meta">#</span><span class="bash"> -v 寻找不匹配的行</span></span><br><span class="line">grep -v  [正则表达式] 文件名</span><br></pre></td></tr></table></figure>
+
+<p><strong>管道操作符  |</strong></p>
+<blockquote>
+<p>可将指令连接起来，前一个指令的输出作为后一个指令的输入</p>
+<ul>
+<li>只能处理前一个命令正确输出，不处理错误输出</li>
+<li>右边命令必须能够接受标准输入流，否则传递过程中数据会被抛出异常</li>
+<li>常见接受标准输入的命令有：sed，awk，grep，head，top，less，more，wc，join，sort，split等</li>
+</ul>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 在/目录下的 file开头的文件中查找存在moon的行</span></span><br><span class="line">find / -name &quot;file*&quot;|grep &quot;moon&quot; </span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><strong>对文件内存做统计awk</strong></p>
+<p>语法：<code>awk [options] file</code></p>
+<blockquote>
+<ul>
+<li>适合规格化的数据，做列数据的处理</li>
+<li>一行读取一行文本，按输入分隔符进行切片，切成多个组成部分</li>
+<li>将切片直接保存在内建的变量中，$1, $2 …($0表示行的全部)</li>
+<li>支持对单个切片的判断，支持循环判断，默认分隔符为空格</li>
+</ul>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 筛选出第一列和第四列的内容</span></span><br><span class="line">awk &#x27;&#123;print $1,$4&#125;&#x27; net.txt</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 筛选出第一列卫tcp第二列为1的行</span></span><br><span class="line">awk &#x27;$1 == &quot;Tcp&quot; &amp;&amp; $2 == 1 &#123;print $0&#125;&#x27; net.txt</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 筛选出的结果+表头</span></span><br><span class="line">awk &#x27;($1 == &quot;Tcp&quot; &amp;&amp; $2 == 1)||NR ==1 &#123;print $0&#125;&#x27; net.txt</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 修改默认的分隔符</span></span><br><span class="line">awk -F &quot;.&quot; &#x27;&#123;print $2&#125;&#x27; test.txt</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 循环输出数据</span></span><br><span class="line">awk &#x27;&#123;enginearr[$1]++&#125;END&#123;for(i in engnearr) print i&quot;\t&quot;enginearr[i]&#125;&#x27;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>**批量替换文本内容 sed s **</p>
+<p>语法：<code>sed [option] &#39;s/pattern/replacement/flags&#39; fileName</code></p>
+<blockquote>
+<p>sed全名：stream editor ，流编辑器</p>
+<p>适合用于对文本的<strong>行内容</strong>进行按照正则处理</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 将Java文件中的jack变成me</span></span><br><span class="line">sed -i &#x27;s/jack/me/&#x27;  user.java</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 将Java文件中的 . 变为 ;</span></span><br><span class="line">sed -i &#x27;s/\./\;/&#x27;  user.java</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 将Java文件中的jack全局变成me</span></span><br><span class="line">sed -i &#x27;s/jack/me/g&#x27;  user.java</span><br></pre></td></tr></table></figure>
+
+
+    </article>
+  </div>
+
+</div>
+
+
+<div class="footer-wrapper container">
+  <footer class="footer clearfix">
+    <div class="clearfix">
+      <a href="https://www.yangxudong.site" class="footer-logo">
+        <i class="fa iconfont icon-baiyangzuo" style="font-size: 24px;"></i>
+      </a>
+      <ul class="footer-social-link">
+        <li>© 2019 旭东同学</li>
+        <li><a href="https://www.yangxudong.site">Home</a></li>
+        
+        <li><a target="_blank" rel="noopener" href="https://github.com/StuartYang">Github</a></li>
+        
+      </ul>
+      <div class="footer-theme-info">
+        Theme Based on <a target="_blank" rel="noopener" href="//github.com/sabrinaluo/hexo-theme-replica">Replica</a> ❤ Powered by Hexo
+      </div>
+    </div>
+  </footer>
+</div>
+<script src="/js/main.js"></script>
+
+</body>
+</html>
