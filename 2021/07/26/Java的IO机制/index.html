@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>
+      Java的IO机制 | YangXudong&#39;s Blog
+    </title>
+    <meta name="description" content="“ 君子藏剑于身，待时而动 ”">
+    
+      <meta name="keywords" content="
+  网络,IO
+  ">
+      
+        <meta name="author" content="旭东同学">
+
+        <meta http-equiv="Cache-Control" content="no-transform" />
+        <meta http-equiv="Cache-Control" content="no-siteapp">
+        <meta name="theme-color" content="#1e2327">
+        <link rel="apple-touch-icon" href="https://github.githubassets.com/apple-touch-icon.png">
+        <link rel="apple-touch-icon" sizes="180x180"
+          href="https://github.githubassets.com/apple-touch-icon-180x180.png">
+
+        <link rel="icon" type="image/x-icon" href="https://gitee.com/StuartYang/bpic/raw/master/20210722154537.png">
+
+        <link rel="stylesheet" href="/css/main.css">
+        
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+        <link rel="stylesheet" href="//at.alicdn.com/t/font_2570198_c1noxsh7ksn.css">
+        </link>
+
+        <script src="//cdnjs.cloudflare.com/ajax/libs/vue/1.0.25-csp/vue.min.js"></script>
+        <!-- JavaScript 日期处理类库 -->
+        <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.11.2/moment.min.js"></script>
+  <meta name="generator" content="Hexo 5.4.0"></head>
+
+<body id="replica-app">
+
+<nav class="navbar-wrapper">
+  <div class="navbar">
+    <div class="container clearfix">
+      <a href="/" class="navbar-logo"><i class="fa iconfont icon-baiyangzuo" style="font-size: 32px;"></i></a>
+
+      <ul class="navbar-nav float-left">
+        
+        <li><a href="/archives">文章</a></li>
+        
+        
+        <li><a href="/categories">归档</a></li>
+        
+        
+        <li><a href="/tags">标签</a></li>
+        
+      </ul>
+
+      <ul class="navbar-nav user-nav float-right desktop-only">
+        <li class="user-nav-notification">
+          <a><span class="user-nav-unread"></span><i class="fa fa-bell"></i></a>
+        </li>
+        <li>
+          <a><i class="fa fa-plus"></i> <i class="fa fa-caret-down"></i></a>
+        </li>
+        <li class="user-nav-logo">
+          <a><img src="https://gitee.com/StuartYang/bpic/raw/master/20210722154532.jpg"> <i class="fa fa-caret-down"></i></i></a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="main-container">
+
+  <header class="header-wrapper desktop-only">
+  <div class="container header-site-detail">
+    <ul class="header-toolbar">
+      <li class="clearfix">
+        <a href="/archives" class="header-toolbar-left"><i
+                  class="fa fa-file-text"></i> 文章 </a>
+        <a href="/archives"
+           class="header-toolbar-right"> 12 </a>
+      </li>
+      <li>
+        <a href="/tags" class="header-toolbar-left"><i
+                  class="fa fa-tags"></i> 标签 </a>
+        <a href="/tags"
+           class="header-toolbar-right"> 19 </a>
+      </li>
+      <li>
+        <a href="/categories" class="header-toolbar-left"><i
+                  class="fa fa-folder-open"></i> 归档 </a>
+        <a href="/categories"
+           class="header-toolbar-right"> 8 </a>
+      </li>
+    </ul>
+    
+    <h2 class="header-title">
+      <i class="fa fa-book text-muted"></i>
+      <a href="/">YangXudong&#39;s Blog</a>
+    </h2>
+  </div>
+</header>
+
+
+  <div class="post-container container">
+    <h3>
+      <i class="fa fa-user-o"></i>
+      旭东同学
+
+        <span class="post-date float-right"
+          title="{{moment(1627231745000).format('MMM DD, YYYY, h:mm:ss A')}}">
+          <i class="fa fa-pencil-square-o"></i>
+          {{moment(1627231745000).fromNow()}}
+        </span>
+    </h3>
+
+    <article class="post-content">
+      <h1>
+        Java的IO机制
+      </h1>
+      <h2 id="绪"><a href="#绪" class="headerlink" title="绪"></a>绪</h2><blockquote>
+<p>参考：</p>
+<ol>
+<li> BIO : <a target="_blank" rel="noopener" href="https://blog.csdn.net/u012250875/article/details/78341874">https://blog.csdn.net/u012250875/article/details/78341874</a></li>
+<li>NIO : <a target="_blank" rel="noopener" href="http://ifeve.com/overview/">http://ifeve.com/overview/</a></li>
+<li>AIO : <a target="_blank" rel="noopener" href="https://blog.csdn.net/chengkui1990/article/details/81566790">https://blog.csdn.net/chengkui1990/article/details/81566790</a></li>
+</ol>
+</blockquote>
+<h2 id="理论"><a href="#理论" class="headerlink" title="理论"></a>理论</h2><ul>
+<li>BIO(Block-IO)：<ul>
+<li>字节流【一个字节为单位 8bit】：<ul>
+<li>*InputStream<ul>
+<li>字节流：偏向实现细节，直接与细节打交道</li>
+<li>处理流：偏向功能，以目标功能为抽象<ul>
+<li>Buffer*：缓存流（加快流的写入写出）</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>*OutStream<ul>
+<li>字节流</li>
+<li>处理流</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>字符流【两个字节为单位 16bit】：<ul>
+<li>*Reader<ul>
+<li>字节流</li>
+<li>处理流</li>
+</ul>
+</li>
+<li>*Writer<ul>
+<li>字节流</li>
+<li>处理流</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>IO流的选取：</p>
+<p>不管用什么处理流，都需要</p>
+<ol>
+<li>先使用<strong>节点流</strong>获取对应节点的数据流，</li>
+<li>根据具体需求来选择相应的<strong>处理流</strong>来对节点流进行包装修饰，从而获取相应的功能</li>
+</ol>
+</blockquote>
+<p><img src="https://gitee.com/StuartYang/bpic/raw/master/20210726005507.png" alt="未命名文件-5"></p>
+<ul>
+<li><p>NIO（NonBlock-IO）：构建多路复用的，同步非阻塞IO操作;</p>
+<ul>
+<li>Channels: Channel 有点像流。 数据可以从Channel读到Buffer中，也可以从Buffer 写到Channel中<ul>
+<li>FileChannel<ul>
+<li>避免了两次用户态和内核之间的上下文切换</li>
+</ul>
+</li>
+<li>SocketChannel</li>
+<li>ServerSocketChannel</li>
+</ul>
+</li>
+<li>Buffers<ul>
+<li>ByteBuffer</li>
+<li>DoubleBuffer</li>
+<li>MappedByteBuffer：用于表示内存映射文件</li>
+</ul>
+</li>
+<li>Selectors<ul>
+<li>Selector允许单线程处理多个 Channel。如果你的应用打开了多个连接（通道），但每个连接的流量都很低，使用Selector就会很方便。例如，在一个聊天服务器中。</li>
+<li>采用了OS的多路复用select/poll/epoll</li>
+</ul>
+</li>
+</ul>
+<p><img src="https://gitee.com/StuartYang/bpic/raw/master/20210726014037.png" alt="未命名文件-7"></p>
+<blockquote>
+<p>要使用Selector，得向Selector注册Channel，然后调用它的select()方法。这个方法会一直阻塞到某个注册的通道有事件就绪。一旦这个方法返回，线程就可以处理这些事件，事件的例子有如新连接进来，数据接收等。</p>
+</blockquote>
+</li>
+<li><p>AIO（Asynchronous IO）：基于事件和回调机制，异步IO</p>
+<ul>
+<li>AIO如何进一步加工处理结果<ul>
+<li>基于回调：实现Completionhandler接口，调用时触发回调函数</li>
+<li>返回Future：通过isDone() 查看是否准备好，通过get()等待返回数据。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="3种IO的总结"><a href="#3种IO的总结" class="headerlink" title="3种IO的总结"></a>3种IO的总结</h2><table>
+<thead>
+<tr>
+<th>IO模型</th>
+<th>BIO</th>
+<th>NIO</th>
+<th>AIO</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Blocking</td>
+<td>同步阻塞</td>
+<td>同步非阻塞</td>
+<td>异步非阻塞</td>
+</tr>
+<tr>
+<td>线程数（client：server）</td>
+<td>1:1</td>
+<td>1:N</td>
+<td>0:N</td>
+</tr>
+<tr>
+<td>复杂度</td>
+<td>简单</td>
+<td>较为复杂</td>
+<td>复杂</td>
+</tr>
+<tr>
+<td>吞吐量</td>
+<td>低</td>
+<td>高</td>
+<td>高</td>
+</tr>
+<tr>
+<td>使用范围</td>
+<td>连接数比较小</td>
+<td>连接数比较多，连接时长比较短的架构（网络聊天服务器）</td>
+<td>连接数比较多，连接时长比较长的架构（相册服务器）</td>
+</tr>
+<tr>
+<td>出现时间</td>
+<td>JDK1.0</td>
+<td>JDK1.4</td>
+<td>JDK1.7</td>
+</tr>
+</tbody></table>
+<h2 id="代码演示"><a href="#代码演示" class="headerlink" title="代码演示"></a>代码演示</h2><h3 id="BIO-java"><a href="#BIO-java" class="headerlink" title="BIO.java"></a>BIO.java</h3><ul>
+<li>使用缓存流做输入输出流的中介，加快流的读写效率。<ul>
+<li>也可以手写一个数组实现缓存：读入流 —》数组缓存—》写出流</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">copyByBufferedStream</span><span class="params">(File src,File dest)</span> </span>&#123;</span><br><span class="line">       BufferedInputStream bis = <span class="keyword">null</span>;</span><br><span class="line">       BufferedOutputStream bos = <span class="keyword">null</span>;</span><br><span class="line">       <span class="keyword">try</span>&#123;</span><br><span class="line">         <span class="comment">// 输入缓存流</span></span><br><span class="line">           bis = <span class="keyword">new</span> BufferedInputStream(<span class="keyword">new</span> FileInputStream(src));</span><br><span class="line">         <span class="comment">// 输出缓存流</span></span><br><span class="line">           bos = <span class="keyword">new</span> BufferedOutputStream(<span class="keyword">new</span> FileOutputStream(dest));</span><br><span class="line">           <span class="keyword">int</span> b = <span class="number">0</span>;</span><br><span class="line">           <span class="keyword">while</span>( (b = bis.read())!=-<span class="number">1</span>)&#123;</span><br><span class="line">                <span class="comment">//使用BufferedXXX重写的write方法进行写入数据。该方法看似未缓冲实际做了缓冲处理</span></span><br><span class="line">               bos.write(b);</span><br><span class="line">           &#125;</span><br><span class="line">         <span class="comment">// 缓存中满了才会写入，最后一次读取后需要手动刷新缓存，让其写入</span></span><br><span class="line">           bos.flush();</span><br><span class="line">       &#125;<span class="keyword">catch</span>(IOException e)&#123;</span><br><span class="line">           e.printStackTrace();</span><br><span class="line">       &#125;<span class="keyword">finally</span>&#123;</span><br><span class="line">           close(bis,bos);</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="NIO-java"><a href="#NIO-java" class="headerlink" title="NIO.java"></a>NIO.java</h3><ul>
+<li>打开一个Selector，注册一个channel到这个Selector上,</li>
+<li>线程持续监控这个Selector的四种事件（接受，连接，读，写）是否就绪。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">Selector selector = Selector.open();</span><br><span class="line"><span class="comment">// 设置为非阻塞IO</span></span><br><span class="line">channel.configureBlocking(<span class="keyword">false</span>);</span><br><span class="line"><span class="comment">// channel注册到Selector中，并让channel关注selector的状态（可读）</span></span><br><span class="line">SelectionKey key = channel.register(selector, SelectionKey.OP_READ);</span><br><span class="line"><span class="keyword">while</span>(<span class="keyword">true</span>) &#123;</span><br><span class="line">  </span><br><span class="line">  <span class="keyword">int</span> readyChannels = selector.select();</span><br><span class="line">  <span class="comment">// 阻塞selector中等待就绪的channel，即没有客户端建立连接就一直轮询</span></span><br><span class="line">  <span class="keyword">if</span>(readyChannels == <span class="number">0</span>) &#123;</span><br><span class="line">    <span class="keyword">continue</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// 一个channel对呀一个channelKey</span></span><br><span class="line">  Set selectedKeys = selector.selectedKeys();</span><br><span class="line">  Iterator keyIterator = selectedKeys.iterator();</span><br><span class="line">  <span class="keyword">while</span>(keyIterator.hasNext()) &#123;</span><br><span class="line">    SelectionKey key = keyIterator.next();</span><br><span class="line">    <span class="comment">// channel处于建立连接的状态</span></span><br><span class="line">    <span class="keyword">if</span>(key.isAcceptable()) &#123;</span><br><span class="line">      </span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// channel处于可读状态</span></span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (key.isReadable()) &#123;</span><br><span class="line">      </span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// // channel处于可写状态</span></span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (key.isWritable()) &#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 数据处理后的channel就从Selector中移除</span></span><br><span class="line">    keyIterator.remove();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="AIO-java"><a href="#AIO-java" class="headerlink" title="AIO.java"></a>AIO.java</h3><ul>
+<li>当有数据可读将数据传乳线程的缓存区，通知线程区去读取「写同理」</li>
+<li>C-S socket为例</li>
+<li>没有selecter，直接采用Channel </li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line"> </span><br><span class="line"><span class="keyword">import</span> java.io.IOException;</span><br><span class="line"><span class="keyword">import</span> java.net.InetSocketAddress;</span><br><span class="line"><span class="keyword">import</span> java.nio.channels.AsynchronousServerSocketChannel;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.CountDownLatch;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AsyncTimeServerHandler</span> <span class="keyword">implements</span> <span class="title">Runnable</span></span>&#123;</span><br><span class="line"> </span><br><span class="line">    	<span class="keyword">private</span> <span class="keyword">int</span> port;</span><br><span class="line"> </span><br><span class="line">  <span class="comment">/*线程读表*/</span></span><br><span class="line">      CountDownLatch latch;</span><br><span class="line"> </span><br><span class="line">     AsynchronousServerSocketChannel asynchronousServerSocketChannel;</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">AsyncTimeServerHandler</span><span class="params">(<span class="keyword">int</span> port)</span></span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.port = port;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="comment">//创建一个AsynchronousServerSocketChannel对象，工厂方法</span></span><br><span class="line">            asynchronousServerSocketChannel = AsynchronousServerSocketChannel.open();</span><br><span class="line">            <span class="comment">//绑定端口号</span></span><br><span class="line">            asynchronousServerSocketChannel.bind(<span class="keyword">new</span> InetSocketAddress(port));</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">  <span class="comment">/*</span></span><br><span class="line"><span class="comment">  </span></span><br><span class="line"><span class="comment">  是一个并发工具类，他允许一个线程等待另一个线程完成后再执行，这里是为了防止主线程启动完成后关闭</span></span><br><span class="line"><span class="comment">  */</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">     latch = <span class="keyword">new</span> CountDownLatch(<span class="number">1</span>);</span><br><span class="line">     doAccept();</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="comment">//阻塞直到count down to 0</span></span><br><span class="line">            latch.await();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line">     <span class="comment">/*</span></span><br><span class="line"><span class="comment">        开始接听客户端请求，</span></span><br><span class="line"><span class="comment">          一旦一个客户端被接受/失败，CompletionHandler的completed或者failed方法被调用</span></span><br><span class="line"><span class="comment">      */</span></span><br><span class="line">  </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doAccept</span><span class="params">()</span></span>&#123;</span><br><span class="line">        asynchronousServerSocketChannel.accept(<span class="keyword">this</span>, <span class="keyword">new</span> AcceptCompletionHandler());</span><br><span class="line">    &#125;</span><br><span class="line">  </span><br><span class="line">  </span><br><span class="line">  </span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> port = <span class="number">8010</span>;</span><br><span class="line">        <span class="keyword">new</span> Thread(<span class="keyword">new</span> AsyncTimeServerHandler(<span class="number">8010</span>)).start();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>AcceptCompletionHandler函数</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AcceptCompletionHandler</span> <span class="keyword">implements</span> <span class="title">CompletionHandler</span> &lt;<span class="title">AsynchronousSocketChannel</span>,<span class="title">AsyncTimeServerHandler</span>&gt;</span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">completed</span><span class="params">(AsynchronousSocketChannel result, AsyncTimeServerHandler attachment)</span> </span>&#123;</span><br><span class="line">        <span class="comment">//服务端已经接收客户端成功了，为什么还要调用accept方法？因为一个channel可以接收成千上万个客户端</span></span><br><span class="line">        <span class="comment">//当调用asynchronousServerSocketChannel.accept(this, new AcceptCompletionHandler())方法后，又有新的</span></span><br><span class="line">        <span class="comment">//客户端连接接入，所以需要继续调用他的accept方法，接受其它客户端的接入，最终形成一个循环</span></span><br><span class="line">        attachment.asynchronousServerSocketChannel.accept(attachment,<span class="keyword">this</span>);</span><br><span class="line">        ByteBuffer buffer = ByteBuffer.allocate(<span class="number">1024</span>);</span><br><span class="line">        <span class="comment">//异步读操作，参数的定义：第一个参数：接收缓冲区，用于异步从channel读取数据包；</span></span><br><span class="line">        <span class="comment">//第二个参数：异步channel携带的附件，通知回调的时候作为入参参数，这里是作为ReadCompletionHandler的入参</span></span><br><span class="line">        <span class="comment">//通知回调的业务handler，也就是数据从channel读到ByteBuffer完成后的回调handler，这里是ReadCompletionHandler</span></span><br><span class="line">        result.read(buffer, buffer, <span class="keyword">new</span> ReadCompletionHandler(result));</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">failed</span><span class="params">(Throwable exc, AsyncTimeServerHandler attachment)</span> </span>&#123;</span><br><span class="line">        exc.printStackTrace();</span><br><span class="line">        AsyncTimeServerHandler result = (AsyncTimeServerHandler) attachment;</span><br><span class="line">        result.latch.countDown();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>ReadCompletionHandler</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ReadCompletionHandler</span> <span class="keyword">implements</span> <span class="title">CompletionHandler</span>&lt;<span class="title">Integer</span>, <span class="title">ByteBuffer</span>&gt; </span>&#123;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">private</span> AsynchronousSocketChannel channel;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ReadCompletionHandler</span><span class="params">(AsynchronousSocketChannel channel)</span></span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(<span class="keyword">this</span>.channel == <span class="keyword">null</span>)</span><br><span class="line">            <span class="keyword">this</span>.channel = channel;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 业务处理，从ByteBuffer读取业务数据，做业务操作</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> result</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> attachment</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">completed</span><span class="params">(Integer result, ByteBuffer attachment)</span> </span>&#123;</span><br><span class="line">     attachment.flip();</span><br><span class="line">     <span class="keyword">byte</span> [] body = <span class="keyword">new</span> <span class="keyword">byte</span>[attachment.remaining()];</span><br><span class="line">     attachment.get(body);</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            String req = <span class="keyword">new</span> String(body, <span class="string">&quot;UTF-8&quot;</span>);</span><br><span class="line">            System.out.println(<span class="string">&quot;the time server receive order:&quot;</span> + req );</span><br><span class="line">            String currentTime = <span class="string">&quot;query time order&quot;</span>.equals(req) ? <span class="keyword">new</span> Date(System.currentTimeMillis()).toString(): <span class="string">&quot;bad order&quot;</span>;</span><br><span class="line">            dowrite(currentTime);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (UnsupportedEncodingException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 往客户端的写操作</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> currentTime</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">public</span>  <span class="keyword">void</span> <span class="title">dowrite</span><span class="params">(String currentTime)</span></span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(currentTime != <span class="keyword">null</span> &amp;&amp; currentTime.trim().length() &gt; <span class="number">0</span>)&#123;</span><br><span class="line">            <span class="keyword">byte</span>[] bytes = currentTime.getBytes();</span><br><span class="line">            <span class="comment">//分配一个写缓存</span></span><br><span class="line">            ByteBuffer write = ByteBuffer.allocate(bytes.length);</span><br><span class="line">            System.out.println(<span class="string">&quot;reponsbody=&quot;</span> + currentTime);</span><br><span class="line">            <span class="comment">//将返回数据写入缓存</span></span><br><span class="line">            write.put(bytes);</span><br><span class="line">            write.flip();</span><br><span class="line">            <span class="comment">//将缓存写进channel</span></span><br><span class="line">            channel.write(write, write, <span class="keyword">new</span> CompletionHandler&lt;Integer, ByteBuffer&gt;() &#123;</span><br><span class="line">                <span class="meta">@Override</span></span><br><span class="line">                <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">completed</span><span class="params">(Integer result, ByteBuffer buffer)</span> </span>&#123;</span><br><span class="line">                    <span class="comment">//如果发现还有数据没写完，继续写</span></span><br><span class="line">                    <span class="keyword">if</span>(buffer.hasRemaining()) &#123;</span><br><span class="line">                        channel.write(buffer, buffer, <span class="keyword">this</span>);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line"> </span><br><span class="line">                <span class="meta">@Override</span></span><br><span class="line">                <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">failed</span><span class="params">(Throwable exc, ByteBuffer attachment)</span> </span>&#123;</span><br><span class="line">                    <span class="keyword">try</span> &#123;</span><br><span class="line">                        <span class="comment">//写失败，关闭channel，并释放与channel相关联的一切资源</span></span><br><span class="line">                        channel.close();</span><br><span class="line">                    &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">                        e.printStackTrace();</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">failed</span><span class="params">(Throwable exc, ByteBuffer attachment)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="comment">//读，关闭channel，并释放与channel相关联的一切资源</span></span><br><span class="line">            <span class="keyword">this</span>.channel.close();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+    </article>
+  </div>
+
+</div>
+
+
+<div class="footer-wrapper container">
+  <footer class="footer clearfix">
+    <div class="clearfix">
+      <a href="https://www.yangxudong.site" class="footer-logo">
+        <i class="fa iconfont icon-baiyangzuo" style="font-size: 24px;"></i>
+      </a>
+      <ul class="footer-social-link">
+        <li>© 2019 旭东同学</li>
+        <li><a href="https://www.yangxudong.site">Home</a></li>
+        
+        <li><a target="_blank" rel="noopener" href="https://github.com/StuartYang">Github</a></li>
+        
+      </ul>
+      <div class="footer-theme-info">
+        Theme Based on <a target="_blank" rel="noopener" href="//github.com/sabrinaluo/hexo-theme-replica">Replica</a> ❤ Powered by Hexo
+      </div>
+    </div>
+  </footer>
+</div>
+<script src="/js/main.js"></script>
+
+</body>
+</html>
