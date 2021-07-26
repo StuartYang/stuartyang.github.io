@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>
+      Java的垃圾回收机制 | YangXudong&#39;s Blog
+    </title>
+    <meta name="description" content="“ 君子藏剑于身，待时而动 ”">
+    
+      <meta name="keywords" content="
+  Java,垃圾回收机制
+  ">
+      
+        <meta name="author" content="旭东同学">
+
+        <meta http-equiv="Cache-Control" content="no-transform" />
+        <meta http-equiv="Cache-Control" content="no-siteapp">
+        <meta name="theme-color" content="#1e2327">
+        <link rel="apple-touch-icon" href="https://github.githubassets.com/apple-touch-icon.png">
+        <link rel="apple-touch-icon" sizes="180x180"
+          href="https://github.githubassets.com/apple-touch-icon-180x180.png">
+
+        <link rel="icon" type="image/x-icon" href="https://gitee.com/StuartYang/bpic/raw/master/20210722154537.png">
+
+        <link rel="stylesheet" href="/css/main.css">
+        
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+        <link rel="stylesheet" href="//at.alicdn.com/t/font_2570198_c1noxsh7ksn.css">
+        </link>
+
+        <script src="//cdnjs.cloudflare.com/ajax/libs/vue/1.0.25-csp/vue.min.js"></script>
+        <!-- JavaScript 日期处理类库 -->
+        <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.11.2/moment.min.js"></script>
+  <meta name="generator" content="Hexo 5.4.0"></head>
+
+<body id="replica-app">
+
+<nav class="navbar-wrapper">
+  <div class="navbar">
+    <div class="container clearfix">
+      <a href="/" class="navbar-logo"><i class="fa iconfont icon-baiyangzuo" style="font-size: 32px;"></i></a>
+
+      <ul class="navbar-nav float-left">
+        
+        <li><a href="/archives">文章</a></li>
+        
+        
+        <li><a href="/categories">归档</a></li>
+        
+        
+        <li><a href="/tags">标签</a></li>
+        
+      </ul>
+
+      <ul class="navbar-nav user-nav float-right desktop-only">
+        <li class="user-nav-notification">
+          <a><span class="user-nav-unread"></span><i class="fa fa-bell"></i></a>
+        </li>
+        <li>
+          <a><i class="fa fa-plus"></i> <i class="fa fa-caret-down"></i></a>
+        </li>
+        <li class="user-nav-logo">
+          <a><img src="https://gitee.com/StuartYang/bpic/raw/master/20210722154532.jpg"> <i class="fa fa-caret-down"></i></i></a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="main-container">
+
+  <header class="header-wrapper desktop-only">
+  <div class="container header-site-detail">
+    <ul class="header-toolbar">
+      <li class="clearfix">
+        <a href="/archives" class="header-toolbar-left"><i
+                  class="fa fa-file-text"></i> 文章 </a>
+        <a href="/archives"
+           class="header-toolbar-right"> 14 </a>
+      </li>
+      <li>
+        <a href="/tags" class="header-toolbar-left"><i
+                  class="fa fa-tags"></i> 标签 </a>
+        <a href="/tags"
+           class="header-toolbar-right"> 20 </a>
+      </li>
+      <li>
+        <a href="/categories" class="header-toolbar-left"><i
+                  class="fa fa-folder-open"></i> 归档 </a>
+        <a href="/categories"
+           class="header-toolbar-right"> 8 </a>
+      </li>
+    </ul>
+    
+    <h2 class="header-title">
+      <i class="fa fa-book text-muted"></i>
+      <a href="/">YangXudong&#39;s Blog</a>
+    </h2>
+  </div>
+</header>
+
+
+  <div class="post-container container">
+    <h3>
+      <i class="fa fa-user-o"></i>
+      旭东同学
+
+        <span class="post-date float-right"
+          title="{{moment(1627237354000).format('MMM DD, YYYY, h:mm:ss A')}}">
+          <i class="fa fa-pencil-square-o"></i>
+          {{moment(1627237354000).fromNow()}}
+        </span>
+    </h3>
+
+    <article class="post-content">
+      <h1>
+        Java的垃圾回收机制
+      </h1>
+      <h2 id="绪"><a href="#绪" class="headerlink" title="绪"></a>绪</h2><blockquote>
+<p>参考：</p>
+<p>《可达性分析与垃圾回收算法》：<a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_41299382/article/details/103560227">https://blog.csdn.net/qq_41299382/article/details/103560227</a></p>
+</blockquote>
+<h2 id="类，实例，引用"><a href="#类，实例，引用" class="headerlink" title="类，实例，引用"></a>类，实例，引用</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">   <span class="comment">// 类</span></span><br><span class="line">    Class clazz = Class.forName(<span class="string">&quot;user&quot;</span>);</span><br><span class="line">  <span class="comment">//  con.newInstance()new实例</span></span><br><span class="line">  <span class="comment">// obj是引用</span></span><br><span class="line">    Object obj = con.newInstance();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>对象什么死后会被被判定为垃圾呢？</strong></p>
+<blockquote>
+<p>没有被其他对象引用时候</p>
+</blockquote>
+<h2 id="判断对象是否为垃圾的算法有哪些？——判断算法！！！对象！！对象"><a href="#判断对象是否为垃圾的算法有哪些？——判断算法！！！对象！！对象" class="headerlink" title="判断对象是否为垃圾的算法有哪些？——判断算法！！！对象！！对象"></a>判断对象是否为垃圾的算法有哪些？——判断算法！！！对象！！对象</h2><ul>
+<li><del>引用计数算法：</del><ul>
+<li>步骤：<ul>
+<li>每个对象实例都有一个引用计数器，被引用则+1，完成引用则-1；</li>
+<li>任何<strong>引用计数为0的对象</strong>实例可以<strong>被当作垃圾</strong>收集；</li>
+</ul>
+</li>
+<li>优缺点：<ul>
+<li>优点：<strong>执行效率高</strong>，程序执行收到的影响小</li>
+<li>缺点：无法检测出<strong>循环引用</strong>的情况，导致内存泄漏</li>
+</ul>
+</li>
+<li>因为其缺点（循环引用）难以忍受，所以主流的垃圾收集器不采用该垃圾收集算法</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 演示循环引用</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">buidDog</span><span class="params">()</span></span>&#123;</span><br><span class="line">    A a = <span class="keyword">new</span> A();</span><br><span class="line">  	B b = <span class="keyword">new</span> B();</span><br><span class="line">  	a.setB(b);</span><br><span class="line">  	b.setA(a);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>可达性分析算法<ul>
+<li>通过判断对象的引用链是否可达来决定对象是否可以被回收</li>
+<li>步骤<ul>
+<li>通过一系列称为“GC Roots”的对象作为起始点，</li>
+<li>从“GC Roots”开始向下搜索，搜索走过的路径称为“引用链”，</li>
+<li>当一个对象到 GC Roots 没有任何的引用链相连时，证明此对象不可用</li>
+</ul>
+</li>
+<li>可作为GC Root的节点有哪些？<ol>
+<li>虚拟机栈中引用的对象(栈帧中的本地变量表)。<ol>
+<li>new的对象赋给一个局部变量</li>
+</ol>
+</li>
+<li>方法区中(static)静态属性引用的对象</li>
+<li>方法区中常量引用的对象<ol>
+<li>new的对象类中定义的(final)常量</li>
+</ol>
+</li>
+<li>本地方法栈中(Native方法)引用的对象<ol>
+<li>native方法中引用的非Java语言的对象</li>
+</ol>
+</li>
+<li>活跃线程引用的对象</li>
+</ol>
+</li>
+<li>优缺点<ul>
+<li>优点：解决的循环引用问题；</li>
+<li>不足（来自网络）：在多线程环境下，其他线程可能会更新已经访问过的对象中的引用，从而造成误报（将引用设置为null）或者漏报（将引用设置为未被访问过的对象）。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p><img src="https://gitee.com/StuartYang/bpic/raw/master/20210726023711.jpg" alt="img"></p>
+<h2 id="无用的类的处理-—-！类！！类！！！"><a href="#无用的类的处理-—-！类！！类！！！" class="headerlink" title="无用的类的处理  —  ！类！！类！！！"></a>无用的类的处理  —  ！类！！类！！！</h2><p>类需要同时满足以下条件才会被算作是”无用的类”:</p>
+<ol>
+<li>该类所有实例都已经被回收(即在Java堆中不存在任何该类的实例)</li>
+<li>加载该类的ClassLoader已经被回收</li>
+<li>该类对应的Class对象没有在任何其他地方被引用,无法在任何地方通过反射访问该类的方法.</li>
+</ol>
+<p><strong>注意： 在满足上述条件后,JVM也只是”可以”对该类进行回收,而不是必然.</strong></p>
+<h2 id="对象的自我拯救-finalize方法"><a href="#对象的自我拯救-finalize方法" class="headerlink" title="对象的自我拯救-finalize方法"></a>对象的自我拯救-finalize方法</h2><p>在可达性分析算法中不可达的对象,也并非”非死不可”,而是处于一种“死缓”的状态。要宣告一个对象的彻底死亡,需要经历两次标记过程 :</p>
+<ol>
+<li>发现对象到GC Roots不可达,此对象对进行<strong>第一次标记并且进行一次筛选过程</strong>，**筛选的条件是此对象执行了finalize()[每个对象的finalize()方法只会被执行一次]**。当对象没有覆盖finalize()或者JVM已经调用过finalize()，JVM会将此对象彻底宣告死亡。</li>
+<li>若对象覆写了finalize()并且未被执行【死缓期】，会将此对象放入F-Queue。<ol>
+<li>如果对象在finalize()中重新与GC Roots建立联系，则对象会在第二次标记时从F-Queue中移除，从新复活。</li>
+<li>若对象在finalize中仍未与GC Roots建立联系(到GC Roots不可达),宣告死亡。</li>
+</ol>
+</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">GCDemo</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> GCDemo gcDemo;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">isAlive</span><span class="params">()</span></span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;我还活着!&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">finalize</span><span class="params">()</span> <span class="keyword">throws</span> Throwable </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.finalize();</span><br><span class="line">        System.out.println(<span class="string">&quot;finalize()已经执行&quot;</span>);</span><br><span class="line">        gcDemo = <span class="keyword">this</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">        gcDemo = <span class="keyword">new</span> GCDemo();</span><br><span class="line">        gcDemo = <span class="keyword">null</span>;</span><br><span class="line">      <span class="comment">// 通知JVM进行GC，会执行对象中的finalize方法（自救成功）</span></span><br><span class="line">        System.gc();</span><br><span class="line">        Thread.sleep(<span class="number">1000</span>);</span><br><span class="line">        <span class="keyword">if</span>(test != <span class="keyword">null</span>)&#123;</span><br><span class="line">            gcDemo.isAlive();</span><br><span class="line">        &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">            System.out.println(<span class="string">&quot;呜呜呜我死掉了&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">      </span><br><span class="line">        <span class="comment">/*</span></span><br><span class="line"><span class="comment">        1. 下面的代码与上面相同,由于finalize（）只会被执行一次，</span></span><br><span class="line"><span class="comment">        2. test = null后，再次GC不会再执行由于finalize方法</span></span><br><span class="line"><span class="comment">        3. 从而test死亡</span></span><br><span class="line"><span class="comment">        */</span></span><br><span class="line">        gcDemo = <span class="keyword">null</span>;</span><br><span class="line">        System.gc();</span><br><span class="line">        Thread.sleep(<span class="number">1000</span>);</span><br><span class="line">        <span class="keyword">if</span>(test != <span class="keyword">null</span>)&#123;</span><br><span class="line">            gcDemo.isAlive();</span><br><span class="line">        &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">            System.out.println(<span class="string">&quot;自救失败，死亡&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="垃圾收集算法-—-收集算法"><a href="#垃圾收集算法-—-收集算法" class="headerlink" title="垃圾收集算法 — 收集算法"></a>垃圾收集算法 — 收集算法</h2><ol>
+<li><p>标记-清除算法（mark and sweep）</p>
+<ul>
+<li><p>最基础的时候收集算法,算法分为”标记”和”清除”两个阶段:</p>
+<ul>
+<li>标记（判断垃圾）：可达性分析算法</li>
+<li>清除：标记完成后统一回收所有被标记的对象</li>
+</ul>
+</li>
+<li><p>缺点：</p>
+<ul>
+<li><p>空间问题：内存碎片化</p>
+</li>
+<li><p><strong>效率问题</strong>:标记和清除这两个过程效率都不高</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p> 复制算法（HotSpot虚拟机新生代采用的算法）</p>
+</li>
+</ol>
+<ul>
+<li><p>解决了”标记-清除”算法的效率问题和内存碎片化</p>
+</li>
+<li><p>步骤：</p>
+<ul>
+<li>将内存按容量分为大小相同的两块：对象面和空闲面</li>
+<li>每次只使用其中的一块.当这块内存需要垃圾回收时,会将此区域还存活的对象复制到另一块中,然后再把这块内存一次性清理掉。</li>
+</ul>
+</li>
+<li><p>HotSpot实现的复制算法流程：由于新生代中98%的对象的存活时间都很短,所以并不需要按上述分为大小相同的两块内存。</p>
+<ol>
+<li><p><strong>当Eden区满的时候会触发一次Minor gc</strong>,把还存活的对象拷贝到Survivor From区中,当Eden区再一次触发Minor gc时,会扫描Eden区和Survivor From区并对两个区进行垃圾回收,回收后还存活的对象则直接复制到To区域,并将Eden和From区域清空.</p>
+</li>
+<li><p>当后续发生Minor gc时,会对Eden区和Survivor To区进行垃圾回收,把还存活的对象复制到From区域,并将Eden和To区清空.</p>
+</li>
+<li><p>有些对象会在From区和To区来回复制,如此交换<strong>15次</strong>(默认为15次,当然也可以通过MaxTenuringThreshold改变).最终如果还是存活,就存入老年代.</p>
+</li>
+</ol>
+</li>
+</ul>
+<ol start="3">
+<li> 标记-整理算法(老年代采用的算法)</li>
+</ol>
+<ul>
+<li><p>算法分为”标记”和”整理”两个阶段:</p>
+<ul>
+<li><p>标记（判断垃圾）：可达性分析算法</p>
+</li>
+<li><p>整理：</p>
+<ul>
+<li>移动所有存活的对象，按照内存地址依次排序</li>
+<li>清除内存末端以后的空间。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<ol start="4">
+<li> 分代收集算法(JVM垃圾收集采用的算法)</li>
+</ol>
+<ul>
+<li><p>按照对象的生命周期划分内存空间，<strong>不同的内存空间采用不同的垃圾收集算法</strong>，Java堆分为新生代和老年代.</p>
+<ul>
+<li>新生代中，每次垃圾回收都有大批对象死亡,只有少量存活,因此我们采用复制算法。— Minor gc。【追求速度】</li>
+<li>老年代中，对象存活率较高, 没有额外空间对他进行分配担保，就必须采用标记清除或者标记整理算法. —MajorGC / OldGC【追求空间】<ul>
+<li>触发时机：<ul>
+<li>老年代空间不足一定触发</li>
+<li>新生代空间不足可能触发</li>
+<li>CMS GC出现concurrent mode failture 或promotion failed  </li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>Full GC = OldGC + 至少一次Minor gc</p>
+<ul>
+<li>理由：发生YoungGC之前往往会先检查一下老年代的空间，如果说明本次YoungGC后可能升入老年代对象的大小，可能超过了老年代当前可用内存空间，此时必须先触发一次OldGC给老年代腾出更多的空间，然后再执行YoungGC。所以，一般OldGC 很可能就是在 YoungGC 之前触发。所以自然OldGC一般都会跟一次YoungGC连带关联在一起了。 那他触发的实际上就是FullGC</li>
+<li>触发时机<ul>
+<li>永久代（方法区）空间不足</li>
+<li>老年代空间不足一定触发</li>
+<li>新生代空间不足可能触发</li>
+<li>CMS GC出现concurrent mode failture 或promotion failed  </li>
+<li>调用system.GC（）——不会绝对回收</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p><img src="https://gitee.com/StuartYang/bpic/raw/master/20210726033401.png" alt="image-20210726033400122"></p>
+<h2 id="垃圾收集器"><a href="#垃圾收集器" class="headerlink" title="垃圾收集器"></a>垃圾收集器</h2>
+    </article>
+  </div>
+
+</div>
+
+
+<div class="footer-wrapper container">
+  <footer class="footer clearfix">
+    <div class="clearfix">
+      <a href="https://www.yangxudong.site" class="footer-logo">
+        <i class="fa iconfont icon-baiyangzuo" style="font-size: 24px;"></i>
+      </a>
+      <ul class="footer-social-link">
+        <li>© 2019 旭东同学</li>
+        <li><a href="https://www.yangxudong.site">Home</a></li>
+        
+        <li><a target="_blank" rel="noopener" href="https://github.com/StuartYang">Github</a></li>
+        
+      </ul>
+      <div class="footer-theme-info">
+        Theme Based on <a target="_blank" rel="noopener" href="//github.com/sabrinaluo/hexo-theme-replica">Replica</a> ❤ Powered by Hexo
+      </div>
+    </div>
+  </footer>
+</div>
+<script src="/js/main.js"></script>
+
+</body>
+</html>
