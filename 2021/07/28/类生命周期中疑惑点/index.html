@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>
+      类生命周期中疑惑点 | YangXudong&#39;s Blog
+    </title>
+    <meta name="description" content="“ 君子藏剑于身，待时而动 ”">
+    
+      <meta name="keywords" content="
+  JVM,Java
+  ">
+      
+        <meta name="author" content="旭东同学">
+
+        <meta http-equiv="Cache-Control" content="no-transform" />
+        <meta http-equiv="Cache-Control" content="no-siteapp">
+        <meta name="theme-color" content="#1e2327">
+        <link rel="apple-touch-icon" href="https://github.githubassets.com/apple-touch-icon.png">
+        <link rel="apple-touch-icon" sizes="180x180"
+          href="https://github.githubassets.com/apple-touch-icon-180x180.png">
+
+        <link rel="icon" type="image/x-icon" href="https://gitee.com/StuartYang/bpic/raw/master/20210722154537.png">
+
+        <link rel="stylesheet" href="/css/main.css">
+        
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+        <link rel="stylesheet" href="//at.alicdn.com/t/font_2570198_c1noxsh7ksn.css">
+        </link>
+
+        <script src="//cdnjs.cloudflare.com/ajax/libs/vue/1.0.25-csp/vue.min.js"></script>
+        <!-- JavaScript 日期处理类库 -->
+        <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.11.2/moment.min.js"></script>
+  <meta name="generator" content="Hexo 5.4.0"></head>
+
+<body id="replica-app">
+
+<nav class="navbar-wrapper">
+  <div class="navbar">
+    <div class="container clearfix">
+      <a href="/" class="navbar-logo"><i class="fa iconfont icon-baiyangzuo" style="font-size: 32px;"></i></a>
+
+      <ul class="navbar-nav float-left">
+        
+        <li><a href="/archives">文章</a></li>
+        
+        
+        <li><a href="/categories">归档</a></li>
+        
+        
+        <li><a href="/tags">标签</a></li>
+        
+      </ul>
+
+      <ul class="navbar-nav user-nav float-right desktop-only">
+        <li class="user-nav-notification">
+          <a><span class="user-nav-unread"></span><i class="fa fa-bell"></i></a>
+        </li>
+        <li>
+          <a><i class="fa fa-plus"></i> <i class="fa fa-caret-down"></i></a>
+        </li>
+        <li class="user-nav-logo">
+          <a><img src="https://gitee.com/StuartYang/bpic/raw/master/20210722154532.jpg"> <i class="fa fa-caret-down"></i></i></a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="main-container">
+
+  <header class="header-wrapper desktop-only">
+  <div class="container header-site-detail">
+    <ul class="header-toolbar">
+      <li class="clearfix">
+        <a href="/archives" class="header-toolbar-left"><i
+                  class="fa fa-file-text"></i> 文章 </a>
+        <a href="/archives"
+           class="header-toolbar-right"> 18 </a>
+      </li>
+      <li>
+        <a href="/tags" class="header-toolbar-left"><i
+                  class="fa fa-tags"></i> 标签 </a>
+        <a href="/tags"
+           class="header-toolbar-right"> 23 </a>
+      </li>
+      <li>
+        <a href="/categories" class="header-toolbar-left"><i
+                  class="fa fa-folder-open"></i> 归档 </a>
+        <a href="/categories"
+           class="header-toolbar-right"> 9 </a>
+      </li>
+    </ul>
+    
+    <h2 class="header-title">
+      <i class="fa fa-book text-muted"></i>
+      <a href="/">YangXudong&#39;s Blog</a>
+    </h2>
+  </div>
+</header>
+
+
+  <div class="post-container container">
+    <h3>
+      <i class="fa fa-user-o"></i>
+      旭东同学
+
+        <span class="post-date float-right"
+          title="{{moment(1627406561000).format('MMM DD, YYYY, h:mm:ss A')}}">
+          <i class="fa fa-pencil-square-o"></i>
+          {{moment(1627406561000).fromNow()}}
+        </span>
+    </h3>
+
+    <article class="post-content">
+      <h1>
+        类生命周期中疑惑点
+      </h1>
+      <p><strong>定义在静态代码块之后的类变量，在静态语句块只可以赋值，但是不能访问</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">StaticTest</span></span>&#123;</span><br><span class="line">    <span class="keyword">static</span> &#123;</span><br><span class="line">        a=<span class="number">10</span>;</span><br><span class="line">        <span class="comment">// System.out.println(a);//报错   去掉这一行就正确</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">int</span> a=<span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        StaticTest staticTest = <span class="keyword">new</span> StaticTest();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>分析：</p>
+<p>类加载的时候在<code>连接</code>阶段的<code>准备</code>中，做了下面的事情：</p>
+<ol>
+<li>为类的<code>静态变量</code>分配<code>内存</code>并设置默认<code>初始值</code>，这些变量所使用的内存都将在<code>方法区</code>中进行分配。如上面代码：准备阶段 检测到了<code>a</code>为<code>int</code>，分配内存并为<code>a</code>赋初值<code>0</code>。</li>
+<li>进入初始化阶段之后，会<code>初始化的顺序为代码排列顺序</code>先进行设置，<code>最后</code>才能访问。</li>
+</ol>
+<p>所以说初始化之前<code>a=0</code>,先执行static代码块，<code>a=10</code>;然后执行静态变量，<code>a=1</code>, 最后执行访问语句时候，发现最后赋值的a是在静态代码块之后，所以不能访问。</p>
+<p><strong><clinit>()方法</strong></p>
+<ul>
+<li><p>是什么：为类变量赋初始值，执行静态代码块的打包。</p>
+</li>
+<li><p>静态语句块只能访问到定义在静态语句块之前的类变量，定义在它之后的类变量，在前面的静态语句块可以赋值，但是不能访问；</p>
+</li>
+<li><p>注意点</p>
+<ul>
+<li>并非所有的类都会拥有一个**<clinit><strong>方法, 满足下列条件之一的类不会拥有</strong><clinit>**方法:<ol>
+<li>该类既没有声明任何类变量，也没有静态初始化语句;</li>
+<li>该类声明了类变量，但没有明确使用类变量初始化语句或静态初始化语句初始化;</li>
+<li>该类仅包含静态 final 变量的类变量初始化语句，并且类变量初始化语句是编译时常量表达式;</li>
+</ol>
+</li>
+<li>静态语句块只能访问到定义在静态语句块之前的变量，定义在它之后的变量，在前面的静态语句块可以赋值，但是不能访问；</li>
+<li><strong>JVM会保证子类的<clinit>()方法执行之前，父类的<clinit>()方法已经执行完毕</strong>，不需要子类clinit方法的显式调用父类构造器。</li>
+</ul>
+</li>
+</ul>
+<p> <strong>static{}静态代码块与{}普通代码块之间的区别</strong></p>
+<ul>
+<li>区别：<ul>
+<li>静态代码块在虚拟机加载类的时候就会加载执行，而且只执行一次;</li>
+<li>非静态代码块，在实例化对象的时候即，new一个对象的时候执行，每次创建对象都会执行一次</li>
+</ul>
+</li>
+<li>联系：一个程序可以有多个静态非静态代码区域。</li>
+</ul>
+<p><strong>Java类使用分类</strong></p>
+<ol>
+<li>主动使用</li>
+<li>被动使用</li>
+</ol>
+<p> <strong>什么时候使用叫主动使用阶段</strong></p>
+<ul>
+<li>创建类的实例（new）。</li>
+<li>访问某个类或接口的静态变量，或者对该静态变量赋值。</li>
+<li>调用类的静态方法。</li>
+<li>通过反射方式执行以上三种行为。</li>
+<li>初始化子类的时候，会触发父类的初始化。</li>
+<li>Java虚拟机启动时被标明为启动类的类。（有main方法的类）</li>
+<li>JDK 1.7开始提供的动态语言支持。（了解即可）</li>
+</ul>
+<p>除了以上7种情况，其它使用Java类的方式都被看作是对类的<strong>被动使用</strong>，都不会导致类的初始化。</p>
+<p><strong>被动使用了解一下</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Dfather</span></span>&#123;</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">int</span> count = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">static</span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;Initialize class Dfather&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Dson</span> <span class="keyword">extends</span> <span class="title">Dfather</span></span>&#123;</span><br><span class="line">    <span class="keyword">static</span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;Initialize class Dson&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Test4</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> x = Dson.count;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>虽然是以Dson.count 形式调用的，但是因为count是Dfather的静态成员变量，所以只初始化Dfather类，而不初始化Dson类</p>
+<p> <strong><init>方法</strong></p>
+<blockquote>
+<p><strong>对象</strong>的初始化阶段时会执行<init>方法实例化一个类的四种途径</p>
+</blockquote>
+<p><strong><init>方法和<cinit>方法的区别</strong></p>
+<ul>
+<li><cinit>方法：静态代码块和静态(类)变量只会在类的初始化时执行，所以只会被执行一次。</li>
+<li><init>方法：普通代码块和成员(实例)变量会在对象初始化时候执行，所以new一次执行一次。</li>
+</ul>
+
+    </article>
+  </div>
+
+</div>
+
+
+<div class="footer-wrapper container">
+  <footer class="footer clearfix">
+    <div class="clearfix">
+      <a href="https://www.yangxudong.site" class="footer-logo">
+        <i class="fa iconfont icon-baiyangzuo" style="font-size: 24px;"></i>
+      </a>
+      <ul class="footer-social-link">
+        <li>© 2019 旭东同学</li>
+        <li><a href="https://www.yangxudong.site">Home</a></li>
+        
+        <li><a target="_blank" rel="noopener" href="https://github.com/StuartYang">Github</a></li>
+        
+      </ul>
+      <div class="footer-theme-info">
+        Theme Based on <a target="_blank" rel="noopener" href="//github.com/sabrinaluo/hexo-theme-replica">Replica</a> ❤ Powered by Hexo
+      </div>
+    </div>
+  </footer>
+</div>
+<script src="/js/main.js"></script>
+
+</body>
+</html>

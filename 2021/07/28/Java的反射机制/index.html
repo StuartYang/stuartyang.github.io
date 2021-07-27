@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>
+      Java的反射机制 | YangXudong&#39;s Blog
+    </title>
+    <meta name="description" content="“ 君子藏剑于身，待时而动 ”">
+    
+      <meta name="keywords" content="
+  JVM,反射,Java
+  ">
+      
+        <meta name="author" content="旭东同学">
+
+        <meta http-equiv="Cache-Control" content="no-transform" />
+        <meta http-equiv="Cache-Control" content="no-siteapp">
+        <meta name="theme-color" content="#1e2327">
+        <link rel="apple-touch-icon" href="https://github.githubassets.com/apple-touch-icon.png">
+        <link rel="apple-touch-icon" sizes="180x180"
+          href="https://github.githubassets.com/apple-touch-icon-180x180.png">
+
+        <link rel="icon" type="image/x-icon" href="https://gitee.com/StuartYang/bpic/raw/master/20210722154537.png">
+
+        <link rel="stylesheet" href="/css/main.css">
+        
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+        <link rel="stylesheet" href="//at.alicdn.com/t/font_2570198_c1noxsh7ksn.css">
+        </link>
+
+        <script src="//cdnjs.cloudflare.com/ajax/libs/vue/1.0.25-csp/vue.min.js"></script>
+        <!-- JavaScript 日期处理类库 -->
+        <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.11.2/moment.min.js"></script>
+  <meta name="generator" content="Hexo 5.4.0"></head>
+
+<body id="replica-app">
+
+<nav class="navbar-wrapper">
+  <div class="navbar">
+    <div class="container clearfix">
+      <a href="/" class="navbar-logo"><i class="fa iconfont icon-baiyangzuo" style="font-size: 32px;"></i></a>
+
+      <ul class="navbar-nav float-left">
+        
+        <li><a href="/archives">文章</a></li>
+        
+        
+        <li><a href="/categories">归档</a></li>
+        
+        
+        <li><a href="/tags">标签</a></li>
+        
+      </ul>
+
+      <ul class="navbar-nav user-nav float-right desktop-only">
+        <li class="user-nav-notification">
+          <a><span class="user-nav-unread"></span><i class="fa fa-bell"></i></a>
+        </li>
+        <li>
+          <a><i class="fa fa-plus"></i> <i class="fa fa-caret-down"></i></a>
+        </li>
+        <li class="user-nav-logo">
+          <a><img src="https://gitee.com/StuartYang/bpic/raw/master/20210722154532.jpg"> <i class="fa fa-caret-down"></i></i></a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="main-container">
+
+  <header class="header-wrapper desktop-only">
+  <div class="container header-site-detail">
+    <ul class="header-toolbar">
+      <li class="clearfix">
+        <a href="/archives" class="header-toolbar-left"><i
+                  class="fa fa-file-text"></i> 文章 </a>
+        <a href="/archives"
+           class="header-toolbar-right"> 18 </a>
+      </li>
+      <li>
+        <a href="/tags" class="header-toolbar-left"><i
+                  class="fa fa-tags"></i> 标签 </a>
+        <a href="/tags"
+           class="header-toolbar-right"> 23 </a>
+      </li>
+      <li>
+        <a href="/categories" class="header-toolbar-left"><i
+                  class="fa fa-folder-open"></i> 归档 </a>
+        <a href="/categories"
+           class="header-toolbar-right"> 9 </a>
+      </li>
+    </ul>
+    
+    <h2 class="header-title">
+      <i class="fa fa-book text-muted"></i>
+      <a href="/">YangXudong&#39;s Blog</a>
+    </h2>
+  </div>
+</header>
+
+
+  <div class="post-container container">
+    <h3>
+      <i class="fa fa-user-o"></i>
+      旭东同学
+
+        <span class="post-date float-right"
+          title="{{moment(1627403743000).format('MMM DD, YYYY, h:mm:ss A')}}">
+          <i class="fa fa-pencil-square-o"></i>
+          {{moment(1627403743000).fromNow()}}
+        </span>
+    </h3>
+
+    <article class="post-content">
+      <h1>
+        Java的反射机制
+      </h1>
+      <h2 id="什么是Java的反射？"><a href="#什么是Java的反射？" class="headerlink" title="什么是Java的反射？"></a>什么是Java的反射？</h2><blockquote>
+<p>动态语言：当程序运行时，认可以允许改变程序结构或变量类型。我们认为java并不是动态语言，但是它却有一个非常突出的动态相关机制，俗称：反射。</p>
+<p>我们认为jjava并不是动态语言，但是它却有一个非常突出的动态相关机制—反射：<strong>不修改源码的前提下，仍能做到对类中属性，方法进行控制程序。这就是Java的反射机制。</strong></p>
+</blockquote>
+<h2 id="案例"><a href="#案例" class="headerlink" title="案例"></a>案例</h2><p>Cat.java — 假设我们早就写好了</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> class <span class="title">Cat</span><span class="params">()</span></span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">say</span><span class="params">()</span></span>&#123;</span><br><span class="line">    System.out.println(<span class="string">&quot;说话&quot;</span>);</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">eat</span><span class="params">()</span></span>&#123;</span><br><span class="line">    System.out.println(<span class="string">&quot;吃东西&quot;</span>);</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>正常调用方式：Test1.java</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">  </span><br><span class="line">  Cat cat = <span class="keyword">new</span> Cat();</span><br><span class="line">  cat.say();</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果这时，我们在后期还需要需要调用Cat的eat方法，就必须在Test1中加入<code> cat.eat();</code></p>
+<p>这只是一处源码（Test1.java）修改，如果多处修改务必给后期代码维护带来麻烦，是否有一种不修改源码就能调用eat方法的模式呢？— 从而有了反射</p>
+<p>反射：</p>
+<p>Test2.java </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">  	Class clazz = Class.forName(<span class="string">&quot;com.demo.Cat&quot;</span>);</span><br><span class="line">    Cat cat=(Cat)clazz.newInstance();</span><br><span class="line">  	Method[] methodArray = stuClass.getMethods();</span><br><span class="line">       <span class="keyword">for</span>(Method m : methodArray)&#123;</span><br><span class="line">           m.invoke(obj);</span><br><span class="line">       &#125;</span><br><span class="line"> </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>当后期大量修改时候,不用修改调用的源码，只需要修改Cat类即可。</p>
+<h2 id="1、获取Class对象的三种方式"><a href="#1、获取Class对象的三种方式" class="headerlink" title="1、获取Class对象的三种方式"></a>1、获取Class对象的三种方式</h2><ol>
+<li><p>Object ——&gt; getClass();</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Student stu1 = <span class="keyword">new</span> Student();</span><br><span class="line">Class stuClass = stu1.getClass();</span><br></pre></td></tr></table></figure></li>
+<li><p>任何数据类型（包括基本数据类型）都有一个“静态”的class属性 </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Class stuClass2 = Student.class;</span><br></pre></td></tr></table></figure></li>
+<li><p>通过Class类的静态方法：loadClass(String  classNam);</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    Class stuClass3 = Class.loadClass(<span class="string">&quot;xxx.Student&quot;</span>);</span><br><span class="line">&#125; <span class="keyword">catch</span> (ClassNotFoundException e) &#123;</span><br><span class="line">    e.printStackTrace();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>通过Class类的静态方法：forName（String  className）(常用)</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    Class stuClass3 = Class.forName(<span class="string">&quot;xxx.Student&quot;</span>);</span><br><span class="line">&#125; <span class="keyword">catch</span> (ClassNotFoundException e) &#123;</span><br><span class="line">    e.printStackTrace();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<p>四种方式对比</p>
+<ul>
+<li>第一种对象都有了还要反射干什么。</li>
+<li>第二种需要导入类的包，依赖太强，不导包就抛编译错误。</li>
+<li>第三种:  同第四种</li>
+<li>第四种:  一个字符串可以传入也可写在配置文件中等多种方法。最常用</li>
+</ul>
+<h2 id="反射中常用的方法"><a href="#反射中常用的方法" class="headerlink" title="反射中常用的方法"></a>反射中常用的方法</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//调用制定方法（所有包括私有的），需要传入两个参数，第一个是调用的方法名称，第二个是方法的形参类型</span></span><br><span class="line">m = clazz.getDeclaredMethod(<span class="string">&quot;show4&quot;</span>, <span class="keyword">int</span>.class);</span><br><span class="line">m.setAccessible(<span class="keyword">true</span>);<span class="comment">//解除私有限定</span></span><br><span class="line"></span><br><span class="line">==================================================</span><br><span class="line">  <span class="comment">//获取所有公有方法</span></span><br><span class="line">Method[] methodArray = clazz.getMethods();</span><br><span class="line"></span><br><span class="line"><span class="comment">// 获取所有方法</span></span><br><span class="line">methodArray = stuClass.getDeclaredMethods();</span><br><span class="line"></span><br><span class="line">==================================================</span><br><span class="line">Field[] getFields():获取所有的公有字段</span><br><span class="line">Field[] getDeclaredFields()获取所有字段，</span><br><span class="line"></span><br><span class="line"> <span class="function">Field <span class="title">getField</span><span class="params">(String fieldName)</span>获取某个&quot;公有的&quot;字段；</span></span><br><span class="line"><span class="function">Field <span class="title">getDeclaredField</span><span class="params">(String fieldName)</span>:获取某个字段<span class="params">(可以是私有的)</span></span></span><br><span class="line"><span class="function"> </span></span><br><span class="line"><span class="function">得到的Field可以通过<span class="title">set</span><span class="params">(实例化对象,<span class="string">&quot;值&quot;</span>)</span>去设置值</span></span><br><span class="line"><span class="function"></span></span><br></pre></td></tr></table></figure>
+
+<h2 id="loadClass和forName创建Class对象的区别"><a href="#loadClass和forName创建Class对象的区别" class="headerlink" title="loadClass和forName创建Class对象的区别"></a>loadClass和forName创建Class对象的区别</h2><p>相同点：不管是使用 loadClass() 还是 forName()，对于任意一个类</p>
+<p>不同点：</p>
+<ul>
+<li>forName（）得到的Class对象是已经初始化的</li>
+<li>loadClass（）得到的是Class对象是还<strong>没有链接</strong>的。</li>
+</ul>
+<p>为什么Mysql的驱动使用forName？</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 注册 JDBC 驱动</span></span><br><span class="line">Class.forName(<span class="string">&quot;com.mysql.jdbc.Driver&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+<p>是因为在com.mysql.jdbc.Driver中有一段静态代码块，如果不用forName，得到的Class对象是没有执行静态代码块的Class对象。</p>
+<ul>
+<li>静态代码块的执行是在类生命周期的初始化阶段进行。</li>
+</ul>
+
+    </article>
+  </div>
+
+</div>
+
+
+<div class="footer-wrapper container">
+  <footer class="footer clearfix">
+    <div class="clearfix">
+      <a href="https://www.yangxudong.site" class="footer-logo">
+        <i class="fa iconfont icon-baiyangzuo" style="font-size: 24px;"></i>
+      </a>
+      <ul class="footer-social-link">
+        <li>© 2019 旭东同学</li>
+        <li><a href="https://www.yangxudong.site">Home</a></li>
+        
+        <li><a target="_blank" rel="noopener" href="https://github.com/StuartYang">Github</a></li>
+        
+      </ul>
+      <div class="footer-theme-info">
+        Theme Based on <a target="_blank" rel="noopener" href="//github.com/sabrinaluo/hexo-theme-replica">Replica</a> ❤ Powered by Hexo
+      </div>
+    </div>
+  </footer>
+</div>
+<script src="/js/main.js"></script>
+
+</body>
+</html>

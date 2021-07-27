@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>
+      类的生命周期 | YangXudong&#39;s Blog
+    </title>
+    <meta name="description" content="“ 君子藏剑于身，待时而动 ”">
+    
+      <meta name="keywords" content="
+  JVM,java
+  ">
+      
+        <meta name="author" content="旭东同学">
+
+        <meta http-equiv="Cache-Control" content="no-transform" />
+        <meta http-equiv="Cache-Control" content="no-siteapp">
+        <meta name="theme-color" content="#1e2327">
+        <link rel="apple-touch-icon" href="https://github.githubassets.com/apple-touch-icon.png">
+        <link rel="apple-touch-icon" sizes="180x180"
+          href="https://github.githubassets.com/apple-touch-icon-180x180.png">
+
+        <link rel="icon" type="image/x-icon" href="https://gitee.com/StuartYang/bpic/raw/master/20210722154537.png">
+
+        <link rel="stylesheet" href="/css/main.css">
+        
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+        <link rel="stylesheet" href="//at.alicdn.com/t/font_2570198_c1noxsh7ksn.css">
+        </link>
+
+        <script src="//cdnjs.cloudflare.com/ajax/libs/vue/1.0.25-csp/vue.min.js"></script>
+        <!-- JavaScript 日期处理类库 -->
+        <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.11.2/moment.min.js"></script>
+  <meta name="generator" content="Hexo 5.4.0"></head>
+
+<body id="replica-app">
+
+<nav class="navbar-wrapper">
+  <div class="navbar">
+    <div class="container clearfix">
+      <a href="/" class="navbar-logo"><i class="fa iconfont icon-baiyangzuo" style="font-size: 32px;"></i></a>
+
+      <ul class="navbar-nav float-left">
+        
+        <li><a href="/archives">文章</a></li>
+        
+        
+        <li><a href="/categories">归档</a></li>
+        
+        
+        <li><a href="/tags">标签</a></li>
+        
+      </ul>
+
+      <ul class="navbar-nav user-nav float-right desktop-only">
+        <li class="user-nav-notification">
+          <a><span class="user-nav-unread"></span><i class="fa fa-bell"></i></a>
+        </li>
+        <li>
+          <a><i class="fa fa-plus"></i> <i class="fa fa-caret-down"></i></a>
+        </li>
+        <li class="user-nav-logo">
+          <a><img src="https://gitee.com/StuartYang/bpic/raw/master/20210722154532.jpg"> <i class="fa fa-caret-down"></i></i></a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="main-container">
+
+  <header class="header-wrapper desktop-only">
+  <div class="container header-site-detail">
+    <ul class="header-toolbar">
+      <li class="clearfix">
+        <a href="/archives" class="header-toolbar-left"><i
+                  class="fa fa-file-text"></i> 文章 </a>
+        <a href="/archives"
+           class="header-toolbar-right"> 18 </a>
+      </li>
+      <li>
+        <a href="/tags" class="header-toolbar-left"><i
+                  class="fa fa-tags"></i> 标签 </a>
+        <a href="/tags"
+           class="header-toolbar-right"> 23 </a>
+      </li>
+      <li>
+        <a href="/categories" class="header-toolbar-left"><i
+                  class="fa fa-folder-open"></i> 归档 </a>
+        <a href="/categories"
+           class="header-toolbar-right"> 9 </a>
+      </li>
+    </ul>
+    
+    <h2 class="header-title">
+      <i class="fa fa-book text-muted"></i>
+      <a href="/">YangXudong&#39;s Blog</a>
+    </h2>
+  </div>
+</header>
+
+
+  <div class="post-container container">
+    <h3>
+      <i class="fa fa-user-o"></i>
+      旭东同学
+
+        <span class="post-date float-right"
+          title="{{moment(1627399511000).format('MMM DD, YYYY, h:mm:ss A')}}">
+          <i class="fa fa-pencil-square-o"></i>
+          {{moment(1627399511000).fromNow()}}
+        </span>
+    </h3>
+
+    <article class="post-content">
+      <h1>
+        类的生命周期
+      </h1>
+      <blockquote>
+<p>参考：</p>
+<p>《详解java类的生命周期》：<a target="_blank" rel="noopener" href="https://blog.csdn.net/zhengzhb/article/details/7517213">https://blog.csdn.net/zhengzhb/article/details/7517213</a></p>
+<p>《类装载器ClassLoader 、执行引擎ExecutionEngine》：<a target="_blank" rel="noopener" href="http://www.atguigu.com/jsfx/6222.html">http://www.atguigu.com/jsfx/6222.html</a></p>
+<p>《关于类加载的时候，static代码块中可以赋值但不能引用的问题》：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/xsyz/p/13728930.html">https://www.cnblogs.com/xsyz/p/13728930.html</a></p>
+</blockquote>
+<h2 id="类生命周期"><a href="#类生命周期" class="headerlink" title="类生命周期"></a>类生命周期</h2><blockquote>
+<p>JVM 将描述类的数据从CLASS文件加载到内存，并对数据进行校验，转换解析和初始化，最终形成可以被虚拟机直接使用的Java类型，最后被销毁的过程。</p>
+</blockquote>
+<p><img src="https://gitee.com/StuartYang/bpic/raw/master/20210727232849.jpeg" alt="img"></p>
+<p><strong>注意</strong>：</p>
+<ul>
+<li>  加载阶段是类的生命周期中的第一个阶段，加载阶段之后，是连接阶段。</li>
+<li>有时连接阶段并不会等加载阶段完全完成之后才开始，而是交叉进行，可能一个类只加载了一部分之后，连接阶段就已经开始了。</li>
+<li>加载和连接总的开始时间和完成时间总是固定的：加载阶段总是在连接阶段之前开始，连接阶段总是在加载阶段完成之后完成。</li>
+</ul>
+<h2 id="加载"><a href="#加载" class="headerlink" title="加载"></a>加载</h2><ul>
+<li>类装载器(ClassLoader)按照class文件特有的标识加载class文件。— 这个过程叫加载。</li>
+<li><strong>注意：</strong>ClassLoader只负责class文件的加载，至于它是否可以运行，则由Execution Engine决定。</li>
+</ul>
+<p><img src="https://gitee.com/StuartYang/bpic/raw/master/20210727235133.png" alt="img"></p>
+<h3 id="类加载器-Class-Loader"><a href="#类加载器-Class-Loader" class="headerlink" title="类加载器 - Class Loader"></a>类加载器 - Class Loader</h3><h4 id="类加载的分类"><a href="#类加载的分类" class="headerlink" title="类加载的分类"></a>类加载的分类</h4><p><img src="https://gitee.com/StuartYang/bpic/raw/master/20210727235212.png" alt="img"></p>
+<ul>
+<li>启动类加载器（BootstrapClassLoader）：是由C/C++编写的，负责加载JDK中的核心类库。</li>
+<li>扩展类加载器（ExtensionClassLoader）：主要负责加载JDK的扩展类库。</li>
+<li>应用程序类加载器（AppClassLoader）：负责加载当前应用的classpath的所有类</li>
+<li>用户自定义加载器： jawa.lang.ClassLoader的子类，用户可以定制类的加载方式。</li>
+</ul>
+<h3 id="类加载器的加载机制—双亲委派模型"><a href="#类加载器的加载机制—双亲委派模型" class="headerlink" title="类加载器的加载机制—双亲委派模型"></a>类加载器的加载机制—双亲委派模型</h3><ul>
+<li>双亲委派模型要求除了顶层的根类加载器以外，其余的类加载器都应该有自己的父类加载器(一般不是以继承实现，而是使用组合关系来复用父加载器的代码)。</li>
+<li>工作过程：<ul>
+<li>如果一个类收到类加载请求，它首先<strong>逐层向上</strong>请求父类加载器去加载这个类<strong>，</strong>只有当父类加载器无法完成加载时(其目录搜索范围内没找到需要的类)，<strong>逐层向下</strong>子类加载器才会自己去加载。</li>
+</ul>
+</li>
+<li>双亲委派模型的好处<ul>
+<li>保证了Java程序的稳定运行，可以避免类的重复加载。</li>
+<li>提供了沙箱安全机制：避免了Java 的核心 API 不被篡改：外层恶意同名类得不到加载从而无法使用。</li>
+</ul>
+</li>
+</ul>
+<h2 id="执行引擎-Execution-Engine"><a href="#执行引擎-Execution-Engine" class="headerlink" title="执行引擎 Execution Engine"></a>执行引擎 Execution Engine</h2><p>执行引擎负责解释命令，提交操作系统执行</p>
+<h3 id="验证"><a href="#验证" class="headerlink" title="验证"></a>验证</h3><p>确保class文件的字节流中信息符合虚拟机的要求</p>
+<h3 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h3><p>为类的静态变量分配内存并设为jvm默认的初值；对于成员变量，则不会为它们分配内存。</p>
+<h3 id="解析"><a href="#解析" class="headerlink" title="解析"></a>解析</h3><p>JVM将常量池中的符号引用替换为直接引用，解析动作主要针对类或接口，字段，类方法，方法类型等等。</p>
+<h3 id="初始化-方法"><a href="#初始化-方法" class="headerlink" title="初始化(方法)"></a>初始化(<clinit>方法)</h3><blockquote>
+<p>执行<clinit>方法 :</p>
+<ol>
+<li>为类的静态变量（类变量）赋予正确的初始值。</li>
+<li>执行类的静态代码块。</li>
+</ol>
+</blockquote>
+<p>注意点：初始化的顺序为代码排列顺序。</p>
+<h4 id="什么时候类会被初始化"><a href="#什么时候类会被初始化" class="headerlink" title="什么时候类会被初始化"></a>什么时候类会被初始化</h4><p>只有类或接口被Java程序<strong>首次主动使用时</strong>才初始化他们。</p>
+<h3 id="使用（方法）"><a href="#使用（方法）" class="headerlink" title="使用（方法）"></a>使用（<init>方法）</h3><p>将类加载到JVM的Runtime Data Area区域（Java内存结构）。</p>
+<p>实例化一个类的四种途径:</p>
+<ol>
+<li>调用 <code>new</code> 操作符</li>
+<li> 调用 <code>Class</code> 或 <code>java.lang.reflect.Constructor</code> 对象的<code>newInstance()</code>方法</li>
+<li> 调用任何现有对象的<code>clone()</code>方法</li>
+<li>通过 <code>java.io.ObjectInputStream</code> 类的 <code>getObject()</code> 方法反序列化</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.jvm.exercises;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> dimdark</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">InitTest</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 实例对象（成员变量）</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> code = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    InitTest() &#123;</span><br><span class="line">        code = <span class="number">1</span>;</span><br><span class="line">        name = <span class="string">&quot;init_name&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> String name = <span class="string">&quot;name&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;InitTest&#123;&quot;</span> +</span><br><span class="line">                <span class="string">&quot;code=&quot;</span> + code +</span><br><span class="line">                <span class="string">&quot;, name=&#x27;&quot;</span> + name + <span class="string">&#x27;\&#x27;&#x27;</span> +</span><br><span class="line">                <span class="string">&#x27;&#125;&#x27;</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="keyword">new</span> InitTest()); <span class="comment">// InitTest&#123;code=1, name=&#x27;init_name&#x27;&#125;</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="卸载"><a href="#卸载" class="headerlink" title="卸载"></a>卸载</h3><p>从内存中释放，就说所说的垃圾回收机制（GC）</p>
+
+    </article>
+  </div>
+
+</div>
+
+
+<div class="footer-wrapper container">
+  <footer class="footer clearfix">
+    <div class="clearfix">
+      <a href="https://www.yangxudong.site" class="footer-logo">
+        <i class="fa iconfont icon-baiyangzuo" style="font-size: 24px;"></i>
+      </a>
+      <ul class="footer-social-link">
+        <li>© 2019 旭东同学</li>
+        <li><a href="https://www.yangxudong.site">Home</a></li>
+        
+        <li><a target="_blank" rel="noopener" href="https://github.com/StuartYang">Github</a></li>
+        
+      </ul>
+      <div class="footer-theme-info">
+        Theme Based on <a target="_blank" rel="noopener" href="//github.com/sabrinaluo/hexo-theme-replica">Replica</a> ❤ Powered by Hexo
+      </div>
+    </div>
+  </footer>
+</div>
+<script src="/js/main.js"></script>
+
+</body>
+</html>
