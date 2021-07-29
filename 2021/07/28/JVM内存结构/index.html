@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>
+      JVM内存结构 | YangXudong&#39;s Blog
+    </title>
+    <meta name="description" content="“ 君子藏剑于身，待时而动 ”">
+    
+      <meta name="keywords" content="
+  Java,内存结构,JVM
+  ">
+      
+        <meta name="author" content="旭东同学">
+
+        <meta http-equiv="Cache-Control" content="no-transform" />
+        <meta http-equiv="Cache-Control" content="no-siteapp">
+        <meta name="theme-color" content="#1e2327">
+        <link rel="apple-touch-icon" href="https://github.githubassets.com/apple-touch-icon.png">
+        <link rel="apple-touch-icon" sizes="180x180"
+          href="https://github.githubassets.com/apple-touch-icon-180x180.png">
+
+        <link rel="icon" type="image/x-icon" href="https://gitee.com/StuartYang/bpic/raw/master/20210722154537.png">
+
+        <link rel="stylesheet" href="/css/main.css">
+        
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+        <link rel="stylesheet" href="//at.alicdn.com/t/font_2570198_c1noxsh7ksn.css">
+        </link>
+
+        <script src="//cdnjs.cloudflare.com/ajax/libs/vue/1.0.25-csp/vue.min.js"></script>
+        <!-- JavaScript 日期处理类库 -->
+        <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.11.2/moment.min.js"></script>
+  <meta name="generator" content="Hexo 5.4.0"></head>
+
+<body id="replica-app">
+
+<nav class="navbar-wrapper">
+  <div class="navbar">
+    <div class="container clearfix">
+      <a href="/" class="navbar-logo"><i class="fa iconfont icon-baiyangzuo" style="font-size: 32px;"></i></a>
+
+      <ul class="navbar-nav float-left">
+        
+        <li><a href="/archives">文章</a></li>
+        
+        
+        <li><a href="/categories">归档</a></li>
+        
+        
+        <li><a href="/tags">标签</a></li>
+        
+      </ul>
+
+      <ul class="navbar-nav user-nav float-right desktop-only">
+        <li class="user-nav-notification">
+          <a><span class="user-nav-unread"></span><i class="fa fa-bell"></i></a>
+        </li>
+        <li>
+          <a><i class="fa fa-plus"></i> <i class="fa fa-caret-down"></i></a>
+        </li>
+        <li class="user-nav-logo">
+          <a><img src="https://gitee.com/StuartYang/bpic/raw/master/20210722154532.jpg"> <i class="fa fa-caret-down"></i></i></a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="main-container">
+
+  <header class="header-wrapper desktop-only">
+  <div class="container header-site-detail">
+    <ul class="header-toolbar">
+      <li class="clearfix">
+        <a href="/archives" class="header-toolbar-left"><i
+                  class="fa fa-file-text"></i> 文章 </a>
+        <a href="/archives"
+           class="header-toolbar-right"> 22 </a>
+      </li>
+      <li>
+        <a href="/tags" class="header-toolbar-left"><i
+                  class="fa fa-tags"></i> 标签 </a>
+        <a href="/tags"
+           class="header-toolbar-right"> 27 </a>
+      </li>
+      <li>
+        <a href="/categories" class="header-toolbar-left"><i
+                  class="fa fa-folder-open"></i> 归档 </a>
+        <a href="/categories"
+           class="header-toolbar-right"> 9 </a>
+      </li>
+    </ul>
+    
+    <h2 class="header-title">
+      <i class="fa fa-book text-muted"></i>
+      <a href="/">YangXudong&#39;s Blog</a>
+    </h2>
+  </div>
+</header>
+
+
+  <div class="post-container container">
+    <h3>
+      <i class="fa fa-user-o"></i>
+      旭东同学
+
+        <span class="post-date float-right"
+          title="{{moment(1627462712000).format('MMM DD, YYYY, h:mm:ss A')}}">
+          <i class="fa fa-pencil-square-o"></i>
+          {{moment(1627462712000).fromNow()}}
+        </span>
+    </h3>
+
+    <article class="post-content">
+      <h1>
+        JVM内存结构
+      </h1>
+      <blockquote>
+<p>《Java虚拟机规范-Java SE 8》：<a target="_blank" rel="noopener" href="https://docs.oracle.com/javase/specs/jvms/se8/html/index.html">https://docs.oracle.com/javase/specs/jvms/se8/html/index.html</a></p>
+<p>《Java官方文档》：<a target="_blank" rel="noopener" href="https://docs.oracle.com/javase/8/">https://docs.oracle.com/javase/8/</a></p>
+<p>《基于jdk8的jvm（hotspot）笔记》：<a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_45676738/article/details/105764778">https://blog.csdn.net/weixin_45676738/article/details/105764778</a></p>
+<p>《jdk8 元空间（Metaspace） GC》：<a target="_blank" rel="noopener" href="https://blog.csdn.net/stone_tomcate/article/details/101032106">https://blog.csdn.net/stone_tomcate/article/details/101032106</a></p>
+<p>《【JVM】元数据空间(Metaspace)》：<a target="_blank" rel="noopener" href="https://blog.csdn.net/u011423880/article/details/112133200?utm_medium=distribute.pc_relevant.none-task-blog-2~default~BlogCommendFromMachineLearnPai2~default-2.control&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2~default~BlogCommendFromMachineLearnPai2~default-2.control">https://blog.csdn.net/u011423880/article/details/112133200?utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromMachineLearnPai2%7Edefault-2.control&amp;depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromMachineLearnPai2%7Edefault-2.control</a></p>
+<p>《为什么废弃永久代》<a target="_blank" rel="noopener" href="http://openjdk.java.net/jeps/122">http://openjdk.java.net/jeps/122</a></p>
+</blockquote>
+<p><img src="https://gitee.com/StuartYang/bpic/raw/master/20210726041831.png" alt="20210726041831"></p>
+<p><img src="https://gitee.com/StuartYang/bpic/raw/master/20210729112825.png" alt="1625447535564-1c284a8a-0082-4c27-8b95-8b075d27de9a"></p>
+<h3 id="线程独享的部分"><a href="#线程独享的部分" class="headerlink" title="线程独享的部分"></a>线程独享的部分</h3><ol>
+<li><p>程序计数器</p>
+<ul>
+<li>当前线程锁执行的字节码行好指示器（逻辑）</li>
+<li>改变计数器的值来选取下一条要执行的字节码指令</li>
+<li>和线程一一对应即线程私有</li>
+<li>不会发生内存泄漏</li>
+<li>只对Java方法进行计数，如果是Native方法则计数器值为Underfined</li>
+</ul>
+</li>
+<li><p>Java虚拟机栈</p>
+<ul>
+<li><p>每个线程都会创建一个私有的Java虚拟机栈 </p>
+</li>
+<li><p>Java方法执行的场所</p>
+</li>
+<li><p>包含多个<strong>栈帧</strong></p>
+<ul>
+<li><p>一个栈帧包括：局部变量表（localSize），操作数栈，动态连接，返回地址</p>
+<ul>
+<li>局部变量表：包含执行过程中的所有变量</li>
+<li>操作数栈：入栈，出栈，复制，交换，产生消费变量</li>
+</ul>
+</li>
+<li><p>执行一个方法时，就会创建一个栈帧压入栈中</p>
+</li>
+</ul>
+</li>
+</ul>
+<p>当一个虚拟机栈中需要生成的栈帧数 &gt; 虚拟机栈的最大深度, 则报 StackOverflowError</p>
+<p>虚拟机栈过多会引发OOM异常。</p>
+</li>
+</ol>
+<ol start="3">
+<li><p>本地方法站</p>
+<ul>
+<li>和虚拟机站相似，主要作用标注native方法。</li>
+</ul>
+</li>
+</ol>
+<h3 id="线程共享"><a href="#线程共享" class="headerlink" title="线程共享"></a>线程共享</h3><p>MetaSpace ，Java堆</p>
+<p>元空间和永久代的区别？</p>
+<ul>
+<li><p>方法区：每个类的结构（元数据）。例如：运行时常量池、字段和方法数据，以及方法和构造函数的代码，包括在类和实例初始化和接口初始化中使用的特殊方法。</p>
+</li>
+<li><p>元空间的本质和永久代都是对JVM规范中方法区的实现。Java 8 之后用元空间替换了永久代。</p>
+</li>
+<li><p>两者最大的区别：</p>
+<ul>
+<li>元空间并不在虚拟机中，而是使用本地内存。</li>
+<li>字符串常量由永久代转移到堆中。</li>
+</ul>
+</li>
+<li><p>初始化的Metaspace大小，控制元空间发生Metaspace GC的阈值。Metaspace GC后，动态增加或降低MetaspaceSize。</p>
+</li>
+<li><p>对于僵死的类及类加载器的垃圾回收将在元数据使用达到<code>MaxMetaspaceSize</code>参数的设定值时进行, 进行的是<code>full gc</code>。</p>
+</li>
+<li><p>为什么由元空间替换了永久代？</p>
+<ul>
+<li>字符串常量池存在永久代，容易出现性能问题和内存溢出。</li>
+<li>类及方法的信息等比较难确定其大小，因此对于永久代的大小指定比较困难，。而元空间的大小仅受本地内存限制。</li>
+<li>永久代会为 GC 带来不必要的复杂度，并且回收效率偏低。</li>
+<li>JRockit 没有永久代，Oracle能会将HotSpot 与 JRockit 合二为一。</li>
+</ul>
+</li>
+</ul>
+<p>Java堆</p>
+<p><img src="https://gitee.com/StuartYang/bpic/raw/master/20210728174109.png" alt="image-20210728174108363"></p>
+<ul>
+<li>对象实例化的分配区域</li>
+<li>堆的内存物理上不需要是连续的，逻辑上是连续的</li>
+<li>用户通过控制最大和最小堆大小调控堆的大小。若计算所需要的堆多于自动存储管理系统所能提供的堆，Java 虚拟机将抛出一个 <code>OutOfMemoryError</code>。</li>
+<li>是GC的主要区域</li>
+</ul>
+<h3 id="面试题"><a href="#面试题" class="headerlink" title="面试题"></a>面试题</h3><ol>
+<li><p>JVM三大性能调优参数-Xms ，-Xmx ，-Xss的含义</p>
+<ol>
+<li>-Xss规定了每个线程栈的大小</li>
+<li>-Xms：堆的初始值</li>
+<li>-Xmx ：堆的最大值</li>
+</ol>
+<p>一般将-Xms和Xmx的大小设置成一样的，因为堆扩容会发生内存抖动。</p>
+</li>
+<li><p>Java内存结构中堆和栈的区别</p>
+<ol>
+<li>管理方式不同：栈自动释放，堆需要GC</li>
+<li>空间不同：栈小于堆</li>
+<li>碎片：栈产生的碎片 远小于 堆</li>
+<li>分配方式不同：栈支持静态分配和动态分配，堆只是支持动态分配</li>
+<li>效率：栈的效率高</li>
+</ol>
+</li>
+<li><p>元空间，堆，线程之间的联系</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">Public <span class="class"><span class="keyword">class</span> <span class="title">HelloWorld</span></span>&#123;</span><br><span class="line">  <span class="keyword">private</span> String name;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">sayHello</span><span class="params">()</span></span>&#123;</span><br><span class="line">    System.out.println(name);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setName</span><span class="params">(String name)</span></span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.name = name;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> a = <span class="number">1</span>;</span><br><span class="line">    HelloWorld hw = <span class="keyword">new</span> HelloWorld();</span><br><span class="line">    hw.setName(<span class="string">&quot;test&quot;</span>);</span><br><span class="line">    hw.sayhello();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<img src="https://gitee.com/StuartYang/bpic/raw/master/20210728175535.png"/></li>
+<li><p> String中intern方法的作用</p>
+</li>
+</ol>
+<p>   <a target="_blank" rel="noopener" href="https://blog.csdn.net/guoxiaolongonly/article/details/80425548">https://blog.csdn.net/guoxiaolongonly/article/details/80425548</a></p>
+<p>1.8之前方法区在在虚拟机内存中，后来方法去分到了本地内存中，但是将原本在方法区中的字符串常量池分回了堆中。</p>
+<p>String str=“abc”；</p>
+<ul>
+<li>1.6之前：当常量池中不存在”abc”这个字符串的引用，在堆内存中new一个String对象，<strong>复制这个对象</strong>加入常量池，返回常量池中的对象。</li>
+<li>1.7之后：在堆内存中new一个新的String对象，将这个对象的引用加入常量池。(跟1.6的区别是常量池不再存放对象，只存放引用)</li>
+</ul>
+<p>String str =new String(“abc”)</p>
+<ul>
+<li>单纯的在堆内存中new一个String对象</li>
+</ul>
+
+    </article>
+  </div>
+
+</div>
+
+
+<div class="footer-wrapper container">
+  <footer class="footer clearfix">
+    <div class="clearfix">
+      <a href="https://www.yangxudong.site" class="footer-logo">
+        <i class="fa iconfont icon-baiyangzuo" style="font-size: 24px;"></i>
+      </a>
+      <ul class="footer-social-link">
+        <li>© 2019 旭东同学</li>
+        <li><a href="https://www.yangxudong.site">Home</a></li>
+        
+        <li><a target="_blank" rel="noopener" href="https://github.com/StuartYang">Github</a></li>
+        
+      </ul>
+      <div class="footer-theme-info">
+        Theme Based on <a target="_blank" rel="noopener" href="//github.com/sabrinaluo/hexo-theme-replica">Replica</a> ❤ Powered by Hexo
+      </div>
+    </div>
+  </footer>
+</div>
+<script src="/js/main.js"></script>
+
+</body>
+</html>

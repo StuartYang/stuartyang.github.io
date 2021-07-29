@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>
+      java多线程与并发 | YangXudong&#39;s Blog
+    </title>
+    <meta name="description" content="“ 君子藏剑于身，待时而动 ”">
+    
+      <meta name="keywords" content="
+  多线程
+  ">
+      
+        <meta name="author" content="旭东同学">
+
+        <meta http-equiv="Cache-Control" content="no-transform" />
+        <meta http-equiv="Cache-Control" content="no-siteapp">
+        <meta name="theme-color" content="#1e2327">
+        <link rel="apple-touch-icon" href="https://github.githubassets.com/apple-touch-icon.png">
+        <link rel="apple-touch-icon" sizes="180x180"
+          href="https://github.githubassets.com/apple-touch-icon-180x180.png">
+
+        <link rel="icon" type="image/x-icon" href="https://gitee.com/StuartYang/bpic/raw/master/20210722154537.png">
+
+        <link rel="stylesheet" href="/css/main.css">
+        
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+        <link rel="stylesheet" href="//at.alicdn.com/t/font_2570198_c1noxsh7ksn.css">
+        </link>
+
+        <script src="//cdnjs.cloudflare.com/ajax/libs/vue/1.0.25-csp/vue.min.js"></script>
+        <!-- JavaScript 日期处理类库 -->
+        <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.11.2/moment.min.js"></script>
+  <meta name="generator" content="Hexo 5.4.0"></head>
+
+<body id="replica-app">
+
+<nav class="navbar-wrapper">
+  <div class="navbar">
+    <div class="container clearfix">
+      <a href="/" class="navbar-logo"><i class="fa iconfont icon-baiyangzuo" style="font-size: 32px;"></i></a>
+
+      <ul class="navbar-nav float-left">
+        
+        <li><a href="/archives">文章</a></li>
+        
+        
+        <li><a href="/categories">归档</a></li>
+        
+        
+        <li><a href="/tags">标签</a></li>
+        
+      </ul>
+
+      <ul class="navbar-nav user-nav float-right desktop-only">
+        <li class="user-nav-notification">
+          <a><span class="user-nav-unread"></span><i class="fa fa-bell"></i></a>
+        </li>
+        <li>
+          <a><i class="fa fa-plus"></i> <i class="fa fa-caret-down"></i></a>
+        </li>
+        <li class="user-nav-logo">
+          <a><img src="https://gitee.com/StuartYang/bpic/raw/master/20210722154532.jpg"> <i class="fa fa-caret-down"></i></i></a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="main-container">
+
+  <header class="header-wrapper desktop-only">
+  <div class="container header-site-detail">
+    <ul class="header-toolbar">
+      <li class="clearfix">
+        <a href="/archives" class="header-toolbar-left"><i
+                  class="fa fa-file-text"></i> 文章 </a>
+        <a href="/archives"
+           class="header-toolbar-right"> 22 </a>
+      </li>
+      <li>
+        <a href="/tags" class="header-toolbar-left"><i
+                  class="fa fa-tags"></i> 标签 </a>
+        <a href="/tags"
+           class="header-toolbar-right"> 27 </a>
+      </li>
+      <li>
+        <a href="/categories" class="header-toolbar-left"><i
+                  class="fa fa-folder-open"></i> 归档 </a>
+        <a href="/categories"
+           class="header-toolbar-right"> 9 </a>
+      </li>
+    </ul>
+    
+    <h2 class="header-title">
+      <i class="fa fa-book text-muted"></i>
+      <a href="/">YangXudong&#39;s Blog</a>
+    </h2>
+  </div>
+</header>
+
+
+  <div class="post-container container">
+    <h3>
+      <i class="fa fa-user-o"></i>
+      旭东同学
+
+        <span class="post-date float-right"
+          title="{{moment(1627529193000).format('MMM DD, YYYY, h:mm:ss A')}}">
+          <i class="fa fa-pencil-square-o"></i>
+          {{moment(1627529193000).fromNow()}}
+        </span>
+    </h3>
+
+    <article class="post-content">
+      <h1>
+        java多线程与并发
+      </h1>
+      <h2 id="线程的一生——6个状态（生命周期）"><a href="#线程的一生——6个状态（生命周期）" class="headerlink" title="线程的一生——6个状态（生命周期）"></a>线程的一生——6个状态（生命周期）</h2><p><img src="https://gitee.com/StuartYang/bpic/raw/master/20210729142125.png" alt="image-20210729142123466"></p>
+<h2 id="thread和object类中的重要方法"><a href="#thread和object类中的重要方法" class="headerlink" title="thread和object类中的重要方法"></a>thread和object类中的重要方法</h2><p><img src="https://gitee.com/StuartYang/bpic/raw/master/20210729142235.png" alt="方法概览"></p>
+<h2 id="线程的分类"><a href="#线程的分类" class="headerlink" title="线程的分类"></a>线程的分类</h2><ul>
+<li>用户线程</li>
+<li>守护线程<ul>
+<li>作用：给用户线程提供服务，如果要服务的线程不在了，守护线程就会停止工作。例如：垃圾处理器就是守护线程</li>
+</ul>
+</li>
+</ul>
+<p>线程默认继承了自父线程。用户线程的父亲是用户线程，守护线程的父亲是守护线程。</p>
+<p>通常而言，守护线程都是由JVM自动启动，不是有用户启动。<strong>JVM是否退出关注的是现在运行的是否还有用户线程。</strong></p>
+<h2 id="实现多线程的方式"><a href="#实现多线程的方式" class="headerlink" title="实现多线程的方式"></a>实现多线程的方式</h2><p>实现多线程的形式有多种</p>
+<ul>
+<li><p>继承Thread类</p>
+</li>
+<li><p>实现Runnable接口</p>
+</li>
+<li><p>使用FutureTask去创建线程</p>
+</li>
+<li><p>实现Callable接口：可以返回指定类型的结果，用Future的实例去获取结果。</p>
+<ul>
+<li>无返回值是实现runable接口，有返回值是实现calssable接口，所以callable是新的实现线程的方式</li>
+</ul>
+</li>
+<li><p>使用线程池</p>
+</li>
+<li><p>…..</p>
+</li>
+</ul>
+<p>本质上是两种，准确的讲，<strong>创建线程只有一种方式就是构建Thread类</strong>，而实现线程的单元<strong>执行有两种方式</strong>。</p>
+<p>实现Runable接口和继承Thread类哪种方式更好？</p>
+<ol>
+<li><p>从代码架构角度应该解耦</p>
+</li>
+<li><ol>
+<li>具体的任务——run方法内部的实现</li>
+<li>和整个线程生命周期相关（Thread类去做的事情）</li>
+</ol>
+</li>
+<li><p>新建线程的损耗（和线程的声明周期有关）</p>
+</li>
+<li><ol>
+<li>如果我们选择了继承Thread的方法，新建任务只能去new一个类，但是这样做的损耗比较大（需要新建一个线程，执行完之后还要销毁）</li>
+<li>如果我们选择实现Runable的方式， 我们就可以反复利用同一个Runable线程。</li>
+</ol>
+</li>
+<li><p>Java不支持双继承——对于扩展性而言</p>
+</li>
+</ol>
+<p>同时使用两种方法会怎么样？</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BothRunableThread</span></span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String [] args)</span></span>&#123;</span><br><span class="line">    	<span class="keyword">new</span> Thread(<span class="keyword">new</span> Runable()&#123;</span><br><span class="line">        		<span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span></span>&#123;</span><br><span class="line">        		System.out.println(<span class="string">&quot;来之Runable&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        &#125;)&#123;</span><br><span class="line">        	<span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span></span>&#123;</span><br><span class="line">        		System.out.println(<span class="string">&quot;来之Thread&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;.start();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>分析：</p>
+<p>先重写run（）方法，后来加载runnable的run（）方法，覆盖了原本类中的run（）方法实现，从而当调用start（）方法时，会执行实现runable接口下的run（）方法。</p>
+<h3 id="start-方法原理解读"><a href="#start-方法原理解读" class="headerlink" title="start()方法原理解读"></a>start()方法原理解读</h3><h4 id="方法含义"><a href="#方法含义" class="headerlink" title="方法含义"></a>方法含义</h4><ul>
+<li>启动新子线程：主线程调用start方法只是通知JVM“有一个线程需要执行”，JVM不一定立即运行</li>
+<li>准备工作</li>
+<li>不能重复的执行Start()方法。否则会报错：<code>IllegalThreadStateException </code></li>
+</ul>
+<h4 id="Start-源码解析"><a href="#Start-源码解析" class="headerlink" title="Start()源码解析"></a>Start()源码解析</h4><ol>
+<li>启动新线程检测线程状态</li>
+<li>加入线程组</li>
+<li>调用start0()</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">Java线程最开始的状态被标记为0 【未启动】</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">volatile</span> <span class="keyword">int</span> threadStatus = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">start</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="comment">//1. 判断一下线程的状态，如果不是new状态则说明已经start了，抛出异常</span></span><br><span class="line">    <span class="keyword">if</span> (threadStatus != <span class="number">0</span>)</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> IllegalThreadStateException();</span><br><span class="line">  </span><br><span class="line">    <span class="comment">//2. 向线程组中添加该线程</span></span><br><span class="line">    group.add(<span class="keyword">this</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 标记还未执行</span></span><br><span class="line">    <span class="keyword">boolean</span> started = <span class="keyword">false</span>;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">     	<span class="comment">//3. start0是一个本地方法，用于执行线程</span></span><br><span class="line">        start0();</span><br><span class="line">        <span class="comment">// 标记还未执行</span></span><br><span class="line">        started = <span class="keyword">true</span>;</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">        	<span class="comment">//如果失败则抛出异常	</span></span><br><span class="line">            <span class="keyword">if</span> (!started) &#123;</span><br><span class="line">                group.threadStartFailed(<span class="keyword">this</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Throwable ignore) &#123;</span><br><span class="line">            <span class="comment">/* do nothing. If start0 threw a Throwable then</span></span><br><span class="line"><span class="comment">              it will be passed up the call stack */</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">native方法可以通过网站openjdk的方式去看源码</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">native</span> <span class="keyword">void</span> <span class="title">start0</span><span class="params">()</span></span>;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<blockquote>
+<p>一个线程两次调用start（）方法会出现什么情况？为什么？</p>
+</blockquote>
+<p>回答：会排除异常。因为在start方法执行的开始，就会对threadStatus进行判断，0代表未启动的线程，如果启动过（执行过start方法），状态码（被volatile标记）就被标记过了，从而抛出异常。</p>
+<h3 id="run-方法原理解读"><a href="#run-方法原理解读" class="headerlink" title="run()方法原理解读"></a>run()方法原理解读</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (target != <span class="keyword">null</span>) &#123;</span><br><span class="line">        target.run();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>可以看出在Thread类中run方法就是一个普通方法，所以要通过start，才能间接调用run()方法。</p>
+<p><strong>既然start方法会调用run方法，为什么我们而是选择调用start方法，而不是直接调用run（）方法呢？</strong></p>
+<blockquote>
+<p>调用start方法才是真正的启动了一个新的线程，会取进行一个线程的生命周期。而直接调用run（）方法，就相当于由main主线程调用了一个普通方法。</p>
+</blockquote>
+<h2 id="如何正确的停止线程"><a href="#如何正确的停止线程" class="headerlink" title="如何正确的停止线程"></a>如何正确的停止线程</h2><p>使用<code>interrupt</code>来通知，是一种规范，而<strong>不是强制（把停止的权利让给被停止线程本身，而不是强制对其停止）</strong>。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">publci <span class="class"><span class="keyword">class</span> <span class="title">RigthWayStopThreadWithoutSleep</span> <span class="keyword">implements</span> <span class="title">Runnable</span></span>&#123;</span><br><span class="line">         <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">           <span class="keyword">int</span> num = <span class="number">0</span>;</span><br><span class="line">        </span><br><span class="line">            <span class="comment">// 自己判断</span></span><br><span class="line">            <span class="keyword">while</span>(!Thread.currentThread().isInterrupted()&amp;&amp;num &lt;= Integer.Max_VALUE /<span class="number">2</span>)&#123;</span><br><span class="line">            	<span class="keyword">if</span>(num % <span class="number">1000</span> == <span class="number">0</span>)&#123;</span><br><span class="line">                	System.out.pintln(num+<span class="string">&quot;是1000的倍数&quot;</span>);</span><br><span class="line">                &#125;</span><br><span class="line">                num++;</span><br><span class="line">            &#125;</span><br><span class="line">            System.out.pintln(<span class="string">&quot;func is over&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String [] args)</span></span>&#123;</span><br><span class="line">  Thread thread = <span class="keyword">new</span> Thread(<span class="keyword">new</span> RigthWayStopThreadWithoutSleep());</span><br><span class="line">        thread.start();</span><br><span class="line">    	thread.sleep(<span class="number">1000</span>);</span><br><span class="line">    	thread.interrupt();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>当中断来临时候，调用下列方法时候，处于该方法的子线程状态对中断是有感知的：</p>
+<p><img src="https://gitee.com/StuartYang/bpic/raw/master/20210729141811.png" alt="image-20210729141809185"></p>
+<h3 id="错误的停止方法——既不要用这种方式停止线程"><a href="#错误的停止方法——既不要用这种方式停止线程" class="headerlink" title="错误的停止方法——既不要用这种方式停止线程"></a>错误的停止方法——既不要用这种方式停止线程</h3><ul>
+<li><p>被弃用的stop，suspend，和resume方法</p>
+</li>
+<li><ul>
+<li>会导致线程运行到一半突然停止，没办法完成一个基本单位的操作（会造成脏数据）。</li>
+<li>为什么弃用Thread.stop（）方法</li>
+</ul>
+</li>
+<li><ul>
+<li><ul>
+<li>因为它本质上是不安全的，停止线程会导致它解锁已经锁定的所有监视器（monitor）。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><ul>
+<li>suspend不会破坏对象，但是会让一个线程挂起，挂起时（释放CPU资源）但是依旧带着锁，这样一来容易造成死锁（万一唤醒它的线程的前提就是拿到它持有的锁，从而造成死锁）。需要被别人唤醒。</li>
+</ul>
+</li>
+<li><p>用volatile修饰boolean标记</p>
+</li>
+<li><ul>
+<li>看上去可行</li>
+<li>错误之处：volatile只满足可见性，不能保证原子性。</li>
+<li>修正方式：改用<code>interrupt</code></li>
+</ul>
+</li>
+</ul>
+<h3 id="sleep和wait的区别"><a href="#sleep和wait的区别" class="headerlink" title="sleep和wait的区别"></a>sleep和wait的区别</h3><ul>
+<li><p>外套进入阻塞状态，放弃CPU资源放弃锁。如果不设置事件，需要等待notify去释放锁。</p>
+</li>
+<li><p>sleep方法可以让线程进入Waiting状态，并且不占用CPU资源，但是不释放锁，直到规定时间后再执行，休眠期间如果被中断，会抛出异常并清除中断状态。</p>
+</li>
+</ul>
+<h3 id="join"><a href="#join" class="headerlink" title="join"></a>join</h3><p><strong>作用</strong>：因为新的线程加入了我们，所以我们要等他执行完再出发<br><strong>用法</strong>：主线程等待加入的子线程，注意谁等谁<br><strong>封装的工具类</strong>：CountDownLatch或CyclicBarrier类<br><strong>join期间主线程处于什么状态</strong>：WAITING状态</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Join</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">        Thread thread = <span class="keyword">new</span> Thread(() -&gt; &#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                Thread.sleep(<span class="number">1000</span>);</span><br><span class="line">            &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">            &#125;</span><br><span class="line">            System.out.println(Thread.currentThread().getName() + <span class="string">&quot;执行完毕&quot;</span>);</span><br><span class="line">        &#125;);</span><br><span class="line">        Thread thread2 = <span class="keyword">new</span> Thread(() -&gt; &#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                Thread.sleep(<span class="number">1000</span>);</span><br><span class="line">            &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">            &#125;</span><br><span class="line">            System.out.println(Thread.currentThread().getName() + <span class="string">&quot;执行完毕&quot;</span>);</span><br><span class="line">        &#125;);</span><br><span class="line"></span><br><span class="line">        thread.start();</span><br><span class="line">        thread2.start();</span><br><span class="line">        System.out.println(<span class="string">&quot;开始等待子线程运行完毕&quot;</span>);</span><br><span class="line">        thread.join();</span><br><span class="line">        thread2.join();</span><br><span class="line">        System.out.println(<span class="string">&quot;所有子线程执行完毕&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+    </article>
+  </div>
+
+</div>
+
+
+<div class="footer-wrapper container">
+  <footer class="footer clearfix">
+    <div class="clearfix">
+      <a href="https://www.yangxudong.site" class="footer-logo">
+        <i class="fa iconfont icon-baiyangzuo" style="font-size: 24px;"></i>
+      </a>
+      <ul class="footer-social-link">
+        <li>© 2019 旭东同学</li>
+        <li><a href="https://www.yangxudong.site">Home</a></li>
+        
+        <li><a target="_blank" rel="noopener" href="https://github.com/StuartYang">Github</a></li>
+        
+      </ul>
+      <div class="footer-theme-info">
+        Theme Based on <a target="_blank" rel="noopener" href="//github.com/sabrinaluo/hexo-theme-replica">Replica</a> ❤ Powered by Hexo
+      </div>
+    </div>
+  </footer>
+</div>
+<script src="/js/main.js"></script>
+
+</body>
+</html>

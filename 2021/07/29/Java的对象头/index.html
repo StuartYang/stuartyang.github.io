@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>
+      Java的对象头 | YangXudong&#39;s Blog
+    </title>
+    <meta name="description" content="“ 君子藏剑于身，待时而动 ”">
+    
+      <meta name="keywords" content="
+  Java,对象模型
+  ">
+      
+        <meta name="author" content="旭东同学">
+
+        <meta http-equiv="Cache-Control" content="no-transform" />
+        <meta http-equiv="Cache-Control" content="no-siteapp">
+        <meta name="theme-color" content="#1e2327">
+        <link rel="apple-touch-icon" href="https://github.githubassets.com/apple-touch-icon.png">
+        <link rel="apple-touch-icon" sizes="180x180"
+          href="https://github.githubassets.com/apple-touch-icon-180x180.png">
+
+        <link rel="icon" type="image/x-icon" href="https://gitee.com/StuartYang/bpic/raw/master/20210722154537.png">
+
+        <link rel="stylesheet" href="/css/main.css">
+        
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+        <link rel="stylesheet" href="//at.alicdn.com/t/font_2570198_c1noxsh7ksn.css">
+        </link>
+
+        <script src="//cdnjs.cloudflare.com/ajax/libs/vue/1.0.25-csp/vue.min.js"></script>
+        <!-- JavaScript 日期处理类库 -->
+        <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.11.2/moment.min.js"></script>
+  <meta name="generator" content="Hexo 5.4.0"></head>
+
+<body id="replica-app">
+
+<nav class="navbar-wrapper">
+  <div class="navbar">
+    <div class="container clearfix">
+      <a href="/" class="navbar-logo"><i class="fa iconfont icon-baiyangzuo" style="font-size: 32px;"></i></a>
+
+      <ul class="navbar-nav float-left">
+        
+        <li><a href="/archives">文章</a></li>
+        
+        
+        <li><a href="/categories">归档</a></li>
+        
+        
+        <li><a href="/tags">标签</a></li>
+        
+      </ul>
+
+      <ul class="navbar-nav user-nav float-right desktop-only">
+        <li class="user-nav-notification">
+          <a><span class="user-nav-unread"></span><i class="fa fa-bell"></i></a>
+        </li>
+        <li>
+          <a><i class="fa fa-plus"></i> <i class="fa fa-caret-down"></i></a>
+        </li>
+        <li class="user-nav-logo">
+          <a><img src="https://gitee.com/StuartYang/bpic/raw/master/20210722154532.jpg"> <i class="fa fa-caret-down"></i></i></a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="main-container">
+
+  <header class="header-wrapper desktop-only">
+  <div class="container header-site-detail">
+    <ul class="header-toolbar">
+      <li class="clearfix">
+        <a href="/archives" class="header-toolbar-left"><i
+                  class="fa fa-file-text"></i> 文章 </a>
+        <a href="/archives"
+           class="header-toolbar-right"> 22 </a>
+      </li>
+      <li>
+        <a href="/tags" class="header-toolbar-left"><i
+                  class="fa fa-tags"></i> 标签 </a>
+        <a href="/tags"
+           class="header-toolbar-right"> 27 </a>
+      </li>
+      <li>
+        <a href="/categories" class="header-toolbar-left"><i
+                  class="fa fa-folder-open"></i> 归档 </a>
+        <a href="/categories"
+           class="header-toolbar-right"> 9 </a>
+      </li>
+    </ul>
+    
+    <h2 class="header-title">
+      <i class="fa fa-book text-muted"></i>
+      <a href="/">YangXudong&#39;s Blog</a>
+    </h2>
+  </div>
+</header>
+
+
+  <div class="post-container container">
+    <h3>
+      <i class="fa fa-user-o"></i>
+      旭东同学
+
+        <span class="post-date float-right"
+          title="{{moment(1627533894000).format('MMM DD, YYYY, h:mm:ss A')}}">
+          <i class="fa fa-pencil-square-o"></i>
+          {{moment(1627533894000).fromNow()}}
+        </span>
+    </h3>
+
+    <article class="post-content">
+      <h1>
+        Java的对象头
+      </h1>
+      <h2 id="绪"><a href="#绪" class="headerlink" title="绪"></a>绪</h2><blockquote>
+<p>引用：</p>
+<p>《深入理解多线程（三）—— Java的对象头》：<a target="_blank" rel="noopener" href="https://www.hollischuang.com/archives/1953">https://www.hollischuang.com/archives/1953</a></p>
+</blockquote>
+<h2 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">oopDesc</span> &#123;</span></span><br><span class="line">  <span class="keyword">friend</span> <span class="class"><span class="keyword">class</span> <span class="title">VMStructs</span>;</span></span><br><span class="line"> <span class="keyword">private</span>:</span><br><span class="line">  <span class="keyword">volatile</span> markOop  _mark;</span><br><span class="line">  <span class="class"><span class="keyword">union</span> _<span class="title">metadata</span> &#123;</span></span><br><span class="line">    wideKlassOop    _klass;</span><br><span class="line">    narrowOop       _compressed_klass;</span><br><span class="line">  &#125; _metadata;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上面代码中的<code>_mark</code>和<code>_metadata</code>其实就是对象头的定义。关于<code>_metadata</code>之前就介绍过，这里不再赘述。由于这个专题主要想介绍和JAVA并发相关的知识，所以本文展开介绍一下<code>_mark</code> ，即mark word。</p>
+<h3 id="mark"><a href="#mark" class="headerlink" title="_mark"></a>_mark</h3><p>对象头信息是与对象自身定义的数据无关的额外存储成本，考虑到虚拟机的空间效率，Mark Word被设计成一个<strong>非固定的</strong>数据结构以便在极小的空间内存储尽量多的信息，它会根据对象的状态复用自己的存储空间。</p>
+<p>下图描述了在32位虚拟机上，在对象不同状态时 mark word各个比特位区间的含义。</p>
+<p><img src="https://gitee.com/StuartYang/bpic/raw/master/20210729124809.png" alt="ObjectHead"></p>
+<p>同样，在HotSpot的源码中我们可以找到关于对象头对象的定义，会一一印证上图的描述。对应与<a target="_blank" rel="noopener" href="https://github.com/openjdk-mirror/jdk7u-hotspot/blob/50bdefc3afe944ca74c3093e7448d6b889cd20d1/src/share/vm/oops/markOop.hpp">markOop.hpp</a>类。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">enum</span> &#123;</span> age_bits                 = <span class="number">4</span>,</span><br><span class="line">      lock_bits                = <span class="number">2</span>,</span><br><span class="line">      biased_lock_bits         = <span class="number">1</span>,</span><br><span class="line">      max_hash_bits            = BitsPerWord - age_bits - lock_bits - biased_lock_bits,</span><br><span class="line">      hash_bits                = max_hash_bits &gt; <span class="number">31</span> ? <span class="number">31</span> : max_hash_bits,</span><br><span class="line">      cms_bits                 = <span class="built_in">LP64_ONLY</span>(<span class="number">1</span>) <span class="built_in">NOT_LP64</span>(<span class="number">0</span>),</span><br><span class="line">      epoch_bits               = <span class="number">2</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>从上面的枚举定义中可以看出，对象头中主要包含了GC分代年龄、锁状态标记、哈希码、epoch等信息。</p>
+<p>从上图中可以看出，对象的状态一共有五种，分别是<strong>无锁态、轻量级锁、重量级锁、GC标记和偏向锁</strong>。在32位的虚拟机中有两个Bits是用来存储锁的标记为的，但是我们都知道，两个bits最多只能表示四种状态：00、01、10、11，那么第五种状态如何表示呢 ，就要额外依赖1Bit的空间，使用0和1来区分。</p>
+<blockquote>
+<p>在32位的HotSpot虚拟机 中对象未被锁定的状态下，Mark Word的32个Bits空间中的25Bits用于存储对象哈希码(HashCode)，4Bits用于存储对象分代年龄，2Bits用于存储锁标志位，1Bit固定为0，表示非偏向锁。</p>
+</blockquote>
+<p><a target="_blank" rel="noopener" href="https://github.com/openjdk-mirror/jdk7u-hotspot/blob/50bdefc3afe944ca74c3093e7448d6b889cd20d1/src/share/vm/oops/markOop.hpp">markOop.hpp</a>类中有关于对象状态的定义：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">enum</span> &#123;</span> locked_value             = <span class="number">0</span>,</span><br><span class="line">       unlocked_value           = <span class="number">1</span>,</span><br><span class="line">       monitor_value            = <span class="number">2</span>,</span><br><span class="line">       marked_value             = <span class="number">3</span>,</span><br><span class="line">       biased_lock_pattern      = <span class="number">5</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>简单翻译一下：</p>
+<blockquote>
+<p>locked_value(00) = 0</p>
+<p>unlocked_value(01) = 1</p>
+<p>monitor_value(10) = 2</p>
+<p>marked_value(11) = 3</p>
+<p>biased_lock_pattern(101) = 5</p>
+</blockquote>
+
+    </article>
+  </div>
+
+</div>
+
+
+<div class="footer-wrapper container">
+  <footer class="footer clearfix">
+    <div class="clearfix">
+      <a href="https://www.yangxudong.site" class="footer-logo">
+        <i class="fa iconfont icon-baiyangzuo" style="font-size: 24px;"></i>
+      </a>
+      <ul class="footer-social-link">
+        <li>© 2019 旭东同学</li>
+        <li><a href="https://www.yangxudong.site">Home</a></li>
+        
+        <li><a target="_blank" rel="noopener" href="https://github.com/StuartYang">Github</a></li>
+        
+      </ul>
+      <div class="footer-theme-info">
+        Theme Based on <a target="_blank" rel="noopener" href="//github.com/sabrinaluo/hexo-theme-replica">Replica</a> ❤ Powered by Hexo
+      </div>
+    </div>
+  </footer>
+</div>
+<script src="/js/main.js"></script>
+
+</body>
+</html>

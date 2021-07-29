@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>
+      java内存模型（JMM） | YangXudong&#39;s Blog
+    </title>
+    <meta name="description" content="“ 君子藏剑于身，待时而动 ”">
+    
+      <meta name="keywords" content="
+  Java,JMM
+  ">
+      
+        <meta name="author" content="旭东同学">
+
+        <meta http-equiv="Cache-Control" content="no-transform" />
+        <meta http-equiv="Cache-Control" content="no-siteapp">
+        <meta name="theme-color" content="#1e2327">
+        <link rel="apple-touch-icon" href="https://github.githubassets.com/apple-touch-icon.png">
+        <link rel="apple-touch-icon" sizes="180x180"
+          href="https://github.githubassets.com/apple-touch-icon-180x180.png">
+
+        <link rel="icon" type="image/x-icon" href="https://gitee.com/StuartYang/bpic/raw/master/20210722154537.png">
+
+        <link rel="stylesheet" href="/css/main.css">
+        
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+        <link rel="stylesheet" href="//at.alicdn.com/t/font_2570198_c1noxsh7ksn.css">
+        </link>
+
+        <script src="//cdnjs.cloudflare.com/ajax/libs/vue/1.0.25-csp/vue.min.js"></script>
+        <!-- JavaScript 日期处理类库 -->
+        <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.11.2/moment.min.js"></script>
+  <meta name="generator" content="Hexo 5.4.0"></head>
+
+<body id="replica-app">
+
+<nav class="navbar-wrapper">
+  <div class="navbar">
+    <div class="container clearfix">
+      <a href="/" class="navbar-logo"><i class="fa iconfont icon-baiyangzuo" style="font-size: 32px;"></i></a>
+
+      <ul class="navbar-nav float-left">
+        
+        <li><a href="/archives">文章</a></li>
+        
+        
+        <li><a href="/categories">归档</a></li>
+        
+        
+        <li><a href="/tags">标签</a></li>
+        
+      </ul>
+
+      <ul class="navbar-nav user-nav float-right desktop-only">
+        <li class="user-nav-notification">
+          <a><span class="user-nav-unread"></span><i class="fa fa-bell"></i></a>
+        </li>
+        <li>
+          <a><i class="fa fa-plus"></i> <i class="fa fa-caret-down"></i></a>
+        </li>
+        <li class="user-nav-logo">
+          <a><img src="https://gitee.com/StuartYang/bpic/raw/master/20210722154532.jpg"> <i class="fa fa-caret-down"></i></i></a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="main-container">
+
+  <header class="header-wrapper desktop-only">
+  <div class="container header-site-detail">
+    <ul class="header-toolbar">
+      <li class="clearfix">
+        <a href="/archives" class="header-toolbar-left"><i
+                  class="fa fa-file-text"></i> 文章 </a>
+        <a href="/archives"
+           class="header-toolbar-right"> 22 </a>
+      </li>
+      <li>
+        <a href="/tags" class="header-toolbar-left"><i
+                  class="fa fa-tags"></i> 标签 </a>
+        <a href="/tags"
+           class="header-toolbar-right"> 27 </a>
+      </li>
+      <li>
+        <a href="/categories" class="header-toolbar-left"><i
+                  class="fa fa-folder-open"></i> 归档 </a>
+        <a href="/categories"
+           class="header-toolbar-right"> 9 </a>
+      </li>
+    </ul>
+    
+    <h2 class="header-title">
+      <i class="fa fa-book text-muted"></i>
+      <a href="/">YangXudong&#39;s Blog</a>
+    </h2>
+  </div>
+</header>
+
+
+  <div class="post-container container">
+    <h3>
+      <i class="fa fa-user-o"></i>
+      旭东同学
+
+        <span class="post-date float-right"
+          title="{{moment(1627529391000).format('MMM DD, YYYY, h:mm:ss A')}}">
+          <i class="fa fa-pencil-square-o"></i>
+          {{moment(1627529391000).fromNow()}}
+        </span>
+    </h3>
+
+    <article class="post-content">
+      <h1>
+        java内存模型（JMM）
+      </h1>
+      <p>JMM是什么：</p>
+<ol>
+<li>JMM是一组规范，需要各个JVM的实现来准守JMM规范，以便于开发者可以利用这些规范，更方便的开发多线程程序。</li>
+<li>JMM是工具类和关键字的原理volatile，synchronized，Lock等原理都是JMM，如果没有JMM，那就需要我们指定什么时候用内存栅栏等，那就相当麻烦，还好有JMM，让我们只需要用到同步工具和关键字就可以开发并发程序。</li>
+<li>最重要的3点内容：<strong>重排序，可见性，原子性</strong></li>
+</ol>
+<h3 id="重排序"><a href="#重排序" class="headerlink" title="重排序"></a>重排序</h3><blockquote>
+<p> 在线程1内部的两行代码的【实际执行顺序】和代码在【Java文件中的顺序】不一致，代码指令并不是严格按照代码语句顺序执行的，它们的顺序被改变了，这就是重排序。</p>
+</blockquote>
+<ul>
+<li> 重排序的好处：提高处理速度</li>
+<li>重排序的3种情况：编译器优化、CPU指令重排、内存的“重排序”<ul>
+<li>编译器优化：包括JVM，JIT编译器等</li>
+<li>CPU指令重排：就算编译器不发生重排，CPU也可能对指令进行重排</li>
+<li>内存的“重排序”：线程A的修改线程B却看不到，引出可见性问题</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">OutOfOrderExecution</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">int</span> x = <span class="number">0</span>, y = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">int</span> a = <span class="number">0</span>, b = <span class="number">0</span>;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">        Thread one = <span class="keyword">new</span> Thread(<span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                a = <span class="number">1</span>;</span><br><span class="line">                x = b;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">        Thread two = <span class="keyword">new</span> Thread(<span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                b = <span class="number">1</span>;</span><br><span class="line">                y = a;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">        one.start();</span><br><span class="line">        two.start();</span><br><span class="line">        one.join();</span><br><span class="line">        two.join();</span><br><span class="line"> </span><br><span class="line">        System.out.println(<span class="string">&quot;x = &quot;</span> + x + <span class="string">&quot;, y = &quot;</span> + y);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>重排序分析</p>
+<p>这4行代码的执行顺序决定了最终x和y的结果，一共有3种情况：</p>
+<ol>
+<li><p>这4行代码的执行顺序决定了最终x和y的结果，一共有3种情况：</p>
+<ol>
+<li>a=1;x=b(0);b=1;y=a(1),最终结果是x=0,y=1<br>Thread-one执行完后，Thread-two再执行</li>
+<li>b=1;y=a(0);a=1;x=b(1),最终结果是x=1,y=0<br>Thread-two执行完后，Thread-one再执行</li>
+<li>b=1;a=1;x=b(1);y=a(1),最终结果是x=1,y=1</li>
+</ol>
+</li>
+</ol>
+<p>内存屏障其实就是一个CPU指令，在硬件层面上来说可以扥为两种：Load Barrier 和 Store Barrier即读屏障和写屏障。主要有两个作用</p>
+<ol>
+<li>阻止屏障两侧的指令重排序；</li>
+<li>强制把写缓冲区/高速缓存中的脏数据等写回主内存，让缓存中相应的数据失效。</li>
+</ol>
+<h3 id="可见性"><a href="#可见性" class="headerlink" title="可见性"></a>可见性</h3><p><img src="https://img-blog.csdnimg.cn/20200629103137947.jpeg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2FzZDA1MTM3NzMwNQ==,size_16,color_FFFFFF,t_70" alt="img"></p>
+<ul>
+<li><p>CPU读取寄存器registers中缓存——&gt;registers读取L1 cache级缓存——&gt;L2——&gt;L3——&gt;主内存RAM</p>
+</li>
+<li><p>CPU有多级缓存，导致读的数据过期</p>
+<ul>
+<li>高速缓存的容量比主内存小，但是速度仅次于寄存器，所以在CPU和主内存之间就多了Cache层</li>
+<li>线程间的对于共享变量的可见性问题不是直接由多核引起的，而是由多缓存引起的</li>
+<li>如果所有的核心(core)都只用一个缓存，那么也就不存在内存可见性问题了</li>
+<li>每个核心都会将自己需要的数据读到独占缓存(工作内存)中，数据修改后也是写入到独占缓存中，然后等待刷入到主存中。所以会导致有些核心读取的值是一个过期的值</li>
+</ul>
+</li>
+</ul>
+<h3 id="JMM的抽象：主内存和本地内存"><a href="#JMM的抽象：主内存和本地内存" class="headerlink" title="JMM的抽象：主内存和本地内存"></a>JMM的抽象：主内存和本地内存</h3><blockquote>
+<p>本地内存【并不是真的是一块给每个线程分配的内存】，而是JMM的一个抽象，是对于寄存器、一级缓存、二级缓存等的抽象</p>
+</blockquote>
+<p>主内存和本地内存的关系</p>
+<ul>
+<li>所有的变量都存储在主内存中，同时每个线程也有自己独立的工作内存，工作内存中的变量内容是主内存中的拷贝</li>
+<li>线程不能直接读写主内存中的变量，而是只能操作自己工作内存中的变量，然后再<strong>同步</strong>到主内存中</li>
+<li>主内存是多个线程共享的，但<strong>线程间不共享工作内存</strong>，如果线程间需要【通信】，必须借助【主内存中转】来完成</li>
+</ul>
+<p><strong>所有的共享变量存在于主内存中，每个线程有自己的本地内存，而且线程读写共享数据也是通过本地内存交换的，所以才导致了可见性问题</strong></p>
+<h3 id="Happens-Before原则-—-解决可见性问题"><a href="#Happens-Before原则-—-解决可见性问题" class="headerlink" title="Happens-Before原则 — 解决可见性问题"></a>Happens-Before原则 — 解决可见性问题</h3><blockquote>
+<p> 前面修改的变量对后面的操作是可见的。但这不影响重排序。</p>
+</blockquote>
+<p>具体的定义为：<br>1）如果一个操作happens-before另一个操作，那么第一个操作的执行结果将对第二个操作可见，而且第一个操作的执行顺序排在第二个操作之前。</p>
+<p>2）两个操作之间存在happens-before关系，并不意味着Java平台的具体实现必须要按照happens-before关系指定的顺序来执行。如果重排序之后的执行结果，与按happens-before关系来执行的结果一致，那么这种重排序并不非法（也就是说，JMM允许这种重排序）。</p>
+<p>具体的规则：<br>(1)程序顺序规则：一个线程中的每个操作，happens-before于该线程中的任意后续操作。<br>(2)监视器锁规则：对一个锁的解锁，happens-before于随后对这个锁的加锁。<br>(3)volatile变量规则：对一个volatile域的写，happens-before于任意后续对这个volatile域的读。<br>(4)传递性：如果A happens-before B，且B happens-before C，那么A happens-before C。<br>(5)start()规则：如果线程A执行操作ThreadB.start()（启动线程B），那么A线程的ThreadB.start()操作happens-before于线程B中的任意操作。<br>(6)Join()规则：如果线程A执行操作ThreadB.join()并成功返回，那么线程B中的任意操作happens-before于线程A从ThreadB.join()操作成功返回。<br>(7)程序中断规则：对线程interrupted()方法的调用先行于被中断线程的代码检测到中断时间的发生。<br>(8)对象finalize规则：一个对象的初始化完成（构造函数执行结束）先行于发生它的finalize()方法的开始。</p>
+<h4 id="工具类的Happens-Before原则"><a href="#工具类的Happens-Before原则" class="headerlink" title="工具类的Happens-Before原则"></a>工具类的Happens-Before原则</h4><ul>
+<li><p>volatile关键字</p>
+</li>
+<li><p>线程安全的容器get一定能看到在此之前的put等存入动作</p>
+</li>
+</ul>
+<figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">如线程安全的ConcurrentHashMap的<span class="keyword">get</span>和<span class="keyword">put</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>CountDownLatch : 计数器n=0时，阻塞的线程都将同时被唤醒。这个计数器就是一次性的。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">CountDownLatch latch = <span class="keyword">new</span> CountDownLatch(<span class="number">1</span>);</span><br><span class="line">Thread one = <span class="keyword">new</span> Thread(<span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            latch.countDown();</span><br><span class="line">            latch.await();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        a = <span class="number">1</span>;</span><br><span class="line">        x = b;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br><span class="line">one.start();</span><br><span class="line">latch.countDown();</span><br><span class="line"> </span><br><span class="line">当执行CountDownLatch的countDown()，Thread one才能从await中唤醒，继续执行下面的a=<span class="number">1</span>；x=b</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>Semaphore：类似CountDownLatch</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestCar</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span>  <span class="keyword">static</span>  Semaphore semaphore=<span class="keyword">new</span> Semaphore(<span class="number">10</span>);</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;<span class="number">100</span>;i++)&#123;</span><br><span class="line">  </span><br><span class="line">          Thread thread=<span class="keyword">new</span> Thread(<span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">                <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                    <span class="keyword">try</span> &#123;</span><br><span class="line">                        <span class="keyword">if</span>(semaphore.availablePermits()==<span class="number">0</span>)&#123;  <span class="comment">//判断令牌是否存在</span></span><br><span class="line">                            System.out.println(<span class="string">&quot;令牌不足&quot;</span>);</span><br><span class="line">                        &#125;</span><br><span class="line">                        semaphore.acquire(); <span class="comment">//获取令牌</span></span><br><span class="line">                        Thread.sleep(<span class="keyword">new</span> Random().nextInt(<span class="number">10000</span>));</span><br><span class="line">                        semaphore.release();<span class="comment">//释放令牌</span></span><br><span class="line">                    &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">                        e.printStackTrace();</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;,i+<span class="string">&quot;号车&quot;</span>);</span><br><span class="line">            thread.start();</span><br><span class="line">        &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>Future：使用Future我们可以很容易的获取线程返回的结果。Future的get是拿到Future的执行结果，get对于之前的执行结果是可见的。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">  </span><br><span class="line">    ExecutorService es = Executors.newFixedThreadPool(<span class="number">3</span>);</span><br><span class="line">    </span><br><span class="line">  Future&lt;String&gt; future = es.submit(()-&gt;&#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="string">&quot;程序执行结束&quot;</span>;</span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      System.out.println(future.get());</span><br><span class="line">    &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">      e.printStackTrace();</span><br><span class="line">    &#125; <span class="keyword">catch</span> (ExecutionException e) &#123;</span><br><span class="line">      e.printStackTrace();</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<ul>
+<li>线程池：我们会向线程池提交许多任务，然后在提交的任务中，每个任务都可以看到在提交之前的所有的执行结果（不用过多关注，默认保证的）</li>
+</ul>
+<ul>
+<li>CyclicBarrier : CyclicBarrier也能实现countDownLatch的功能，并且它的计数器n是可以被重置的，n又能重新回到原有值。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CyclicBarrierDemo</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">TaskThread</span> <span class="keyword">extends</span> <span class="title">Thread</span> </span>&#123;</span><br><span class="line">        </span><br><span class="line">        CyclicBarrier barrier  = <span class="keyword">new</span> CyclicBarrier(<span class="number">5</span>);</span><br><span class="line">        </span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                barrier.await();</span><br><span class="line">                System.out.println(getName() + <span class="string">&quot; 冲破栅栏 B&quot;</span>);</span><br><span class="line">            &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; threadNum; i++) &#123;</span><br><span class="line">            <span class="keyword">new</span> TaskThread(barrier).start();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="synchronized和volatile"><a href="#synchronized和volatile" class="headerlink" title="synchronized和volatile"></a>synchronized和volatile</h2><ul>
+<li>volatile保证可见性，保证操作不发生单条代码的指令重排。但是无法保证多条代码的原子操作。</li>
+<li>synchronized不仅保证了原子性，还保证了可见性，但是如果锁使用不当，还可能引发指令重排带来的问题。</li>
+</ul>
+
+    </article>
+  </div>
+
+</div>
+
+
+<div class="footer-wrapper container">
+  <footer class="footer clearfix">
+    <div class="clearfix">
+      <a href="https://www.yangxudong.site" class="footer-logo">
+        <i class="fa iconfont icon-baiyangzuo" style="font-size: 24px;"></i>
+      </a>
+      <ul class="footer-social-link">
+        <li>© 2019 旭东同学</li>
+        <li><a href="https://www.yangxudong.site">Home</a></li>
+        
+        <li><a target="_blank" rel="noopener" href="https://github.com/StuartYang">Github</a></li>
+        
+      </ul>
+      <div class="footer-theme-info">
+        Theme Based on <a target="_blank" rel="noopener" href="//github.com/sabrinaluo/hexo-theme-replica">Replica</a> ❤ Powered by Hexo
+      </div>
+    </div>
+  </footer>
+</div>
+<script src="/js/main.js"></script>
+
+</body>
+</html>

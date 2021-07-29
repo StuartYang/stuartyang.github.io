@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>
+      Java对象模型 | YangXudong&#39;s Blog
+    </title>
+    <meta name="description" content="“ 君子藏剑于身，待时而动 ”">
+    
+      <meta name="keywords" content="
+  Java,对象模型
+  ">
+      
+        <meta name="author" content="旭东同学">
+
+        <meta http-equiv="Cache-Control" content="no-transform" />
+        <meta http-equiv="Cache-Control" content="no-siteapp">
+        <meta name="theme-color" content="#1e2327">
+        <link rel="apple-touch-icon" href="https://github.githubassets.com/apple-touch-icon.png">
+        <link rel="apple-touch-icon" sizes="180x180"
+          href="https://github.githubassets.com/apple-touch-icon-180x180.png">
+
+        <link rel="icon" type="image/x-icon" href="https://gitee.com/StuartYang/bpic/raw/master/20210722154537.png">
+
+        <link rel="stylesheet" href="/css/main.css">
+        
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+        <link rel="stylesheet" href="//at.alicdn.com/t/font_2570198_c1noxsh7ksn.css">
+        </link>
+
+        <script src="//cdnjs.cloudflare.com/ajax/libs/vue/1.0.25-csp/vue.min.js"></script>
+        <!-- JavaScript 日期处理类库 -->
+        <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.11.2/moment.min.js"></script>
+  <meta name="generator" content="Hexo 5.4.0"></head>
+
+<body id="replica-app">
+
+<nav class="navbar-wrapper">
+  <div class="navbar">
+    <div class="container clearfix">
+      <a href="/" class="navbar-logo"><i class="fa iconfont icon-baiyangzuo" style="font-size: 32px;"></i></a>
+
+      <ul class="navbar-nav float-left">
+        
+        <li><a href="/archives">文章</a></li>
+        
+        
+        <li><a href="/categories">归档</a></li>
+        
+        
+        <li><a href="/tags">标签</a></li>
+        
+      </ul>
+
+      <ul class="navbar-nav user-nav float-right desktop-only">
+        <li class="user-nav-notification">
+          <a><span class="user-nav-unread"></span><i class="fa fa-bell"></i></a>
+        </li>
+        <li>
+          <a><i class="fa fa-plus"></i> <i class="fa fa-caret-down"></i></a>
+        </li>
+        <li class="user-nav-logo">
+          <a><img src="https://gitee.com/StuartYang/bpic/raw/master/20210722154532.jpg"> <i class="fa fa-caret-down"></i></i></a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="main-container">
+
+  <header class="header-wrapper desktop-only">
+  <div class="container header-site-detail">
+    <ul class="header-toolbar">
+      <li class="clearfix">
+        <a href="/archives" class="header-toolbar-left"><i
+                  class="fa fa-file-text"></i> 文章 </a>
+        <a href="/archives"
+           class="header-toolbar-right"> 22 </a>
+      </li>
+      <li>
+        <a href="/tags" class="header-toolbar-left"><i
+                  class="fa fa-tags"></i> 标签 </a>
+        <a href="/tags"
+           class="header-toolbar-right"> 27 </a>
+      </li>
+      <li>
+        <a href="/categories" class="header-toolbar-left"><i
+                  class="fa fa-folder-open"></i> 归档 </a>
+        <a href="/categories"
+           class="header-toolbar-right"> 9 </a>
+      </li>
+    </ul>
+    
+    <h2 class="header-title">
+      <i class="fa fa-book text-muted"></i>
+      <a href="/">YangXudong&#39;s Blog</a>
+    </h2>
+  </div>
+</header>
+
+
+  <div class="post-container container">
+    <h3>
+      <i class="fa fa-user-o"></i>
+      旭东同学
+
+        <span class="post-date float-right"
+          title="{{moment(1627529950000).format('MMM DD, YYYY, h:mm:ss A')}}">
+          <i class="fa fa-pencil-square-o"></i>
+          {{moment(1627529950000).fromNow()}}
+        </span>
+    </h3>
+
+    <article class="post-content">
+      <h1>
+        Java对象模型
+      </h1>
+      <h2 id="绪"><a href="#绪" class="headerlink" title="绪"></a>绪</h2><blockquote>
+<p>引用：</p>
+<p>《深入理解多线程（二）—— Java的对象模型》<a target="_blank" rel="noopener" href="https://www.hollischuang.com/archives/1910">https://www.hollischuang.com/archives/1910</a></p>
+</blockquote>
+<h2 id="Java对象模型是什么"><a href="#Java对象模型是什么" class="headerlink" title="Java对象模型是什么"></a>Java对象模型是什么</h2><ul>
+<li>和Java对象在虚拟机中的表现形式有关</li>
+<li>Java存储自身的存储模型</li>
+</ul>
+<h2 id="Java对象模型的结构"><a href="#Java对象模型的结构" class="headerlink" title="Java对象模型的结构"></a>Java对象模型的结构</h2><p>Java是一种面向对象语言。在学习Java的过程中你一定对下面两句话不陌生：</p>
+<ul>
+<li>在面向对象的软件中，对象（Object）是某一个类（Class）的实例。</li>
+<li>一切皆对象 </li>
+</ul>
+<p>我们还知道，在JVM的内存结构中，对象保存在堆内存中，而我们在对对象进行操作时，其实操作的是对象的引用。那么对象本身在JVM中的结构是什么样的呢？本文的所有分析均基于<a target="_blank" rel="noopener" href="https://github.com/openjdk-mirror/jdk7u-hotspot">HotSpot</a>虚拟机。</p>
+<p><img src="https://gitee.com/StuartYang/bpic/raw/master/20210729114304.png" alt="image-20210729114302779"></p>
+<h3 id="OOP-Klass模型"><a href="#OOP-Klass模型" class="headerlink" title="OOP-Klass模型"></a>OOP-Klass模型</h3><p>HotSpot是基于C++实现，而C++是一门面向对象的语言。本身是具备面向对象基本特征的，所以Java中的面向对象最简单的做法是为每个Java类生成一个c++类与之对应。</p>
+<p>但HotSpot JVM并没有这么做【 面向对象语言有一个很重要的特性就是多态。在C++中通过<a target="_blank" rel="noopener" href="https://baike.baidu.com/item/%E8%99%9A%E5%87%BD%E6%95%B0/2912832?fr=aladdin">虚函数表</a>（virtual table）的方式实现多态，HotSopt JVM的设计者不想让每个对象中都含有一个<code>vtable</code>（虚函数表）】，而是设计了一个<code>OOP-Klass 模型</code>。</p>
+<blockquote>
+<p>OOP-Klass模型：OOP（<code>Ordinary Object Pointer</code>）指的是普通对象指针，而<code>Klass</code>用来描述对象实例的具体类型。</p>
+</blockquote>
+<p>OOPS模块可以分成两个相对独立的部分：</p>
+<ul>
+<li>OOP框架</li>
+<li>Klass框架</li>
+</ul>
+<h4 id="OOP模型"><a href="#OOP模型" class="headerlink" title="OOP模型"></a>OOP模型</h4><p>在Java程序运行过程中，每new一个新的对象，在JVM内部就会相应地创建一个对应类型的OOP对象【OOPDesc】。</p>
+<p>OOPDesc为了表示不同的类型，有纵多的子类，例如：<code>instanceOopDesc</code>、<code>arrayOopDesc</code> 等</p>
+<ul>
+<li>当我们使用<code>new</code>创建一个Java对象实例的时候，JVM会创建一个<code>instanceOopDesc</code>对象来表示这个Java对象。</li>
+<li>当我们使用<code>new</code>创建一个Java数组实例的时候，JVM会创建一个<code>arrayOopDesc</code>对象来表示这个数组对象。</li>
+</ul>
+<p><strong>oopDesc类的定义</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">oopDesc</span> &#123;</span></span><br><span class="line">  <span class="keyword">friend</span> <span class="class"><span class="keyword">class</span> <span class="title">VMStructs</span>;</span></span><br><span class="line">  <span class="comment">// 对象头</span></span><br><span class="line">  <span class="keyword">private</span>:</span><br><span class="line">      <span class="keyword">volatile</span> markOop  _mark;</span><br><span class="line">      <span class="class"><span class="keyword">union</span> _<span class="title">metadata</span> &#123;</span></span><br><span class="line">        wideKlassOop    _klass;</span><br><span class="line">        narrowOop       _compressed_klass;</span><br><span class="line">      &#125; _metadata;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 实例数据</span></span><br><span class="line">  <span class="keyword">private</span>:</span><br><span class="line">      <span class="function"><span class="keyword">void</span>*     <span class="title">field_base</span><span class="params">(<span class="keyword">int</span> offset)</span>        <span class="keyword">const</span></span>;</span><br><span class="line">      <span class="function">jbyte*    <span class="title">byte_field_addr</span><span class="params">(<span class="keyword">int</span> offset)</span>   <span class="keyword">const</span></span>;</span><br><span class="line">      <span class="function">jchar*    <span class="title">char_field_addr</span><span class="params">(<span class="keyword">int</span> offset)</span>   <span class="keyword">const</span></span>;</span><br><span class="line">      <span class="function">jboolean* <span class="title">bool_field_addr</span><span class="params">(<span class="keyword">int</span> offset)</span>   <span class="keyword">const</span></span>;</span><br><span class="line">      <span class="function">jint*     <span class="title">int_field_addr</span><span class="params">(<span class="keyword">int</span> offset)</span>    <span class="keyword">const</span></span>;</span><br><span class="line">      <span class="function">jshort*   <span class="title">short_field_addr</span><span class="params">(<span class="keyword">int</span> offset)</span>  <span class="keyword">const</span></span>;</span><br><span class="line">      <span class="function">jlong*    <span class="title">long_field_addr</span><span class="params">(<span class="keyword">int</span> offset)</span>   <span class="keyword">const</span></span>;</span><br><span class="line">      <span class="function">jfloat*   <span class="title">float_field_addr</span><span class="params">(<span class="keyword">int</span> offset)</span>  <span class="keyword">const</span></span>;</span><br><span class="line">      <span class="function">jdouble*  <span class="title">double_field_addr</span><span class="params">(<span class="keyword">int</span> offset)</span> <span class="keyword">const</span></span>;</span><br><span class="line">      <span class="function">address*  <span class="title">address_field_addr</span><span class="params">(<span class="keyword">int</span> offset)</span> <span class="keyword">const</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">instanceOopDesc</span> :</span> <span class="keyword">public</span> oopDesc &#123;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">arrayOopDesc</span> :</span> <span class="keyword">public</span> oopDesc &#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在HotSpot虚拟机中，对象在内存中存储的布局可以分为三块区域：</p>
+<ul>
+<li><p>对象头（最重要）</p>
+<ul>
+<li><p>_mark： 关于锁标记、GC分代等信息均保存在<code>_mark</code>中。</p>
+</li>
+<li><p>_metadata（元数据）</p>
+<ul>
+<li><p>_metadata是一个共用体，其中：</p>
+<ul>
+<li><code>_klass</code>是普通指针</li>
+<li><code>_compressed_klass</code>是压缩类指针</li>
+</ul>
+<p>这两个指针都指向<code>instanceKlass</code>对象，它用来描述对象的具体类型。</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>实例数据</p>
+</li>
+<li><p>对齐填充</p>
+</li>
+</ul>
+<h4 id="klass模型"><a href="#klass模型" class="headerlink" title="klass模型"></a>klass模型</h4><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//klassOop的一部分，用来描述语言层的类型</span></span><br><span class="line"><span class="class"><span class="keyword">class</span>  <span class="title">Klass</span>;</span></span><br><span class="line"><span class="comment">//在虚拟机层面描述一个Java类</span></span><br><span class="line"><span class="class"><span class="keyword">class</span>   <span class="title">instanceKlass</span>;</span></span><br><span class="line"><span class="comment">//专有instantKlass，表示java.lang.Class的Klass</span></span><br><span class="line"><span class="class"><span class="keyword">class</span>     <span class="title">instanceMirrorKlass</span>;</span></span><br><span class="line"><span class="comment">//专有instantKlass，表示java.lang.ref.Reference的子类的Klass</span></span><br><span class="line"><span class="class"><span class="keyword">class</span>     <span class="title">instanceRefKlass</span>;</span></span><br><span class="line"><span class="comment">//表示methodOop的Klass</span></span><br><span class="line"><span class="class"><span class="keyword">class</span>   <span class="title">methodKlass</span>;</span></span><br><span class="line"><span class="comment">//表示constMethodOop的Klass</span></span><br><span class="line"><span class="class"><span class="keyword">class</span>   <span class="title">constMethodKlass</span>;</span></span><br><span class="line"><span class="comment">//表示methodDataOop的Klass</span></span><br><span class="line"><span class="class"><span class="keyword">class</span>   <span class="title">methodDataKlass</span>;</span></span><br><span class="line"><span class="comment">//最为klass链的端点，klassKlass的Klass就是它自身</span></span><br><span class="line"><span class="class"><span class="keyword">class</span>   <span class="title">klassKlass</span>;</span></span><br><span class="line"><span class="comment">//表示instanceKlass的Klass</span></span><br><span class="line"><span class="class"><span class="keyword">class</span>     <span class="title">instanceKlassKlass</span>;</span></span><br><span class="line"><span class="comment">//表示arrayKlass的Klass</span></span><br><span class="line"><span class="class"><span class="keyword">class</span>     <span class="title">arrayKlassKlass</span>;</span></span><br><span class="line"><span class="comment">//表示objArrayKlass的Klass</span></span><br><span class="line"><span class="class"><span class="keyword">class</span>       <span class="title">objArrayKlassKlass</span>;</span></span><br><span class="line"><span class="comment">//表示typeArrayKlass的Klass</span></span><br><span class="line"><span class="class"><span class="keyword">class</span>       <span class="title">typeArrayKlassKlass</span>;</span></span><br><span class="line"><span class="comment">//表示array类型的抽象基类</span></span><br><span class="line"><span class="class"><span class="keyword">class</span>   <span class="title">arrayKlass</span>;</span></span><br><span class="line"><span class="comment">//表示objArrayOop的Klass</span></span><br><span class="line"><span class="class"><span class="keyword">class</span>     <span class="title">objArrayKlass</span>;</span></span><br><span class="line"><span class="comment">//表示typeArrayOop的Klass</span></span><br><span class="line"><span class="class"><span class="keyword">class</span>     <span class="title">typeArrayKlass</span>;</span></span><br><span class="line"><span class="comment">//表示constantPoolOop的Klass</span></span><br><span class="line"><span class="class"><span class="keyword">class</span>   <span class="title">constantPoolKlass</span>;</span></span><br><span class="line"><span class="comment">//表示constantPoolCacheOop的Klass</span></span><br><span class="line"><span class="class"><span class="keyword">class</span>   <span class="title">constantPoolCacheKlass</span>;</span></span><br></pre></td></tr></table></figure>
+
+<p>和<code>oopDesc</code>是其他oop类型的父类一样，Klass类是其他klass类型的父类。</p>
+<p>Klass向JVM提供两个功能：</p>
+<ul>
+<li>实现语言层面的Java类（在Klass基类中已经实现）</li>
+<li>实现Java对象的分发功能（由Klass的子类提供虚函数实现）</li>
+</ul>
+<p>因为HotSopt JVM的设计者不想让每个对象中都含有一个虚函数表。HotSopt JVM的设计者把对象一拆为二，分为<code>klass</code>和<code>oop</code>,其中：</p>
+<ul>
+<li>oop的职能主要在于表示对象的实例数据</li>
+<li>klass为了实现虚函数多态，所以提供了虚函数表。</li>
+</ul>
+<p><code>_metadata</code>是一个共用体，其中<code>_klass</code>是普通指针，<code>_compressed_klass</code>是压缩类指针。这两个指针都指向<code>instanceKlass</code>对象。</p>
+<h6 id="instanceKlass"><a href="#instanceKlass" class="headerlink" title="instanceKlass"></a>instanceKlass</h6><p>JVM在运行时，需要一种用来标识Java内部结构的机制。在HotSpot中的解决方案是：为每一个已加载的Java类创建一个<code>instanceKlass</code>对象。</p>
+<p>来看下<a target="_blank" rel="noopener" href="https://github.com/openjdk-mirror/jdk7u-hotspot/blob/50bdefc3afe944ca74c3093e7448d6b889cd20d1/src/share/vm/oops/instanceKlass.hpp">instanceKlass</a>的内部结构：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//类拥有的方法列表</span></span><br><span class="line">  objArrayOop     _methods;</span><br><span class="line">  <span class="comment">//描述方法顺序</span></span><br><span class="line">  typeArrayOop    _method_ordering;</span><br><span class="line">  <span class="comment">//实现的接口</span></span><br><span class="line">  objArrayOop     _local_interfaces;</span><br><span class="line">  <span class="comment">//继承的接口</span></span><br><span class="line">  objArrayOop     _transitive_interfaces;</span><br><span class="line">  <span class="comment">//域</span></span><br><span class="line">  typeArrayOop    _fields;</span><br><span class="line">  <span class="comment">//常量</span></span><br><span class="line">  constantPoolOop _constants;</span><br><span class="line">  <span class="comment">//类加载器</span></span><br><span class="line">  oop             _class_loader;</span><br><span class="line">  <span class="comment">//protected域</span></span><br><span class="line">  oop             _protection_domain;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>可以看到，一个类该具有的东西，这里面基本都包含了。</p>
+<p>这里还有个点需要简单介绍一下。</p>
+<p>在JVM中，对象在内存中的基本存在形式就是oop。那么，对象所属的类，在JVM中也是一种对象，因此它们实际上也会被组织成一种oop，即klassOop。同样的，对于klassOop，也有对应的一个klass来描述，它就是klassKlass，也是klass的一个子类。klassKlass作为oop的klass链的端点。关于对象和数组的klass链大致如下图：</p>
+<p><img src="https://gitee.com/StuartYang/bpic/raw/master/20210729123704.png" alt="400_ac3_932"></p>
+<p>在这种设计下，JVM对内存的分配和回收，都可以采用统一的方式来管理。oop-klass-klassKlass关系如图：</p>
+<p><img src="https://gitee.com/StuartYang/bpic/raw/master/20210729123741.png" alt="2579123-5b117a7c06e83d84"></p>
+<h6 id="内存存储"><a href="#内存存储" class="headerlink" title="内存存储"></a>内存存储</h6><p>关于一个Java对象，他的存储是怎样的，一般很多人会回答：对象存储在堆上。稍微好一点的人会回答：对象存储在堆上，对象的引用存储在栈上。今天，再给你一个更加显得牛逼的回答：</p>
+<blockquote>
+<p>对象的实例（instantOopDesc)保存在堆上，对象的元数据（instantKlass）保存在方法区，对象的引用保存在栈上。</p>
+</blockquote>
+<p>其实如果细追究的话，上面这句话有点故意卖弄的意思。因为我们都知道。<strong>方法区用于存储虚拟机加载的类信息、常量、静态变量、即时编译器编译后的代码等数据。</strong> 所谓加载的类信息，其实不就是给每一个被加载的类都创建了一个 instantKlass对象么。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Model</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> a = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> b;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Model</span><span class="params">(<span class="keyword">int</span> b)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.b = b;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> c = <span class="number">10</span>;</span><br><span class="line">    Model modelA = <span class="keyword">new</span> Model(<span class="number">2</span>);</span><br><span class="line">    Model modelB = <span class="keyword">new</span> Model(<span class="number">3</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p><img src="https://gitee.com/StuartYang/bpic/raw/master/20210729114304.png" alt="image-20210729114302779"></p>
+<p>从上图中可以看到，在方法区的instantKlass中有一个<code>int a=1</code>的数据存储。在堆内存中的两个对象的oop中，分别维护着<code>int b=3</code>,<code>int b=2</code>的实例数据。和oopDesc一样，instantKlass也维护着一些<code>fields</code>，用来保存类中定义的类数据，比如<code>int staic a=1</code>。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><ul>
+<li><p>每一个Java类，在被JVM加载的时候，JVM会给这个类创建个<code>instanceKlass</code>保存在方法区，用来在JVM层表示该Java类。</p>
+</li>
+<li><p>当我们new创建一个对象的时候，JVM会创建一个<code>instanceOopDesc</code>对象，这个对象中最重要的对象头。</p>
+<ul>
+<li>对象头中的_mark：包含了和多线程相关的锁的信息。</li>
+<li>对象头中的_metadata（元数据）：维护着指向的是对象所属的类的<code>instanceKlass</code>的指针。</li>
+</ul>
+</li>
+</ul>
+
+    </article>
+  </div>
+
+</div>
+
+
+<div class="footer-wrapper container">
+  <footer class="footer clearfix">
+    <div class="clearfix">
+      <a href="https://www.yangxudong.site" class="footer-logo">
+        <i class="fa iconfont icon-baiyangzuo" style="font-size: 24px;"></i>
+      </a>
+      <ul class="footer-social-link">
+        <li>© 2019 旭东同学</li>
+        <li><a href="https://www.yangxudong.site">Home</a></li>
+        
+        <li><a target="_blank" rel="noopener" href="https://github.com/StuartYang">Github</a></li>
+        
+      </ul>
+      <div class="footer-theme-info">
+        Theme Based on <a target="_blank" rel="noopener" href="//github.com/sabrinaluo/hexo-theme-replica">Replica</a> ❤ Powered by Hexo
+      </div>
+    </div>
+  </footer>
+</div>
+<script src="/js/main.js"></script>
+
+</body>
+</html>
