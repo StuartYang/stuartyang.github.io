@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>
+      Java子线程中的异常处理 | YangXudong&#39;s Blog
+    </title>
+    <meta name="description" content="“ 君子藏剑于身，待时而动 ”">
+    
+      <meta name="keywords" content="
+  Java,多线程
+  ">
+      
+        <meta name="author" content="旭东同学">
+
+        <meta http-equiv="Cache-Control" content="no-transform" />
+        <meta http-equiv="Cache-Control" content="no-siteapp">
+        <meta name="theme-color" content="#1e2327">
+        <link rel="apple-touch-icon" href="https://github.githubassets.com/apple-touch-icon.png">
+        <link rel="apple-touch-icon" sizes="180x180"
+          href="https://github.githubassets.com/apple-touch-icon-180x180.png">
+
+        <link rel="icon" type="image/x-icon" href="https://gitee.com/StuartYang/bpic/raw/master/20210722154537.png">
+
+        <link rel="stylesheet" href="/css/main.css">
+        
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+        <link rel="stylesheet" href="//at.alicdn.com/t/font_2570198_c1noxsh7ksn.css">
+        </link>
+
+        <script src="//cdnjs.cloudflare.com/ajax/libs/vue/1.0.25-csp/vue.min.js"></script>
+        <!-- JavaScript 日期处理类库 -->
+        <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.11.2/moment.min.js"></script>
+  <meta name="generator" content="Hexo 5.4.0"></head>
+
+<body id="replica-app">
+
+<nav class="navbar-wrapper">
+  <div class="navbar">
+    <div class="container clearfix">
+      <a href="/" class="navbar-logo"><i class="fa iconfont icon-baiyangzuo" style="font-size: 32px;"></i></a>
+
+      <ul class="navbar-nav float-left">
+        
+        <li><a href="/archives">文章</a></li>
+        
+        
+        <li><a href="/categories">归档</a></li>
+        
+        
+        <li><a href="/tags">标签</a></li>
+        
+      </ul>
+
+      <ul class="navbar-nav user-nav float-right desktop-only">
+        <li class="user-nav-notification">
+          <a><span class="user-nav-unread"></span><i class="fa fa-bell"></i></a>
+        </li>
+        <li>
+          <a><i class="fa fa-plus"></i> <i class="fa fa-caret-down"></i></a>
+        </li>
+        <li class="user-nav-logo">
+          <a><img src="https://gitee.com/StuartYang/bpic/raw/master/20210722154532.jpg"> <i class="fa fa-caret-down"></i></i></a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="main-container">
+
+  <header class="header-wrapper desktop-only">
+  <div class="container header-site-detail">
+    <ul class="header-toolbar">
+      <li class="clearfix">
+        <a href="/archives" class="header-toolbar-left"><i
+                  class="fa fa-file-text"></i> 文章 </a>
+        <a href="/archives"
+           class="header-toolbar-right"> 23 </a>
+      </li>
+      <li>
+        <a href="/tags" class="header-toolbar-left"><i
+                  class="fa fa-tags"></i> 标签 </a>
+        <a href="/tags"
+           class="header-toolbar-right"> 27 </a>
+      </li>
+      <li>
+        <a href="/categories" class="header-toolbar-left"><i
+                  class="fa fa-folder-open"></i> 归档 </a>
+        <a href="/categories"
+           class="header-toolbar-right"> 9 </a>
+      </li>
+    </ul>
+    
+    <h2 class="header-title">
+      <i class="fa fa-book text-muted"></i>
+      <a href="/">YangXudong&#39;s Blog</a>
+    </h2>
+  </div>
+</header>
+
+
+  <div class="post-container container">
+    <h3>
+      <i class="fa fa-user-o"></i>
+      旭东同学
+
+        <span class="post-date float-right"
+          title="{{moment(1627570852000).format('MMM DD, YYYY, h:mm:ss A')}}">
+          <i class="fa fa-pencil-square-o"></i>
+          {{moment(1627570852000).fromNow()}}
+        </span>
+    </h3>
+
+    <article class="post-content">
+      <h1>
+        Java子线程中的异常处理
+      </h1>
+      <h2 id="如果子线程中的异常不做处理"><a href="#如果子线程中的异常不做处理" class="headerlink" title="如果子线程中的异常不做处理"></a>如果子线程中的异常不做处理</h2><p>子线程中发生了异常，如果没有任何类来接手处理的话，是会直接退出的，而<strong>不会记录任何日志。</strong></p>
+<h2 id="方式一：子线程种使用try…-catch"><a href="#方式一：子线程种使用try…-catch" class="headerlink" title="方式一：子线程种使用try….catch"></a>方式一：子线程种使用try….catch</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ChildThread</span> <span class="keyword">implements</span> <span class="title">Runnable</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        doSomething1();</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            exceptionMethod();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            System.out.println(String.format(<span class="string">&quot;handle exception in child thread. %s&quot;</span>, e));</span><br><span class="line">        &#125;</span><br><span class="line">        doSomething2();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="方式二：-为线程设置“未捕获异常处理器”—UncaughtExceptionHandler"><a href="#方式二：-为线程设置“未捕获异常处理器”—UncaughtExceptionHandler" class="headerlink" title="方式二： 为线程设置“未捕获异常处理器”—UncaughtExceptionHandler"></a>方式二： 为线程设置“未捕获异常处理器”—UncaughtExceptionHandler</h2><p>为线程设置异常处理器。具体做法可以是以下几种：</p>
+<ol>
+<li><p>Thread.setUncaughtExceptionHandler设置当前线程的异常处理器；</p>
+</li>
+<li><p>Thread.setDefaultUncaughtExceptionHandler为整个程序设置默认的异常处理器；</p>
+</li>
+</ol>
+<p>使用说明：</p>
+<ol>
+<li>如果当前线程所属的线程组有异常处理器，则使用线程组的UncaughtExceptionHandler</li>
+<li>否则，使用全局默认的DefaultUncaughtExceptionHandler；</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ChildThread</span> <span class="keyword">implements</span> <span class="title">Runnable</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> ChildThreadExceptionHandler exceptionHandler;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> &#123;</span><br><span class="line">        exceptionHandler = <span class="keyword">new</span> ChildThreadExceptionHandler();</span><br><span class="line">      	<span class="comment">// 全局在这里设置 </span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line"> </span><br><span class="line">      <span class="comment">// 局部的在这里设置       </span></span><br><span class="line">    	</span><br><span class="line">    Thread.currentThread().setUncaughtExceptionHandler(exceptionHandler);</span><br><span class="line">        System.out.println(<span class="string">&quot;do something 1&quot;</span>);</span><br><span class="line">        exceptionMethod();</span><br><span class="line">        System.out.println(<span class="string">&quot;do something 2&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">ChildThreadExceptionHandler</span> <span class="keyword">implements</span> <span class="title">Thread</span>.<span class="title">UncaughtExceptionHandler</span> </span>&#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">uncaughtException</span><span class="params">(Thread t, Throwable e)</span> </span>&#123;</span><br><span class="line">            System.out.println(String.format(<span class="string">&quot;handle exception in child thread. %s&quot;</span>, e));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<p><strong>或者，设置所有线程的默认异常处理器</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ChildThread</span> <span class="keyword">implements</span> <span class="title">Runnable</span> </span>&#123;</span><br><span class="line">  </span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> ChildThreadExceptionHandler exceptionHandler;</span><br><span class="line">    <span class="keyword">static</span> &#123;</span><br><span class="line">        exceptionHandler = <span class="keyword">new</span> ChildThreadExceptionHandler();</span><br><span class="line">        Thread.setDefaultUncaughtExceptionHandler(exceptionHandler);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;do something 1&quot;</span>);</span><br><span class="line">        exceptionMethod();</span><br><span class="line">        System.out.println(<span class="string">&quot;do something 2&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">exceptionMethod</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">&quot;ChildThread exception&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">ChildThreadExceptionHandler</span> <span class="keyword">implements</span> <span class="title">Thread</span>.<span class="title">UncaughtExceptionHandler</span> </span>&#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">uncaughtException</span><span class="params">(Thread t, Throwable e)</span> </span>&#123;</span><br><span class="line">            System.out.println(String.format(<span class="string">&quot;handle exception in child thread. %s&quot;</span>, e));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="方法三：通过Future的get方法捕获异常（推荐）"><a href="#方法三：通过Future的get方法捕获异常（推荐）" class="headerlink" title="方法三：通过Future的get方法捕获异常（推荐）"></a>方法三：通过Future的get方法捕获异常（推荐）</h2><ol>
+<li>使用线程池提交一个能获取到返回信息的方法-<code>ExecutorService.submit(Callable)</code></li>
+<li>在submit之后可以获得一个线程执行结果的Future对象</li>
+<li>如果子线程中发生了异常，通过future.get()获取返回值时，可以捕获ExecutionException异常，从而知道子线程中发生了异常。</li>
+</ol>
+<p><strong>子线程</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ChildThread</span> <span class="keyword">implements</span> <span class="title">Callable</span>&lt;<span class="title">String</span>&gt; </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">call</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;do something 1&quot;</span>);</span><br><span class="line">        exceptionMethod();</span><br><span class="line">        System.out.println(<span class="string">&quot;do something 2&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;test result&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">exceptionMethod</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">&quot;ChildThread1 exception&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>使用线程池父线程</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        ExecutorService executorService = Executors.newFixedThreadPool(<span class="number">8</span>);</span><br><span class="line">        Future future = executorService.submit(<span class="keyword">new</span> ChildThread());</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            future.get();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">            System.out.println(String.format(<span class="string">&quot;handle exception in child thread. %s&quot;</span>, e));</span><br><span class="line">        &#125; <span class="keyword">catch</span> (ExecutionException e) &#123;</span><br><span class="line">            System.out.println(String.format(<span class="string">&quot;handle exception in child thread. %s&quot;</span>, e));</span><br><span class="line">        &#125;</span><br><span class="line">      <span class="comment">// 关闭线程池</span></span><br><span class="line">      <span class="keyword">finally</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> (executorService != <span class="keyword">null</span>) &#123;</span><br><span class="line">                executorService.shutdown();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+    </article>
+  </div>
+
+</div>
+
+
+<div class="footer-wrapper container">
+  <footer class="footer clearfix">
+    <div class="clearfix">
+      <a href="https://www.yangxudong.site" class="footer-logo">
+        <i class="fa iconfont icon-baiyangzuo" style="font-size: 24px;"></i>
+      </a>
+      <ul class="footer-social-link">
+        <li>© 2019 旭东同学</li>
+        <li><a href="https://www.yangxudong.site">Home</a></li>
+        
+        <li><a target="_blank" rel="noopener" href="https://github.com/StuartYang">Github</a></li>
+        
+      </ul>
+      <div class="footer-theme-info">
+        Theme Based on <a target="_blank" rel="noopener" href="//github.com/sabrinaluo/hexo-theme-replica">Replica</a> ❤ Powered by Hexo
+      </div>
+    </div>
+  </footer>
+</div>
+<script src="/js/main.js"></script>
+
+</body>
+</html>
