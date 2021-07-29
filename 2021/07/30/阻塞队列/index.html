@@ -8,12 +8,12 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>
-      jvm面试 | YangXudong&#39;s Blog
+      阻塞队列 | YangXudong&#39;s Blog
     </title>
     <meta name="description" content="“ 君子藏剑于身，待时而动 ”">
     
       <meta name="keywords" content="
-  jvm,面试,java
+  Java,JUC
   ">
       
         <meta name="author" content="旭东同学">
@@ -112,61 +112,17 @@
       旭东同学
 
         <span class="post-date float-right"
-          title="{{moment(1627398040000).format('MMM DD, YYYY, h:mm:ss A')}}">
+          title="{{moment(1627578780000).format('MMM DD, YYYY, h:mm:ss A')}}">
           <i class="fa fa-pencil-square-o"></i>
-          {{moment(1627398040000).fromNow()}}
+          {{moment(1627578780000).fromNow()}}
         </span>
     </h3>
 
     <article class="post-content">
       <h1>
-        jvm面试
+        阻塞队列
       </h1>
-      <p><strong>Java语言的的特性</strong></p>
-<ul>
-<li>Java语言简单：语法与 C 语言和 C++ 语言接近。<ul>
-<li>Java 语言不使用指针，而是引用。</li>
-<li>JVM提供了自动分配和回收内存空间，使得程序员不必为内存管理而担忧。</li>
-</ul>
-</li>
-<li>Java 语言是面向对象的<ul>
-<li>封装：类将对象的属性和方法结合为一个独立的整体，对外并尽可能隐藏对象的内部实现细节。 </li>
-<li>继承：支持类之间的单继承，但支持接口之间的多继承</li>
-<li>多态：<ul>
-<li>重写父方法<ul>
-<li>参数列表必须完全相同</li>
-<li>返回类型可以不相同，但是必须是父类返回值的派生类</li>
-<li>访问权限不能比父类中被重写的方法的访问权限更低</li>
-<li>final 的方法不能被重写</li>
-<li>使用 super调用父类的被重写方法</li>
-</ul>
-</li>
-<li>方法重载：<ul>
-<li>参数不同<ul>
-<li>个数不同</li>
-<li>顺序不同</li>
-<li>类型不同</li>
-</ul>
-</li>
-<li>返回类型可以不同</li>
-<li>访问修饰符可以不同</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<h2 id="java的平台无关性"><a href="#java的平台无关性" class="headerlink" title="java的平台无关性"></a>java的平台无关性</h2><p><code>javac xxx.java</code>  ： Java文件编译成class文件</p>
-<p><code>java  xxx.class</code> 执行class文件字节码</p>
-<p><code>javp -c xxx.class</code>：反汇编class文件字节码</p>
-<p>![image-20210727231317654](/Users/yangxudong/Library/Application Support/typora-user-images/image-20210727231317654.png)</p>
-<p><strong>为什么JVM不直接将源码解析成机器码去执行</strong></p>
-<ol>
-<li>不用每次都需要做编译前的准备工作</li>
-<li>兼容性：一次执行，多处运行</li>
-</ol>
-
+      
     </article>
   </div>
 
