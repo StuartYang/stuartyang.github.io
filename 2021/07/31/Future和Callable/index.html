@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>
+      Future和Callable | YangXudong&#39;s Blog
+    </title>
+    <meta name="description" content="“ 君子藏剑于身，待时而动 ”">
+    
+      <meta name="keywords" content="
+  JUC,Java,多线程
+  ">
+      
+        <meta name="author" content="旭东同学">
+
+        <meta http-equiv="Cache-Control" content="no-transform" />
+        <meta http-equiv="Cache-Control" content="no-siteapp">
+        <meta name="theme-color" content="#1e2327">
+        <link rel="apple-touch-icon" href="https://github.githubassets.com/apple-touch-icon.png">
+        <link rel="apple-touch-icon" sizes="180x180"
+          href="https://github.githubassets.com/apple-touch-icon-180x180.png">
+
+        <link rel="icon" type="image/x-icon" href="https://gitee.com/StuartYang/bpic/raw/master/20210722154537.png">
+
+        <link rel="stylesheet" href="/css/main.css">
+        
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+        <link rel="stylesheet" href="//at.alicdn.com/t/font_2570198_c1noxsh7ksn.css">
+        </link>
+
+        <script src="//cdnjs.cloudflare.com/ajax/libs/vue/1.0.25-csp/vue.min.js"></script>
+        <!-- JavaScript 日期处理类库 -->
+        <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.11.2/moment.min.js"></script>
+  <meta name="generator" content="Hexo 5.4.0"></head>
+
+<body id="replica-app">
+
+<nav class="navbar-wrapper">
+  <div class="navbar">
+    <div class="container clearfix">
+      <a href="/" class="navbar-logo"><i class="fa iconfont icon-baiyangzuo" style="font-size: 32px;"></i></a>
+
+      <ul class="navbar-nav float-left">
+        
+        <li><a href="/archives">文章</a></li>
+        
+        
+        <li><a href="/categories">归档</a></li>
+        
+        
+        <li><a href="/tags">标签</a></li>
+        
+      </ul>
+
+      <ul class="navbar-nav user-nav float-right desktop-only">
+        <li class="user-nav-notification">
+          <a><span class="user-nav-unread"></span><i class="fa fa-bell"></i></a>
+        </li>
+        <li>
+          <a><i class="fa fa-plus"></i> <i class="fa fa-caret-down"></i></a>
+        </li>
+        <li class="user-nav-logo">
+          <a><img src="https://gitee.com/StuartYang/bpic/raw/master/20210722154532.jpg"> <i class="fa fa-caret-down"></i></i></a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="main-container">
+
+  <header class="header-wrapper desktop-only">
+  <div class="container header-site-detail">
+    <ul class="header-toolbar">
+      <li class="clearfix">
+        <a href="/archives" class="header-toolbar-left"><i
+                  class="fa fa-file-text"></i> 文章 </a>
+        <a href="/archives"
+           class="header-toolbar-right"> 33 </a>
+      </li>
+      <li>
+        <a href="/tags" class="header-toolbar-left"><i
+                  class="fa fa-tags"></i> 标签 </a>
+        <a href="/tags"
+           class="header-toolbar-right"> 33 </a>
+      </li>
+      <li>
+        <a href="/categories" class="header-toolbar-left"><i
+                  class="fa fa-folder-open"></i> 归档 </a>
+        <a href="/categories"
+           class="header-toolbar-right"> 10 </a>
+      </li>
+    </ul>
+    
+    <h2 class="header-title">
+      <i class="fa fa-book text-muted"></i>
+      <a href="/">YangXudong&#39;s Blog</a>
+    </h2>
+  </div>
+</header>
+
+
+  <div class="post-container container">
+    <h3>
+      <i class="fa fa-user-o"></i>
+      旭东同学
+
+        <span class="post-date float-right"
+          title="{{moment(1627665490000).format('MMM DD, YYYY, h:mm:ss A')}}">
+          <i class="fa fa-pencil-square-o"></i>
+          {{moment(1627665490000).fromNow()}}
+        </span>
+    </h3>
+
+    <article class="post-content">
+      <h1>
+        Future和Callable
+      </h1>
+      <h2 id="Runable的缺陷"><a href="#Runable的缺陷" class="headerlink" title="Runable的缺陷"></a>Runable的缺陷</h2><ul>
+<li>不能返回一个返回值</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Runnable</span></span>&#123;</span><br><span class="line">    <span class="comment">// 返回值类型是void</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>run方法中不能抛出错误</li>
+</ul>
+<p><strong>Runnable为什么设计成这样？</strong></p>
+<p>不抛出异常时因为，生产中大部分的异常都不是程序员自己处理的（大部分的异常是在线程池中运行）</p>
+<h2 id="Callable接口"><a href="#Callable接口" class="headerlink" title="Callable接口"></a>Callable接口</h2><blockquote>
+<ol>
+<li>类似Runable，别其他线程执行的任务</li>
+<li>实现call方法</li>
+<li>有返回值</li>
+</ol>
+</blockquote>
+<h3 id="源码"><a href="#源码" class="headerlink" title="源码"></a>源码</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Callable</span>&lt;<span class="title">V</span>&gt; </span>&#123;</span><br><span class="line">    <span class="function">V <span class="title">call</span><span class="params">()</span> <span class="keyword">throws</span> Exception</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="Future接口"><a href="#Future接口" class="headerlink" title="Future接口"></a>Future接口</h2><blockquote>
+<p>一个Future对应一个任务的存储器，它<strong>存储了call（）这个任务的结果</strong>，而这个任务的执行时间是无法提前确定的，因为这完全取决于call（）方法的执行情况。</p>
+</blockquote>
+<h3 id="Future的常用方法"><a href="#Future的常用方法" class="headerlink" title="Future的常用方法"></a>Future的常用方法</h3><ol>
+<li><p>get方法：获取结果</p>
+</li>
+<li><ol>
+<li>get方法的行为取决于Callable任务的状态，只有一下5种状态</li>
+</ol>
+</li>
+<li><ol>
+<li><ol>
+<li>任务正常完成：get方法会立刻返回结果</li>
+<li>任务尚未完成（任务没开始或者进行中）：get将阻塞知道任务完成。</li>
+<li>任务执行过程中抛出异常：get方法抛出异常</li>
+</ol>
+</li>
+</ol>
+</li>
+<li><ol>
+<li><ol>
+<li><ol>
+<li>ExcutionException：无论内部抛出什么异常，<strong>get</strong>只会抛出<strong>ExcutionException</strong></li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+<li><ol>
+<li><ol>
+<li>任务取消：<strong>get</strong>方法会抛出<strong>CancellationException</strong></li>
+<li>任务超时：get方法有一个重载方法，会传入一个延迟时间的，如果时间到了还没有获得结果，<strong>get</strong>方法就会抛出<strong>TimeoutException</strong></li>
+</ol>
+</li>
+</ol>
+</li>
+<li><p>get（long timeout,TimeUnit unit）:有超时的获取</p>
+</li>
+<li><ol>
+<li>用get（long timeout,TimeUnit unit）方法时，如果call（）在规定指定时间内完成了任务，那就正常会的返回值，如果在指定时间没有得到结果，就会抛出TimeoutException</li>
+<li>超时不获取，任务取消</li>
+</ol>
+</li>
+<li><p>cancel方法：取消任务的执行，</p>
+<ol>
+<li><p>任务还没开始：会被正常取消，未来不会被执行，方法返回true</p>
+</li>
+<li><p>任务已完成，或已取消：那么cancel方法会执行失败，返回false</p>
+</li>
+<li><p>任务执行中：根据cacel（boolean）去判断是否中断当下任务</p>
+</li>
+<li><ol>
+<li>cancel（true）适用于：</li>
+</ol>
+</li>
+<li><ol>
+<li><ol>
+<li>任务能够处理interrupt</li>
+</ol>
+</li>
+</ol>
+</li>
+<li><ol>
+<li>cancel（false）适用于：</li>
+</ol>
+</li>
+<li><ol>
+<li><ol>
+<li>任务未能处理interrupt</li>
+<li>不清楚任务是否支持取消</li>
+<li>需要等待已经开始的任务执行完成</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+<li><p>isDone方法：判断线程是否执行完毕（<strong>成功/不成功是不知道</strong>）</p>
+</li>
+<li><p>isCanceled方法：是否取消了</p>
+</li>
+</ol>
+<ul>
+<li><ul>
+<li>任务还没开始：会被正常取消，未来不会被执行，方法返回true</li>
+<li>任务完成，或已取消：那么cancel方法会执行失败，返回false</li>
+<li>任务开始执行：根据cacel（boolean）去判断是否中断当下任务</li>
+</ul>
+</li>
+</ul>
+<h4 id="用法"><a href="#用法" class="headerlink" title="用法"></a>用法</h4><p><strong>用法一：线程池的submit方法返回Future对象</strong></p>
+<p>首先，我们给线程池提交我们的任务，提交时线程池会<strong>立刻返回</strong>我们一个<strong>空的Future容器</strong>。当线程的任务<strong>一旦执行完毕</strong>，也就是当我们可以获取结果的时候，线程池便会把<strong>结果填入</strong>到之前给我们的那个Future中去（而不是创建一个新的Future），我们此时便<strong>可从该Future中获取任务的执行结果</strong>。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> future;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.Random;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.Callable;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.ExecutionException;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.ExecutorService;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.Executors;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.Future;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 描述：     演示一个Future的使用方法</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">OneFuture</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        ExecutorService service = Executors.newFixedThreadPool(<span class="number">10</span>);</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 可以用future对象去获取返回值结果</span></span><br><span class="line">        Callable&lt;Integer&gt; callable = ()-&gt;&#123;</span><br><span class="line">        	hread.sleep(<span class="number">3000</span>);</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> Random().nextInt();</span><br><span class="line">        &#125;;</span><br><span class="line">        </span><br><span class="line">        Future&lt;Integer&gt; future = service.submit(callable);</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">          <span class="comment">// 去拿结果</span></span><br><span class="line">            System.out.println(future.get());</span><br><span class="line">        &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (ExecutionException e) &#123;</span><br><span class="line">          <span class="comment">// 内部抛出什么异常</span></span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        service.shutdown();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<p>用 ArrayList&lt;Future&gt;来批量接收结果</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> future;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.ArrayList;</span><br><span class="line"><span class="keyword">import</span> java.util.Random;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.Callable;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.ExecutionException;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.ExecutorService;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.Executors;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.Future;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 描述：     演示批量提交任务时，用List来批量接收结果</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MultiFutures</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">        <span class="comment">// 线程池</span></span><br><span class="line">        ExecutorService service = Executors.newFixedThreadPool(<span class="number">20</span>);</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// list 的future</span></span><br><span class="line">        ArrayList&lt;Future&gt; futures = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">20</span>; i++) &#123;</span><br><span class="line">            Future&lt;Integer&gt; future = service.submit(<span class="keyword">new</span> CallableTask());</span><br><span class="line">            futures.add(future);</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        Thread.sleep(<span class="number">5000</span>);</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">20</span>; i++) &#123;</span><br><span class="line">            Future&lt;Integer&gt; future = futures.get(i);</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                Integer integer = future.get();</span><br><span class="line">                System.out.println(integer);</span><br><span class="line">            &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">            &#125; <span class="keyword">catch</span> (ExecutionException e) &#123;</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">CallableTask</span> <span class="keyword">implements</span> <span class="title">Callable</span>&lt;<span class="title">Integer</span>&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> Integer <span class="title">call</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">            Thread.sleep(<span class="number">3000</span>);</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> Random().nextInt();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<p>演示get方法过程中抛出异常，for循环为了演示抛出Exception的时机：</p>
+<ul>
+<li>并不是说一产生异常就抛出，直到我们get执行时，才会抛出。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> future;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.Random;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.Callable;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.ExecutionException;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.ExecutorService;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.Executors;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.Future;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">GetException</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        ExecutorService service = Executors.newFixedThreadPool(<span class="number">20</span>);</span><br><span class="line">        Future&lt;Integer&gt; future = service.submit(<span class="keyword">new</span> CallableTask());</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; i++) &#123;</span><br><span class="line">                System.out.println(i);</span><br><span class="line">                Thread.sleep(<span class="number">500</span>);</span><br><span class="line">            &#125;</span><br><span class="line">            System.out.println(future.isDone());</span><br><span class="line">            future.get();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">            System.out.println(<span class="string">&quot;InterruptedException异常&quot;</span>);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (ExecutionException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">            System.out.println(<span class="string">&quot;ExecutionException异常&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">CallableTask</span> <span class="keyword">implements</span> <span class="title">Callable</span>&lt;<span class="title">Integer</span>&gt; </span>&#123;</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> Integer <span class="title">call</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">&quot;Callable抛出异常&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>演示get的超时方法，需要注意超时后处理，调用future.cancel()。</p>
+<ul>
+<li><pre><code>   演示cancel传入true和false的区别，代表是否中断正在执行的任务。
+</code></pre>
+</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> future;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.Callable;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.ExecutionException;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.ExecutorService;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.Executors;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.Future;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.TimeUnit;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.TimeoutException;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 描述：演示get的超时方法，需要注意超时后处理，调用future.cancel()。</span></span><br><span class="line"><span class="comment"> *		演示cancel传入true和false的区别，代表是否中断正在执行的任务。</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Timeout</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Ad DEFAULT_AD = <span class="keyword">new</span> Ad(<span class="string">&quot;无网络时候的默认广告&quot;</span>);</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> ExecutorService exec = Executors.newFixedThreadPool(<span class="number">10</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Ad</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        String name;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">Ad</span><span class="params">(String name)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">this</span>.name = name;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="string">&quot;Ad&#123;&quot;</span> +</span><br><span class="line">                    <span class="string">&quot;name=&#x27;&quot;</span> + name + <span class="string">&#x27;\&#x27;&#x27;</span> +</span><br><span class="line">                    <span class="string">&#x27;&#125;&#x27;</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">FetchAdTask</span> <span class="keyword">implements</span> <span class="title">Callable</span>&lt;<span class="title">Ad</span>&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> Ad <span class="title">call</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                Thread.sleep(<span class="number">3000</span>);</span><br><span class="line">            &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">                System.out.println(<span class="string">&quot;sleep期间被中断了&quot;</span>);</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">new</span> Ad(<span class="string">&quot;被中断时候的默认广告&quot;</span>);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> Ad(<span class="string">&quot;旅游订票哪家强？找某程&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">printAd</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        Future&lt;Ad&gt; f = exec.submit(<span class="keyword">new</span> FetchAdTask());</span><br><span class="line">        Ad ad;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            ad = f.get(<span class="number">2000</span>, TimeUnit.MILLISECONDS);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">            ad = <span class="keyword">new</span> Ad(<span class="string">&quot;被中断时候的默认广告&quot;</span>);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (ExecutionException e) &#123;</span><br><span class="line">            ad = <span class="keyword">new</span> Ad(<span class="string">&quot;异常时候的默认广告&quot;</span>);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (TimeoutException e) &#123;</span><br><span class="line">            ad = <span class="keyword">new</span> Ad(<span class="string">&quot;超时时候的默认广告&quot;</span>);</span><br><span class="line">            System.out.println(<span class="string">&quot;超时，未获取到广告&quot;</span>);</span><br><span class="line">            <span class="comment">/*</span></span><br><span class="line"><span class="comment">            	cancel（Boolean）：true中断当下线程</span></span><br><span class="line"><span class="comment">                				   false 不中断（让其执行完）</span></span><br><span class="line"><span class="comment">            */</span></span><br><span class="line">            <span class="keyword">boolean</span> cancel = f.cancel(<span class="keyword">true</span>);</span><br><span class="line">            System.out.println(<span class="string">&quot;cancel的结果：&quot;</span> + cancel);</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 关闭线程池</span></span><br><span class="line">        exec.shutdown();</span><br><span class="line">         </span><br><span class="line">        System.out.println(ad);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Timeout timeout = <span class="keyword">new</span> Timeout();</span><br><span class="line">        timeout.printAd();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>用法二：用FutureTask创建Future</strong></p>
+<ul>
+<li>用FutureTask来获取Future和任务的结果</li>
+<li>FutureTask是一种包装器，可以把Callable转换成Future和Runnable。它同时实现二者的接口</li>
+</ul>
+<p><img src="https://gitee.com/StuartYang/bpic/raw/master/20210731012959.png" alt="image.png"></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> future;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.Callable;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.ExecutionException;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.ExecutorService;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.Executors;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.FutureTask;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 描述：     演示FutureTask的用法</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">FutureTaskDemo</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Task task = <span class="keyword">new</span> Task();</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 演示FutureTask的用法</span></span><br><span class="line">        FutureTask&lt;Integer&gt; integerFutureTask = <span class="keyword">new</span> FutureTask&lt;&gt;(task);</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 可以将integerFutureTask当成一个Runable来用</span></span><br><span class="line">       <span class="comment">// new Thread(integerFutureTask).start();</span></span><br><span class="line">      </span><br><span class="line">        <span class="comment">// 线程池也行</span></span><br><span class="line">        ExecutorService service = Executors.newCachedThreadPool();</span><br><span class="line">        service.submit(integerFutureTask);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            System.out.println(<span class="string">&quot;task运行结果：&quot;</span>+integerFutureTask.get());</span><br><span class="line"></span><br><span class="line">        &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (ExecutionException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Task</span> <span class="keyword">implements</span> <span class="title">Callable</span>&lt;<span class="title">Integer</span>&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Integer <span class="title">call</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;子线程正在计算&quot;</span>);</span><br><span class="line">        Thread.sleep(<span class="number">3000</span>);</span><br><span class="line">        <span class="keyword">int</span> sum = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">100</span>; i++) &#123;</span><br><span class="line">            sum += i;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> sum;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="注意点"><a href="#注意点" class="headerlink" title="注意点"></a>注意点</h4><ul>
+<li>当for循环批量获取future的结果时容易发生一部分线程很慢的情况。get方法调用应该使用timeout限制，逾期的不要了</li>
+</ul>
+<ol>
+<li><ul>
+<li>原因：Future对象是按顺序获取的，后面的线程执行的快，也需要等待前面的线程执行完前面的任务，才能将任务结果从头到位传回主线程。</li>
+</ul>
+</li>
+</ol>
+<ul>
+<li>Future的生命周期不能后退</li>
+</ul>
+<ol>
+<li><ul>
+<li>一旦完成了任务，它就永久停在了“已完成”的状态，不能重头再来。</li>
+</ul>
+</li>
+</ol>
+
+    </article>
+  </div>
+
+</div>
+
+
+<div class="footer-wrapper container">
+  <footer class="footer clearfix">
+    <div class="clearfix">
+      <a href="https://www.yangxudong.site" class="footer-logo">
+        <i class="fa iconfont icon-baiyangzuo" style="font-size: 24px;"></i>
+      </a>
+      <ul class="footer-social-link">
+        <li>© 2019 旭东同学</li>
+        <li><a href="https://www.yangxudong.site">Home</a></li>
+        
+        <li><a target="_blank" rel="noopener" href="https://github.com/StuartYang">Github</a></li>
+        
+      </ul>
+      <div class="footer-theme-info">
+        Theme Based on <a target="_blank" rel="noopener" href="//github.com/sabrinaluo/hexo-theme-replica">Replica</a> ❤ Powered by Hexo
+      </div>
+    </div>
+  </footer>
+</div>
+<script src="/js/main.js"></script>
+
+</body>
+</html>

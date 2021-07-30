@@ -8,12 +8,12 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>
-      starUML的使用 | YangXudong&#39;s Blog
+      final关键字和不变性 | YangXudong&#39;s Blog
     </title>
     <meta name="description" content="“ 君子藏剑于身，待时而动 ”">
     
       <meta name="keywords" content="
-  starUML
+  JUC,多线程
   ">
       
         <meta name="author" content="旭东同学">
@@ -112,32 +112,113 @@
       旭东同学
 
         <span class="post-date float-right"
-          title="{{moment(1627154424000).format('MMM DD, YYYY, h:mm:ss A')}}">
+          title="{{moment(1627666395000).format('MMM DD, YYYY, h:mm:ss A')}}">
           <i class="fa fa-pencil-square-o"></i>
-          {{moment(1627154424000).fromNow()}}
+          {{moment(1627666395000).fromNow()}}
         </span>
     </h3>
 
     <article class="post-content">
       <h1>
-        starUML的使用
+        final关键字和不变性
       </h1>
-      <h2 id="UML"><a href="#UML" class="headerlink" title="UML"></a>UML</h2><p><strong>UML：</strong> Unified Modeling Language，直接翻译就是<strong>统一建模语言</strong>，简单地说就是<strong>一种有特殊用途的语言</strong>。</p>
-<ul>
-<li>用例图（Use Case Diagram）：角色使用的各个方法【比如用户拿来干嘛，后台拿来用来干嘛】；</li>
-<li>类图（Class Diagram）：所有类之间的关系；</li>
-<li>流程/活动图（Activity Diagram）：用户使用方法，登录与否？然后进行分叉；</li>
-<li>时序图 （Sequence Diagram） ：IDE中Controller、Service、Impl、Entity之间的关系；</li>
+      <h2 id="不变性"><a href="#不变性" class="headerlink" title="不变性"></a>不变性</h2><p>如果对象<strong>被创建后，状态就不能修改，那么它就是不可变的</strong>。</p>
+<p>出了这个类，谁都无法改变。即其他类只能进行查询，不能修改。</p>
+<p>具有不变形的对象一定是线程安全的，我们不需要对其采取任何额外的安全措施，也能保证线程安全。</p>
+<h2 id="final关键字"><a href="#final关键字" class="headerlink" title="final关键字"></a>final关键字</h2><h3 id="final的作用"><a href="#final的作用" class="headerlink" title="final的作用"></a>final的作用</h3><ul>
+<li>类防止被修改，方法防止被重写，变量防止被修改</li>
+<li>天生是线程安全，而不需要额外的同步开销</li>
 </ul>
-<h2 id="主界面简介"><a href="#主界面简介" class="headerlink" title="主界面简介"></a>主界面简介</h2><h2 id="StarUML的使用"><a href="#StarUML的使用" class="headerlink" title="StarUML的使用"></a>StarUML的使用</h2><ol>
-<li>建工程</li>
-<li>建模型</li>
-<li>建包</li>
-<li>建类图</li>
-<li>在model中设置Java环境</li>
-</ol>
-<h3 id="时序图（系统交互）Sequence-Diagram"><a href="#时序图（系统交互）Sequence-Diagram" class="headerlink" title="时序图（系统交互）Sequence Diagram"></a>时序图（系统交互）Sequence Diagram</h3><img src="https://gitee.com/StuartYang/bpic/raw/master/20210725233020.png" alt="image-20210725034709785" style="zoom:50%;" />
-
+<h3 id="final的用法"><a href="#final的用法" class="headerlink" title="final的用法"></a>final的用法</h3><ul>
+<li><p>修饰变量：被final修饰的变量，值不能被更改。</p>
+<ul>
+<li>如果变量是对象，那么对象的引用不能变，<strong>但是对自身的内容依然可以变化</strong>。</li>
+</ul>
+</li>
+<li><ul>
+<li>类中的final属性：</li>
+</ul>
+</li>
+<li><ul>
+<li><ul>
+<li>声明变量时等号右边直接赋值</li>
+<li>在构造函数中赋值</li>
+<li>代码块中赋值</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><ul>
+<li>类中的static final属性</li>
+</ul>
+</li>
+<li><ul>
+<li><ul>
+<li>声明变量右边直接赋值</li>
+<li>静态代码块中赋值</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><ul>
+<li>方法中的final变量</li>
+</ul>
+</li>
+<li><ul>
+<li><ul>
+<li>不规定赋值时机，只要求<strong>使用前必须赋值</strong></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>修饰方法：</p>
+</li>
+<li><ul>
+<li><p>不允许修饰构造方法</p>
+</li>
+<li><p>不可被重写。</p>
+<p>补充：static也方法也不能被重写，即使父类子类中有一模一样的static，那就不是重写</p>
+</li>
+</ul>
+</li>
+<li><p>修饰类：</p>
+</li>
+<li><ul>
+<li>不可被继承</li>
+<li>例：String类就是final</li>
+</ul>
+</li>
+</ul>
+<p><strong>为什么要规定赋值时机？</strong></p>
+<p>如果初始化不赋值，后续赋值，就是从null变成你的赋值，这就违反final不变的原则了。</p>
+<h3 id="不变性和final的关系"><a href="#不变性和final的关系" class="headerlink" title="不变性和final的关系"></a>不变性和final的关系</h3><ul>
+<li><p>不变性 不等于 final</p>
+</li>
+<li><ul>
+<li>对于基本数据类型：final = 不可变性</li>
+<li>对于对象类型，需要该对象保证自身被创建后，状态永远不会变才可以。</li>
+</ul>
+</li>
+</ul>
+<p>满足以下一下条件时，对象是不可变的</p>
+<ul>
+<li><p>对象创建后，其状态不能修改</p>
+</li>
+<li><p>所有属性都是final修饰的</p>
+</li>
+<li><p>对象创建过程中没有发生<strong>逸出</strong></p>
+</li>
+<li><ul>
+<li><strong>逸出：</strong>某个不应该发布的对象被发布<strong>时</strong>，这种情况就被称为<strong>逸出</strong>（Escape）</li>
+</ul>
+</li>
+<li><p>把变量写在线程内部——栈封闭</p>
+</li>
+<li><ul>
+<li>局部变量</li>
+</ul>
+</li>
+</ul>
 
     </article>
   </div>
