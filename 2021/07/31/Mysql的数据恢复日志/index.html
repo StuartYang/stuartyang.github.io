@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>
+      Mysql的数据恢复日志 | YangXudong&#39;s Blog
+    </title>
+    <meta name="description" content="“ 君子藏剑于身，待时而动 ”">
+    
+      <meta name="keywords" content="
+  Mysql,数据恢复
+  ">
+      
+        <meta name="author" content="旭东同学">
+
+        <meta http-equiv="Cache-Control" content="no-transform" />
+        <meta http-equiv="Cache-Control" content="no-siteapp">
+        <meta name="theme-color" content="#1e2327">
+        <link rel="apple-touch-icon" href="https://github.githubassets.com/apple-touch-icon.png">
+        <link rel="apple-touch-icon" sizes="180x180"
+          href="https://github.githubassets.com/apple-touch-icon-180x180.png">
+
+        <link rel="icon" type="image/x-icon" href="https://gitee.com/StuartYang/bpic/raw/master/20210722154537.png">
+
+        <link rel="stylesheet" href="/css/main.css">
+        
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+        <link rel="stylesheet" href="//at.alicdn.com/t/font_2570198_c1noxsh7ksn.css">
+        </link>
+
+        <script src="//cdnjs.cloudflare.com/ajax/libs/vue/1.0.25-csp/vue.min.js"></script>
+        <!-- JavaScript 日期处理类库 -->
+        <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.11.2/moment.min.js"></script>
+  <meta name="generator" content="Hexo 5.4.0"></head>
+
+<body id="replica-app">
+
+<nav class="navbar-wrapper">
+  <div class="navbar">
+    <div class="container clearfix">
+      <a href="/" class="navbar-logo"><i class="fa iconfont icon-baiyangzuo" style="font-size: 32px;"></i></a>
+
+      <ul class="navbar-nav float-left">
+        
+        <li><a href="/archives">文章</a></li>
+        
+        
+        <li><a href="/categories">归档</a></li>
+        
+        
+        <li><a href="/tags">标签</a></li>
+        
+      </ul>
+
+      <ul class="navbar-nav user-nav float-right desktop-only">
+        <li class="user-nav-notification">
+          <a><span class="user-nav-unread"></span><i class="fa fa-bell"></i></a>
+        </li>
+        <li>
+          <a><i class="fa fa-plus"></i> <i class="fa fa-caret-down"></i></a>
+        </li>
+        <li class="user-nav-logo">
+          <a><img src="https://gitee.com/StuartYang/bpic/raw/master/20210722154532.jpg"> <i class="fa fa-caret-down"></i></i></a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="main-container">
+
+  <header class="header-wrapper desktop-only">
+  <div class="container header-site-detail">
+    <ul class="header-toolbar">
+      <li class="clearfix">
+        <a href="/archives" class="header-toolbar-left"><i
+                  class="fa fa-file-text"></i> 文章 </a>
+        <a href="/archives"
+           class="header-toolbar-right"> 37 </a>
+      </li>
+      <li>
+        <a href="/tags" class="header-toolbar-left"><i
+                  class="fa fa-tags"></i> 标签 </a>
+        <a href="/tags"
+           class="header-toolbar-right"> 38 </a>
+      </li>
+      <li>
+        <a href="/categories" class="header-toolbar-left"><i
+                  class="fa fa-folder-open"></i> 归档 </a>
+        <a href="/categories"
+           class="header-toolbar-right"> 12 </a>
+      </li>
+    </ul>
+    
+    <h2 class="header-title">
+      <i class="fa fa-book text-muted"></i>
+      <a href="/">YangXudong&#39;s Blog</a>
+    </h2>
+  </div>
+</header>
+
+
+  <div class="post-container container">
+    <h3>
+      <i class="fa fa-user-o"></i>
+      旭东同学
+
+        <span class="post-date float-right"
+          title="{{moment(1627669322000).format('MMM DD, YYYY, h:mm:ss A')}}">
+          <i class="fa fa-pencil-square-o"></i>
+          {{moment(1627669322000).fromNow()}}
+        </span>
+    </h3>
+
+    <article class="post-content">
+      <h1>
+        Mysql的数据恢复日志
+      </h1>
+      <h1 id="绪"><a href="#绪" class="headerlink" title="绪"></a>绪</h1><blockquote>
+<p>参考：</p>
+<p>《MySQL实战45讲》：<a target="_blank" rel="noopener" href="https://time.geekbang.org/column/intro/139">https://time.geekbang.org/column/intro/139</a></p>
+</blockquote>
+<p>如果每一次的更新操作都需要写进磁盘，然后磁盘也要找到对应的那条记录，然后再更新，整个过程 IO 成本、查找成本都很高。为了解决这个问题，MySQL 采用 WAL 技术来提升更新效率。</p>
+<p>WAL 的全称是 Write-Ahead Logging，它的关键点就是先写日志，再写磁盘。</p>
+<p>具体来说，当有一条记录需要更新的时候：</p>
+<ol>
+<li>InnoDB 引擎就会先把记录写到 redo log里面，并更新内存，这个时候更新就算完成了。</li>
+<li>InnoDB 引擎会在适当的时候，将这个操作记录更新到磁盘里面，而这个更新往往是在系统比较空闲的时候做。</li>
+</ol>
+<h2 id="redo-log"><a href="#redo-log" class="headerlink" title="redo log"></a>redo log</h2><p><strong>InnoDB 的 redo log</strong> 是固定大小的，比如可以配置为一组 4 个文件，每个文件的大小是 1GB，则redo log可以记录 4GB 的操作。从头开始写，写到末尾就又回到开头循环写，如下面这个图所示。</p>
+<p><img src="https://gitee.com/StuartYang/bpic/raw/master/20210731022706.png" alt="image-20210731022705672"></p>
+<ul>
+<li>write pos 是当前记录的位置，一边写一边后移。<ul>
+<li>当写到第 3 号文件末尾后就回到 0 号文件开头。</li>
+</ul>
+</li>
+<li>checkpoint 是当前要擦除的位置，也是往后推移并且循环的，<ul>
+<li>擦除记录前要把日志文件中的记录更新到硬盘的数据库中。</li>
+</ul>
+</li>
+</ul>
+<p><strong>redo log的使用</strong></p>
+<ol>
+<li>write pos 和 checkpoint 之间还有空白空着的部分，可以用来记录新的操作。</li>
+<li>如果 write pos 追上 checkpoint，表示日志文件满了。这时候不能再执行新的SQL更新，需要停下来先擦掉一些记录并将数据更新到硬盘的数据库中，然后把 checkpoint 推进一下。</li>
+</ol>
+<p>有了 redo log，<strong>InnoDB 就可以保证即使数据库发生异常重启，之前提交的记录都不会丢失</strong>，这个能力称为<strong>crash-safe</strong>。</p>
+<h2 id="bin-log"><a href="#bin-log" class="headerlink" title="bin log"></a>bin log</h2><p>MySQL 整体来看，其实就有两块：</p>
+<ul>
+<li>一块是 Server 层，它主要做的是<strong>MySQL 功能层面的事情</strong>；</li>
+<li>还有一块是引擎层，负责<strong>存储相关的具体事宜</strong>。上面我们聊到</li>
+</ul>
+<p><strong>redo log 是 InnoDB 引擎特有的日志，而 Server 层也有自己的日志，称为binlog（归档日志）。</strong></p>
+<blockquote>
+<p>为什么会有两份日志呢？</p>
+<p>因为最开始 MySQL 里并没有 InnoDB 引擎。MySQL 自带的引擎是 MyISAM，<strong>只能用binlog 日志只能用于归档。</strong></p>
+<p>而 InnoDB 是另一个公司以插件形式引入 MySQL 的，既然只依靠 binlog 是没有 crash-safe 能力的，所以InnoDB 使用另外一套日志系统 — 也就是 redo log 来实现 crash-safe 能力。</p>
+</blockquote>
+<blockquote>
+<p>两种日志有3点的不同：</p>
+<ol>
+<li> redo log 是 InnoDB 引擎特有的；binlog 是 MySQL 的 Server 层实现的，所有引擎都可以使用。</li>
+<li>redo log 是物理日志，记录的是““<strong>对哪个数据页中的什么记录，做了个什么修改</strong>”。”；<strong>binlog叫做归档日志，他里面记录的是偏向于逻辑性的日志</strong>，类似于“对users表中的id=10的一行数据做了更新操作，更新以后的值是什么”</li>
+<li> redo log 是循环写的，空间固定会用完；binlog 是可以追加方式写入的。“追加写”是指binlog 文件写到一定大小后会切换到下一个，并不会覆盖以前的日志。</li>
+</ol>
+</blockquote>
+<h3 id="update-语句时的内部流程"><a href="#update-语句时的内部流程" class="headerlink" title="update 语句时的内部流程"></a>update 语句时的内部流程</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">update T set c=c+1 where ID=2;</span><br></pre></td></tr></table></figure>
+
+<p><strong>以InnoDB为例：</strong></p>
+<ol>
+<li>执行器先找引擎取 ID=2 这一行。ID 是主键，存储引擎在内存中搜索找到这一行。<ol>
+<li>如果ID=2 这一行所在的数据页本来就在内存中，就直接返回给执行器；</li>
+<li>否则，需要先从磁盘读入内存，然后再返回。</li>
+</ol>
+</li>
+<li>执行器拿到引擎给的行数据， 执行c=c+1 。执行结束后调用存储引擎接口写入这行新数据。</li>
+<li>存储引擎将这行新数据更新到内存中，同时将这个更新操作记录到 redo log 里面，此时redo log 处于 prepare 状态。然后告知执行器执行完成了，随时可以提交事务。</li>
+<li>执行器生成这个操作的 binlog，并把 binlog 写入磁盘。</li>
+<li>执行器调用引擎的提交事务接口，存储引擎把刚刚写入的 redo log 改成提交（commit）状态，更新完成。</li>
+</ol>
+<p><img src="https://gitee.com/StuartYang/bpic/raw/master/20210731024304.png" alt="image-20210731024303674"></p>
+<p>可以看到日志的写入过程为：</p>
+<ol>
+<li>记录写入redo log</li>
+<li>将redo log设置为入prepare</li>
+<li>数据写入binlog</li>
+<li>将redo log设置为入commit</li>
+</ol>
+<p><img src="https://gitee.com/StuartYang/bpic/raw/master/20210731040632.jpg" alt="两阶段提交"></p>
+<p><strong>如果不使用两阶段提交？先写完一个日志，再写另一个日志，或者反过来，会出现什么情况？</strong></p>
+<ul>
+<li><p>先写redolog日志，再写binlog日志：</p>
+<ol>
+<li>如果redolog写完，binlog还没写完，Mysql进程异常重启。</li>
+<li>使用<strong>redolog恢复数据，c的值为1</strong>，</li>
+<li>之后使用binlog做备份的时候，由于binlog中丢失该SQL语句，生成的c为0，造成数据不一致。</li>
+</ol>
+</li>
+<li><p>如果先写binlog，再写redolog:</p>
+<ol>
+<li>如果binlog写完，redolog没有写完，Mysql进程异常重启，</li>
+<li>数据恢复的时候，由于redolog没有记录这个事件，所以c为0，</li>
+<li>但是使用binlog做备份的时候，由于binlog记录了这个SQL语句，所以生成的c为1，造成数据不一致</li>
+</ol>
+</li>
+</ul>
+<p>所以两阶段提交就是让这两个状态保持逻辑的一致；如果不使用两阶段提交，那么数据库状态就有可能和用它的日志恢复出来的库的状态不一致</p>
+<h2 id="怎么让数据库恢复到半个月内任意一秒的状态？"><a href="#怎么让数据库恢复到半个月内任意一秒的状态？" class="headerlink" title="怎么让数据库恢复到半个月内任意一秒的状态？"></a>怎么让数据库恢复到半个月内任意一秒的状态？</h2><ol>
+<li>首先，找到最近的一次全量备份，如果你运气好，可能就是昨天晚上的一个备份，从这个备份恢复到临时库；</li>
+<li>然后，从备份的时间点开始，将备份的 binlog 依次取出来，重放到中午误删表之前的那个时刻。</li>
+<li>这样你的临时库就跟误删之前的线上库一样了，然后你可以把表数据从临时库取出来，按需要恢复到线上库去。</li>
+</ol>
+<p>当遇到 crash 时，恢复的过程也非常简单：</p>
+<ol>
+<li>扫描最后一个 Binlog 文件，提取其中的 xid；</li>
+<li>重做检查点以后的 redo 日志，搜集处于 prepare 阶段的事务链表，将事务的 xid 与 binlog 中的 xid 对比，若存在，则提交，否则就回滚；</li>
+</ol>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><ul>
+<li><strong>redo log 用于保证 crash-safe 能力</strong>。innodb_flush_log_at_trx_commit 这个参数设置成1 的时候，表示每次事务的 redo log 都直接持久化到磁盘。这个参数建议设置成 1，这样可以保证 MySQL 异常重启之后数据不丢失。<ul>
+<li><strong>作用在于：mysql宕机之后做数据恢复</strong></li>
+</ul>
+</li>
+<li>bin log：sync_binlog 这个参数设置成 1 的时候，表示每次事务的 binlog 都持久化到磁盘。这个参数建议设置成 1，这样可以保证 <strong>MySQL 异常重启之后 binlog 不丢失</strong>。<ul>
+<li><strong>作用在于：做数据备份</strong></li>
+</ul>
+</li>
+</ul>
+
+    </article>
+  </div>
+
+</div>
+
+
+<div class="footer-wrapper container">
+  <footer class="footer clearfix">
+    <div class="clearfix">
+      <a href="https://www.yangxudong.site" class="footer-logo">
+        <i class="fa iconfont icon-baiyangzuo" style="font-size: 24px;"></i>
+      </a>
+      <ul class="footer-social-link">
+        <li>© 2019 旭东同学</li>
+        <li><a href="https://www.yangxudong.site">Home</a></li>
+        
+        <li><a target="_blank" rel="noopener" href="https://github.com/StuartYang">Github</a></li>
+        
+      </ul>
+      <div class="footer-theme-info">
+        Theme Based on <a target="_blank" rel="noopener" href="//github.com/sabrinaluo/hexo-theme-replica">Replica</a> ❤ Powered by Hexo
+      </div>
+    </div>
+  </footer>
+</div>
+<script src="/js/main.js"></script>
+
+</body>
+</html>

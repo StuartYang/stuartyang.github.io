@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>
+      MySql基础架构 | YangXudong&#39;s Blog
+    </title>
+    <meta name="description" content="“ 君子藏剑于身，待时而动 ”">
+    
+      <meta name="keywords" content="
+  MySql,面试
+  ">
+      
+        <meta name="author" content="旭东同学">
+
+        <meta http-equiv="Cache-Control" content="no-transform" />
+        <meta http-equiv="Cache-Control" content="no-siteapp">
+        <meta name="theme-color" content="#1e2327">
+        <link rel="apple-touch-icon" href="https://github.githubassets.com/apple-touch-icon.png">
+        <link rel="apple-touch-icon" sizes="180x180"
+          href="https://github.githubassets.com/apple-touch-icon-180x180.png">
+
+        <link rel="icon" type="image/x-icon" href="https://gitee.com/StuartYang/bpic/raw/master/20210722154537.png">
+
+        <link rel="stylesheet" href="/css/main.css">
+        
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+        <link rel="stylesheet" href="//at.alicdn.com/t/font_2570198_c1noxsh7ksn.css">
+        </link>
+
+        <script src="//cdnjs.cloudflare.com/ajax/libs/vue/1.0.25-csp/vue.min.js"></script>
+        <!-- JavaScript 日期处理类库 -->
+        <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.11.2/moment.min.js"></script>
+  <meta name="generator" content="Hexo 5.4.0"></head>
+
+<body id="replica-app">
+
+<nav class="navbar-wrapper">
+  <div class="navbar">
+    <div class="container clearfix">
+      <a href="/" class="navbar-logo"><i class="fa iconfont icon-baiyangzuo" style="font-size: 32px;"></i></a>
+
+      <ul class="navbar-nav float-left">
+        
+        <li><a href="/archives">文章</a></li>
+        
+        
+        <li><a href="/categories">归档</a></li>
+        
+        
+        <li><a href="/tags">标签</a></li>
+        
+      </ul>
+
+      <ul class="navbar-nav user-nav float-right desktop-only">
+        <li class="user-nav-notification">
+          <a><span class="user-nav-unread"></span><i class="fa fa-bell"></i></a>
+        </li>
+        <li>
+          <a><i class="fa fa-plus"></i> <i class="fa fa-caret-down"></i></a>
+        </li>
+        <li class="user-nav-logo">
+          <a><img src="https://gitee.com/StuartYang/bpic/raw/master/20210722154532.jpg"> <i class="fa fa-caret-down"></i></i></a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="main-container">
+
+  <header class="header-wrapper desktop-only">
+  <div class="container header-site-detail">
+    <ul class="header-toolbar">
+      <li class="clearfix">
+        <a href="/archives" class="header-toolbar-left"><i
+                  class="fa fa-file-text"></i> 文章 </a>
+        <a href="/archives"
+           class="header-toolbar-right"> 37 </a>
+      </li>
+      <li>
+        <a href="/tags" class="header-toolbar-left"><i
+                  class="fa fa-tags"></i> 标签 </a>
+        <a href="/tags"
+           class="header-toolbar-right"> 38 </a>
+      </li>
+      <li>
+        <a href="/categories" class="header-toolbar-left"><i
+                  class="fa fa-folder-open"></i> 归档 </a>
+        <a href="/categories"
+           class="header-toolbar-right"> 12 </a>
+      </li>
+    </ul>
+    
+    <h2 class="header-title">
+      <i class="fa fa-book text-muted"></i>
+      <a href="/">YangXudong&#39;s Blog</a>
+    </h2>
+  </div>
+</header>
+
+
+  <div class="post-container container">
+    <h3>
+      <i class="fa fa-user-o"></i>
+      旭东同学
+
+        <span class="post-date float-right"
+          title="{{moment(1627667714000).format('MMM DD, YYYY, h:mm:ss A')}}">
+          <i class="fa fa-pencil-square-o"></i>
+          {{moment(1627667714000).fromNow()}}
+        </span>
+    </h3>
+
+    <article class="post-content">
+      <h1>
+        MySql基础架构
+      </h1>
+      <h2 id="绪"><a href="#绪" class="headerlink" title="绪"></a>绪</h2><blockquote>
+<p>参考：</p>
+<p>《MySQL实战45讲》：<a target="_blank" rel="noopener" href="https://time.geekbang.org/column/intro/139">https://time.geekbang.org/column/intro/139</a></p>
+</blockquote>
+<h2 id="整体架构"><a href="#整体架构" class="headerlink" title="整体架构"></a>整体架构</h2><p><img src="https://gitee.com/StuartYang/bpic/raw/master/20210731015634.png" alt="image-20210731015631016"></p>
+<p>大体来说，MySQL 可以分为 Server 层和存储引擎层两部分。</p>
+<ul>
+<li>Server 层包括连接器、查询缓存、分析器、优化器、执行器等</li>
+<li>存储引擎层负责数据的存储和提取。其架构模式是插件式的，支持 InnoDB、MyISAM、Memory 等多个存储引擎。</li>
+</ul>
+<p>从 MySQL5.5.5 版本开始InnoDB成为了默认存储引擎。你执行 create table 建表的时候，如果不指定引擎类型，默认使用的就是InnoDB。不过，你也可以通过指定存储引擎的类型来选择别的引擎，比如在 create table语句中使用 engine=memory, 来指定使用内存引擎创建表。不同存储引擎的表数据存取方式不同，支持的功能也不同。</p>
+<h2 id="连接器"><a href="#连接器" class="headerlink" title="连接器"></a>连接器</h2><p>你会先连接到这个数据库上，这时候接待你的就是连接器。连接器负责跟客户端建立连接、获取权限、维持和管理连接。连接命令一般是这么写的：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysql -h 127.0.0.1 -P 3306 -u root -p root</span><br></pre></td></tr></table></figure>
+
+
+
+<p>在完成经典的 TCP 握手后，连接器就要开始认证你的身份，这个时候用的就是你输入的用户名和密码。</p>
+<ul>
+<li><p>如果用户名或密码不对，你就会收到一个”Access denied for user”的错误，然后客户</p>
+<p>端程序结束执行。</p>
+</li>
+<li><p>如果用户名密码认证通过，连接器会到权限表里面查出你拥有的权限。之后，这个连接</p>
+<p>里面的权限判断逻辑，都将依赖<strong>于此时读到的权限</strong>。</p>
+<ul>
+<li>这就意味着，一个用户成功建立连接后，即使你用管理员账号对这个用户的权限做了修改，也不会影响已经存在连接的权限。修改完成后，只有再新建的连接才会使用新的权限设置。</li>
+</ul>
+</li>
+</ul>
+<p>连接完成后，如果你没有后续的动作，这个连接就处于空闲状态，客户端如果太长时间没动静，连接器就会自动将它断开。这个时间是由参数 wait_timeout控制的，默认值是 8 小时。  如果在连接被断开之后，客户端再次发送请求的话，就会收到一个错误提醒： Lost connection to MySQL server during query。这时候如果你要继续，就需要重连，然后再执行请求了。</p>
+<ul>
+<li>长连接是指连接成功后，如果客户端持续有请求，则一直使用同一个连接。</li>
+<li>短连接则是指每次执行完很少的几次查询就断开连接，下次查询再重新建立一个。</li>
+</ul>
+<p>由于建立连接过程比较复杂，建立尽量使用长连接，但是全部使用长连接后，你可能会发现，有些时候 <strong>MySQL 占用内存涨得特别快，这是因为 MySQL 在执行过程中临时使用的内存是管理在连接对象里面的。这些资源会在连接断开的时候才释放。</strong></p>
+<p><strong>怎么解决长连接大量占用内存的问题呢？你可以考虑以下两种方案。</strong></p>
+<ol>
+<li><p>定期断开长连接 或者 程序里面判断执行过一个占用内存的大查询后，断开连接，之后要查询再重连。</p>
+</li>
+<li><p>如果用的是 MySQL 5.7 或更新版本，可以在每次执行一个比较大的操作后，通过执行 mysql_reset_connection 来重新初始化连接资源。这个过程不需要重连和重新做权限验证，但是会将连接恢复到刚刚创建完时的状态。</p>
+</li>
+</ol>
+<h2 id="查询缓存"><a href="#查询缓存" class="headerlink" title="查询缓存"></a>查询缓存</h2><p>连接建立完成后，你就可以执行 select 语句了。执行逻辑就会来到第二步：查询缓存。</p>
+<p>MySQL 拿到一个查询请求后，会先到查询缓存看看，之前是不是执行过这条语句。<strong>之前执行过的语句及其结果可能会以 key-value 对的形式被直接缓存在内存中</strong>。key 是查询的语句，value 是查询的结果。如果你的查询能够直接在这个缓存中找到 key，那么这个value 就会被直接返回给客户端。</p>
+<p>如果语句不在查询缓存中，就会继续后面的执行阶段。</p>
+<p><strong>但是大多数情况下建议不要使用查询缓存，因为查询缓存的失效非常频繁，只要有对一个表的更新，这个表上所有的查询缓存都会被清。</strong></p>
+<p><strong>要注意的是MySQL 8.0 版本直接将查询缓存的整块功能删掉了。</strong></p>
+<h2 id="分析器"><a href="#分析器" class="headerlink" title="分析器"></a>分析器</h2><p>如果没有命中查询缓存，就要开始真正执行语句了。首先，MySQL 需要知道你要做什么，因此需要对 SQL 语句做解析。</p>
+<ol>
+<li>词法分析：从SQL语句中，识别出里面的字串分别代表什么。<ol>
+<li>例如：Mysql讲输入的”select”这个关键字识别出来，这是一个查询语句。它也要把字符串“T”识别成“表名 T”，把字符串“ID”识别成“列 ID”。</li>
+</ol>
+</li>
+<li>语法分析：语法分析器会根据语法规则，判断你输入的这个 SQL 语句是否满足 MySQL 语法。<ol>
+<li>如果你的语句不对，就会收到“You have an error in your SQL syntax”的错误提醒，比。</li>
+</ol>
+</li>
+</ol>
+<p><strong>一般语法错误会提示第一个出现错误的位置，所以你要关注的是紧接“use near”的内容。</strong></p>
+<h2 id="优化器"><a href="#优化器" class="headerlink" title="优化器"></a>优化器</h2><p>经过了分析器，MySQL 就知道你要做什么了。在开始执行之前，还要先经过优化器的处理。</p>
+<ul>
+<li><p>优化器是在表里面有多个索引的时候，决定使用哪个索引；</p>
+</li>
+<li><p>在一个语句有多表关联(join)的时候，决定各个表的连接顺序;</p>
+</li>
+</ul>
+<h2 id="执行器"><a href="#执行器" class="headerlink" title="执行器"></a>执行器</h2><p>MySQL 通过分析器知道了你要做什么，通过优化器知道了该怎么做，于是就进入了执行器阶段，开始执行语句。</p>
+<ol>
+<li>先判断一下你对这个表 T 有没有执行查询的权限</li>
+<li>如果没有，就会返回没有权限的错误<code> SELECT command denied to user  table T</code></li>
+<li>如果有权限，就打开表继续执行。打开表的时候，执行器就会根据表的引擎定义，去使用这个引擎提供的接口。</li>
+</ol>
+
+    </article>
+  </div>
+
+</div>
+
+
+<div class="footer-wrapper container">
+  <footer class="footer clearfix">
+    <div class="clearfix">
+      <a href="https://www.yangxudong.site" class="footer-logo">
+        <i class="fa iconfont icon-baiyangzuo" style="font-size: 24px;"></i>
+      </a>
+      <ul class="footer-social-link">
+        <li>© 2019 旭东同学</li>
+        <li><a href="https://www.yangxudong.site">Home</a></li>
+        
+        <li><a target="_blank" rel="noopener" href="https://github.com/StuartYang">Github</a></li>
+        
+      </ul>
+      <div class="footer-theme-info">
+        Theme Based on <a target="_blank" rel="noopener" href="//github.com/sabrinaluo/hexo-theme-replica">Replica</a> ❤ Powered by Hexo
+      </div>
+    </div>
+  </footer>
+</div>
+<script src="/js/main.js"></script>
+
+</body>
+</html>

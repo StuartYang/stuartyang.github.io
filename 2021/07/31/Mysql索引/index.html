@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>
+      Mysql索引 | YangXudong&#39;s Blog
+    </title>
+    <meta name="description" content="“ 君子藏剑于身，待时而动 ”">
+    
+      <meta name="keywords" content="
+  Mysql,索引
+  ">
+      
+        <meta name="author" content="旭东同学">
+
+        <meta http-equiv="Cache-Control" content="no-transform" />
+        <meta http-equiv="Cache-Control" content="no-siteapp">
+        <meta name="theme-color" content="#1e2327">
+        <link rel="apple-touch-icon" href="https://github.githubassets.com/apple-touch-icon.png">
+        <link rel="apple-touch-icon" sizes="180x180"
+          href="https://github.githubassets.com/apple-touch-icon-180x180.png">
+
+        <link rel="icon" type="image/x-icon" href="https://gitee.com/StuartYang/bpic/raw/master/20210722154537.png">
+
+        <link rel="stylesheet" href="/css/main.css">
+        
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+        <link rel="stylesheet" href="//at.alicdn.com/t/font_2570198_c1noxsh7ksn.css">
+        </link>
+
+        <script src="//cdnjs.cloudflare.com/ajax/libs/vue/1.0.25-csp/vue.min.js"></script>
+        <!-- JavaScript 日期处理类库 -->
+        <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.11.2/moment.min.js"></script>
+  <meta name="generator" content="Hexo 5.4.0"></head>
+
+<body id="replica-app">
+
+<nav class="navbar-wrapper">
+  <div class="navbar">
+    <div class="container clearfix">
+      <a href="/" class="navbar-logo"><i class="fa iconfont icon-baiyangzuo" style="font-size: 32px;"></i></a>
+
+      <ul class="navbar-nav float-left">
+        
+        <li><a href="/archives">文章</a></li>
+        
+        
+        <li><a href="/categories">归档</a></li>
+        
+        
+        <li><a href="/tags">标签</a></li>
+        
+      </ul>
+
+      <ul class="navbar-nav user-nav float-right desktop-only">
+        <li class="user-nav-notification">
+          <a><span class="user-nav-unread"></span><i class="fa fa-bell"></i></a>
+        </li>
+        <li>
+          <a><i class="fa fa-plus"></i> <i class="fa fa-caret-down"></i></a>
+        </li>
+        <li class="user-nav-logo">
+          <a><img src="https://gitee.com/StuartYang/bpic/raw/master/20210722154532.jpg"> <i class="fa fa-caret-down"></i></i></a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="main-container">
+
+  <header class="header-wrapper desktop-only">
+  <div class="container header-site-detail">
+    <ul class="header-toolbar">
+      <li class="clearfix">
+        <a href="/archives" class="header-toolbar-left"><i
+                  class="fa fa-file-text"></i> 文章 </a>
+        <a href="/archives"
+           class="header-toolbar-right"> 37 </a>
+      </li>
+      <li>
+        <a href="/tags" class="header-toolbar-left"><i
+                  class="fa fa-tags"></i> 标签 </a>
+        <a href="/tags"
+           class="header-toolbar-right"> 38 </a>
+      </li>
+      <li>
+        <a href="/categories" class="header-toolbar-left"><i
+                  class="fa fa-folder-open"></i> 归档 </a>
+        <a href="/categories"
+           class="header-toolbar-right"> 12 </a>
+      </li>
+    </ul>
+    
+    <h2 class="header-title">
+      <i class="fa fa-book text-muted"></i>
+      <a href="/">YangXudong&#39;s Blog</a>
+    </h2>
+  </div>
+</header>
+
+
+  <div class="post-container container">
+    <h3>
+      <i class="fa fa-user-o"></i>
+      旭东同学
+
+        <span class="post-date float-right"
+          title="{{moment(1627671133000).format('MMM DD, YYYY, h:mm:ss A')}}">
+          <i class="fa fa-pencil-square-o"></i>
+          {{moment(1627671133000).fromNow()}}
+        </span>
+    </h3>
+
+    <article class="post-content">
+      <h1>
+        Mysql索引
+      </h1>
+      <h2 id="InnoDB-的索引模型"><a href="#InnoDB-的索引模型" class="headerlink" title="InnoDB 的索引模型"></a>InnoDB 的索引模型</h2><p>在 InnoDB 中，表都是根据主键顺序以索引的形式存放的，这种存储方式的表称为索引组织表。又因为前面我们提到的，InnoDB 使用了 B+ 树索引模型，所以数据都是存储在 B+树中的。</p>
+<ul>
+<li><strong>每一个索引</strong>在 InnoDB 里面对应<strong>一棵 B+ 树</strong>。</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">create table T(</span><br><span class="line"> id int primary key, </span><br><span class="line"> k int not null, </span><br><span class="line"> name varchar(16),</span><br><span class="line"> index (k))engine=InnoDB;</span><br></pre></td></tr></table></figure>
+
+<p> 行数据1~5 的 (ID,k) 值分别为 (100,1)、(200,2)、(300,3)、(500,5) 和 (600,6)，两棵树的示例示意图如下。</p>
+<p><img src="https://gitee.com/StuartYang/bpic/raw/master/20210731025608.png" alt="image-20210731025607661"></p>
+<p>从图中不难看出，根据叶子节点的内容，索引类型分为主键索引和非主键索引。</p>
+<ul>
+<li>主键索引的<strong>叶子节点存的是整行数据</strong>。在 InnoDB 里，<strong>主键索引也被称为聚簇索引</strong>（clustered index）。</li>
+<li>非主键索引的<strong>叶子节点内容是主键的值</strong>。在 InnoDB 里，<strong>非主键索引也被称为二级索引</strong>（secondary index）。</li>
+</ul>
+<p><strong>基于主键索引和普通索引的查询有什么区别？</strong></p>
+<ul>
+<li><code>select * from T where ID=500</code>，即主键查询方式<ul>
+<li>只需要搜索 id 这棵B+ 树；</li>
+</ul>
+</li>
+<li><code>select * from T where k=5</code>，即普通索引查询方式<ol>
+<li>需要先搜索 k 索引树得到 ID 的值为 500;</li>
+<li>再到 ID 索引树搜索一次。<strong>这个过程称为回表。</strong></li>
+</ol>
+</li>
+</ul>
+<p>也就是说，基于非主键索引的查询需要多扫描一棵索引树。</p>
+<h2 id="索引维护"><a href="#索引维护" class="headerlink" title="索引维护"></a>索引维护</h2><p><strong>为什么说自增主键往往是更合理的选择？</strong></p>
+<ol>
+<li>让记录进行从前往后进行添加，不要在现有记录之间再进行插值。因为，一旦选择中间插入值，如果插入的位置恰好数据页已满，B+树会考虑进行页分裂。这样必将影响到性能，同时原本放一页的数据，现在分到两个页中，整体的空间利用率下降。</li>
+<li>主键长度越小，普通索引的叶子节点（存储主键值）就越小，普通索引占用的空间也就越小。</li>
+</ol>
+<h2 id="覆盖索引"><a href="#覆盖索引" class="headerlink" title="覆盖索引"></a>覆盖索引</h2><p><code>select ID from T where k between 3 and 5</code>，这时只需要查 ID 的值，而 ID 的值已经在 k 索引树上了，因此可以直接提供查询结果，不需要回表。也就是说，在这个查询里面，索引 k 已经“覆盖了”我们的查询需求，我们称为覆盖索引。</p>
+<p><strong>由于覆盖索引可以减少树的搜索次数，显著提升查询性能，所以使用覆盖索引是一个常用的性能优化手段。</strong></p>
+<h2 id="最左前缀原则的讨论"><a href="#最左前缀原则的讨论" class="headerlink" title="最左前缀原则的讨论"></a>最左前缀原则的讨论</h2><p>用（name，age）这个联合索引来分析：</p>
+<p><img src="https://gitee.com/StuartYang/bpic/raw/master/20210731030836.png" alt="image-20210731030835000"></p>
+<p>图中可以看到索引项是按照索引定义里面出现的字段顺序排序的。</p>
+<ul>
+<li>当你的逻辑需求是查到所有名字是“张三”的人时，可以快速定位到 ID4，然后向后遍历得到所有需要的结果。</li>
+<li>如果你要查的是所有名字第一个字是“张”的人，你的 SQL 语句的条件是”where name like ‘张 %’”。这时，你也能够用上这个索引，<strong>查找到第一个符合条件的记录是 ID3，然后向后遍历</strong>，直到不满足条件为止。</li>
+</ul>
+<p><strong>在建立联合索引的时候，如何安排索引内的字段顺序呢？</strong></p>
+<ol>
+<li>第一原则是，如果通过调整顺序，可以少维护一个索引，那么这个顺序往往就是需要优先考虑采用的。</li>
+<li>考虑的原则就是空间<ol>
+<li>name 字段是比age 字段大的 ，那就建议创建一个（name,age) 的联合索引和一个 (age) 的单字段索引。</li>
+</ol>
+</li>
+</ol>
+<h2 id="索引下推"><a href="#索引下推" class="headerlink" title="索引下推"></a>索引下推</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from tuser where name like &#x27;张 %&#x27; and age=10 and ismale=1;</span><br></pre></td></tr></table></figure>
+
+
+
+<p> MySQL 5.6 之前，只能从ID3开始<strong>一个个回表</strong>。到主键索引上找出数据行，再对比字段值.</p>
+<p><img src="https://gitee.com/StuartYang/bpic/raw/master/20210731031325.png" alt="image-20210731031324650"></p>
+<p>MySQL 5.6 之后，引入的索引下推优化（index condition pushdown)， <strong>可以在索引遍历过程中，对索引中包含的字段先做判断，直接过滤掉不满足条件的记录，减少回表次数</strong>。</p>
+<p>​    具体操作：</p>
+<ol>
+<li>InnoDB 在 (name,age) 索引内部就判断了 age 是否等于 10，</li>
+<li>对于不等于 10 的记录，直接判断并跳过。</li>
+<li>在我们的这个例子中，只需要对 ID4、ID5 这两条记录回表取数据判断，就只需要回表 2 次。</li>
+</ol>
+<p><img src="https://gitee.com/StuartYang/bpic/raw/master/20210731031344.png" alt="image-20210731031342012"></p>
+<h2 id="重建重建主键索引"><a href="#重建重建主键索引" class="headerlink" title="重建重建主键索引"></a>重建重建主键索引</h2><p><strong>为什么要重建主建索引？</strong></p>
+<p>索引可能因为删除，或者页分裂等原因，导致数据页有空洞，重建索引的过程会创建一个新的索引，把数据按顺序插入，这样页面的利用率最高，也就是索引更紧凑、更省空间。</p>
+<p>不论是删除主键还是创建主键，都会将整个表重建。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">alter table T add primary key(id);</span><br><span class="line"></span><br><span class="line">或者</span><br><span class="line"></span><br><span class="line">alter table T engine=InnoDB</span><br></pre></td></tr></table></figure>
+
+
+    </article>
+  </div>
+
+</div>
+
+
+<div class="footer-wrapper container">
+  <footer class="footer clearfix">
+    <div class="clearfix">
+      <a href="https://www.yangxudong.site" class="footer-logo">
+        <i class="fa iconfont icon-baiyangzuo" style="font-size: 24px;"></i>
+      </a>
+      <ul class="footer-social-link">
+        <li>© 2019 旭东同学</li>
+        <li><a href="https://www.yangxudong.site">Home</a></li>
+        
+        <li><a target="_blank" rel="noopener" href="https://github.com/StuartYang">Github</a></li>
+        
+      </ul>
+      <div class="footer-theme-info">
+        Theme Based on <a target="_blank" rel="noopener" href="//github.com/sabrinaluo/hexo-theme-replica">Replica</a> ❤ Powered by Hexo
+      </div>
+    </div>
+  </footer>
+</div>
+<script src="/js/main.js"></script>
+
+</body>
+</html>

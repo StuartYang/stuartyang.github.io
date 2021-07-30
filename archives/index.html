@@ -162,17 +162,17 @@
       </li>
       <li class="selected">
         <a href="/archives">文章 <span class="counter">
-            33
+            37
           </span></a>
       </li>
       <li class="">
         <a href="/categories">归档 <span class="counter">
-            10
+            12
           </span></a>
       </li>
       <li class="">
         <a href="/tags">标签 <span class="counter">
-            33
+            38
           </span></a>
       </li>
     </ul>
@@ -180,6 +180,114 @@
 
     <div class="body-secondary">
       <ul class="archive-list">
+        
+        <li class="archive-list-item">
+          <h2><a href="/2021/07/31/Mysql%E7%B4%A2%E5%BC%95/">Mysql索引</a></h2>
+          <p>
+               InnoDB 的索引模型  在 InnoDB 中，表都是根据主键顺序以索引的形式存放的，这种存储方式的表称为索引组织表。又因为前面我们提到的，InnoDB 使用了 B+ 树索引模型，所以数据都是存储在 B+树中的。 
+ 
+  每一个索引 在 InnoDB 里面对应 一棵 B+ 树 。 
+ 
+ ...
+          </p>
+          <ul class="tag-list clearfix">
+            
+            <li class="tag-list-item"><a href="/tags/Mysql/">Mysql</a></li>
+            
+            <li class="tag-list-item"><a href="/tags/%E7%B4%A2%E5%BC%95/">索引</a></li>
+            
+          </ul>
+          <div class="post-info">
+            <span>
+              
+              <a class="category-link" href="/categories/Mysql/"><i class="fa fa-folder-open"></i> Mysql</a>
+              
+            </span>
+            <span><i class="fa fa-tag"></i> 2 </span>
+            <span>Published {{moment(1627671133000).fromNow()}}</span>
+          </div>
+        </li>
+        
+        <li class="archive-list-item">
+          <h2><a href="/2021/07/31/Mysql%E4%BA%8B%E5%8A%A1/">Mysql事务</a></h2>
+          <p>
+               隔离性与隔离级别  事务，想到ACID（Atomicity、Consistency、Isolation、Durability，即原子性、一致性、隔离性、持久性），今天我们就来说说其中 I，也就是“隔离性”。 
+...
+          </p>
+          <ul class="tag-list clearfix">
+            
+            <li class="tag-list-item"><a href="/tags/%E4%BA%8B%E5%8A%A1/">事务</a></li>
+            
+            <li class="tag-list-item"><a href="/tags/Mysql/">Mysql</a></li>
+            
+          </ul>
+          <div class="post-info">
+            <span>
+              
+              <a class="category-link" href="/categories/Mysql/"><i class="fa fa-folder-open"></i> Mysql</a>
+              
+            </span>
+            <span><i class="fa fa-tag"></i> 2 </span>
+            <span>Published {{moment(1627670854000).fromNow()}}</span>
+          </div>
+        </li>
+        
+        <li class="archive-list-item">
+          <h2><a href="/2021/07/31/Mysql%E7%9A%84%E6%95%B0%E6%8D%AE%E6%81%A2%E5%A4%8D%E6%97%A5%E5%BF%97/">Mysql的数据恢复日志</a></h2>
+          <p>
+               绪  
+ 参考： 
+ 《MySQL实战45讲》： https://time.geekbang.org/column/intro/139  
+ 
+ 如果每一次的更新操作都需要写进磁盘，然后磁盘也要找到对应的那条记录，然后再更新，整个过程 IO 成本、查找成本都很高。为了解决这个问题，MySQL ...
+          </p>
+          <ul class="tag-list clearfix">
+            
+            <li class="tag-list-item"><a href="/tags/Mysql/">Mysql</a></li>
+            
+            <li class="tag-list-item"><a href="/tags/%E6%95%B0%E6%8D%AE%E6%81%A2%E5%A4%8D/">数据恢复</a></li>
+            
+          </ul>
+          <div class="post-info">
+            <span>
+              
+              <a class="category-link" href="/categories/Mysql/"><i class="fa fa-folder-open"></i> Mysql</a>
+              
+            </span>
+            <span><i class="fa fa-tag"></i> 2 </span>
+            <span>Published {{moment(1627669322000).fromNow()}}</span>
+          </div>
+        </li>
+        
+        <li class="archive-list-item">
+          <h2><a href="/2021/07/31/MySql%E5%9F%BA%E7%A1%80%E6%9E%B6%E6%9E%84/">MySql基础架构</a></h2>
+          <p>
+               绪  
+ 参考： 
+ 《MySQL实战45讲》： https://time.geekbang.org/column/intro/139  
+ 
+   整体架构    
+ 大体来说，MySQL 可以分为 Server 层和存储引擎层两部分。 
+ 
+ Server 层包括连接器、查询缓存、分析器、...
+          </p>
+          <ul class="tag-list clearfix">
+            
+            <li class="tag-list-item"><a href="/tags/MySql/">MySql</a></li>
+            
+            <li class="tag-list-item"><a href="/tags/%E9%9D%A2%E8%AF%95/">面试</a></li>
+            
+          </ul>
+          <div class="post-info">
+            <span>
+              
+              <a class="category-link" href="/categories/MySql/"><i class="fa fa-folder-open"></i> MySql</a>
+              
+            </span>
+            <span><i class="fa fa-tag"></i> 2 </span>
+            <span>Published {{moment(1627667714000).fromNow()}}</span>
+          </div>
+        </li>
         
         <li class="archive-list-item">
           <h2><a href="/2021/07/31/final%E5%85%B3%E9%94%AE%E5%AD%97%E5%92%8C%E4%B8%8D%E5%8F%98%E6%80%A7/">final关键字和不变性</a></h2>
@@ -218,9 +326,9 @@
           </p>
           <ul class="tag-list clearfix">
             
-            <li class="tag-list-item"><a href="/tags/JUC/">JUC</a></li>
-            
             <li class="tag-list-item"><a href="/tags/Java/">Java</a></li>
+            
+            <li class="tag-list-item"><a href="/tags/JUC/">JUC</a></li>
             
             <li class="tag-list-item"><a href="/tags/%E5%A4%9A%E7%BA%BF%E7%A8%8B/">多线程</a></li>
             
@@ -250,9 +358,9 @@
           </p>
           <ul class="tag-list clearfix">
             
-            <li class="tag-list-item"><a href="/tags/JUC/">JUC</a></li>
-            
             <li class="tag-list-item"><a href="/tags/Java/">Java</a></li>
+            
+            <li class="tag-list-item"><a href="/tags/JUC/">JUC</a></li>
             
             <li class="tag-list-item"><a href="/tags/%E5%A4%9A%E7%BA%BF%E7%A8%8B/">多线程</a></li>
             
@@ -276,9 +384,9 @@
           </p>
           <ul class="tag-list clearfix">
             
-            <li class="tag-list-item"><a href="/tags/JUC/">JUC</a></li>
-            
             <li class="tag-list-item"><a href="/tags/Java/">Java</a></li>
+            
+            <li class="tag-list-item"><a href="/tags/JUC/">JUC</a></li>
             
             <li class="tag-list-item"><a href="/tags/AtomicInterger/">AtomicInterger</a></li>
             
@@ -402,9 +510,9 @@
           </p>
           <ul class="tag-list clearfix">
             
-            <li class="tag-list-item"><a href="/tags/JUC/">JUC</a></li>
-            
             <li class="tag-list-item"><a href="/tags/Java/">Java</a></li>
+            
+            <li class="tag-list-item"><a href="/tags/JUC/">JUC</a></li>
             
           </ul>
           <div class="post-info">
@@ -430,9 +538,9 @@
           </p>
           <ul class="tag-list clearfix">
             
-            <li class="tag-list-item"><a href="/tags/JUC/">JUC</a></li>
-            
             <li class="tag-list-item"><a href="/tags/Java/">Java</a></li>
+            
+            <li class="tag-list-item"><a href="/tags/JUC/">JUC</a></li>
             
             <li class="tag-list-item"><a href="/tags/%E5%A4%9A%E7%BA%BF%E7%A8%8B/">多线程</a></li>
             
@@ -469,9 +577,9 @@
           </p>
           <ul class="tag-list clearfix">
             
-            <li class="tag-list-item"><a href="/tags/JUC/">JUC</a></li>
-            
             <li class="tag-list-item"><a href="/tags/Java/">Java</a></li>
+            
+            <li class="tag-list-item"><a href="/tags/JUC/">JUC</a></li>
             
             <li class="tag-list-item"><a href="/tags/%E7%BA%BF%E7%A8%8B%E6%B1%A0/">线程池</a></li>
             
@@ -745,9 +853,9 @@
           </p>
           <ul class="tag-list clearfix">
             
-            <li class="tag-list-item"><a href="/tags/jvm/">jvm</a></li>
-            
             <li class="tag-list-item"><a href="/tags/%E9%9D%A2%E8%AF%95/">面试</a></li>
+            
+            <li class="tag-list-item"><a href="/tags/jvm/">jvm</a></li>
             
             <li class="tag-list-item"><a href="/tags/java/">java</a></li>
             
@@ -884,9 +992,9 @@
           </p>
           <ul class="tag-list clearfix">
             
-            <li class="tag-list-item"><a href="/tags/Mac/">Mac</a></li>
-            
             <li class="tag-list-item"><a href="/tags/starUML/">starUML</a></li>
+            
+            <li class="tag-list-item"><a href="/tags/Mac/">Mac</a></li>
             
           </ul>
           <div class="post-info">
