@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>
+      原子类 | YangXudong&#39;s Blog
+    </title>
+    <meta name="description" content="“ 君子藏剑于身，待时而动 ”">
+    
+      <meta name="keywords" content="
+  JUC,Java,AtomicInterger
+  ">
+      
+        <meta name="author" content="旭东同学">
+
+        <meta http-equiv="Cache-Control" content="no-transform" />
+        <meta http-equiv="Cache-Control" content="no-siteapp">
+        <meta name="theme-color" content="#1e2327">
+        <link rel="apple-touch-icon" href="https://github.githubassets.com/apple-touch-icon.png">
+        <link rel="apple-touch-icon" sizes="180x180"
+          href="https://github.githubassets.com/apple-touch-icon-180x180.png">
+
+        <link rel="icon" type="image/x-icon" href="https://gitee.com/StuartYang/bpic/raw/master/20210722154537.png">
+
+        <link rel="stylesheet" href="/css/main.css">
+        
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+        <link rel="stylesheet" href="//at.alicdn.com/t/font_2570198_c1noxsh7ksn.css">
+        </link>
+
+        <script src="//cdnjs.cloudflare.com/ajax/libs/vue/1.0.25-csp/vue.min.js"></script>
+        <!-- JavaScript 日期处理类库 -->
+        <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.11.2/moment.min.js"></script>
+  <meta name="generator" content="Hexo 5.4.0"></head>
+
+<body id="replica-app">
+
+<nav class="navbar-wrapper">
+  <div class="navbar">
+    <div class="container clearfix">
+      <a href="/" class="navbar-logo"><i class="fa iconfont icon-baiyangzuo" style="font-size: 32px;"></i></a>
+
+      <ul class="navbar-nav float-left">
+        
+        <li><a href="/archives">文章</a></li>
+        
+        
+        <li><a href="/categories">归档</a></li>
+        
+        
+        <li><a href="/tags">标签</a></li>
+        
+      </ul>
+
+      <ul class="navbar-nav user-nav float-right desktop-only">
+        <li class="user-nav-notification">
+          <a><span class="user-nav-unread"></span><i class="fa fa-bell"></i></a>
+        </li>
+        <li>
+          <a><i class="fa fa-plus"></i> <i class="fa fa-caret-down"></i></a>
+        </li>
+        <li class="user-nav-logo">
+          <a><img src="https://gitee.com/StuartYang/bpic/raw/master/20210722154532.jpg"> <i class="fa fa-caret-down"></i></i></a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="main-container">
+
+  <header class="header-wrapper desktop-only">
+  <div class="container header-site-detail">
+    <ul class="header-toolbar">
+      <li class="clearfix">
+        <a href="/archives" class="header-toolbar-left"><i
+                  class="fa fa-file-text"></i> 文章 </a>
+        <a href="/archives"
+           class="header-toolbar-right"> 30 </a>
+      </li>
+      <li>
+        <a href="/tags" class="header-toolbar-left"><i
+                  class="fa fa-tags"></i> 标签 </a>
+        <a href="/tags"
+           class="header-toolbar-right"> 33 </a>
+      </li>
+      <li>
+        <a href="/categories" class="header-toolbar-left"><i
+                  class="fa fa-folder-open"></i> 归档 </a>
+        <a href="/categories"
+           class="header-toolbar-right"> 10 </a>
+      </li>
+    </ul>
+    
+    <h2 class="header-title">
+      <i class="fa fa-book text-muted"></i>
+      <a href="/">YangXudong&#39;s Blog</a>
+    </h2>
+  </div>
+</header>
+
+
+  <div class="post-container container">
+    <h3>
+      <i class="fa fa-user-o"></i>
+      旭东同学
+
+        <span class="post-date float-right"
+          title="{{moment(1627642663000).format('MMM DD, YYYY, h:mm:ss A')}}">
+          <i class="fa fa-pencil-square-o"></i>
+          {{moment(1627642663000).fromNow()}}
+        </span>
+    </h3>
+
+    <article class="post-content">
+      <h1>
+        原子类
+      </h1>
+      <h2 id="什么是原子类"><a href="#什么是原子类" class="headerlink" title="什么是原子类"></a>什么是原子类</h2><p>java 1.5引进原子类，具体在java.util.concurrent.atomic包下，atomic包里面一共提供了13个类，分为4种类型，分别是：原子更新基本类型，原子更新数组，原子更新引用，原子更新属性。原子类也是java实现同步的一套解决方案。</p>
+<h2 id="为什么还要引入原子类呢？"><a href="#为什么还要引入原子类呢？" class="headerlink" title="为什么还要引入原子类呢？"></a>为什么还要引入原子类呢？</h2><p>在很多时候，我们需要的仅仅是一个简单的、高效的、线程安全的递增或者递减方案：</p>
+<ol>
+<li>简单：操作简单，底层实现简单</li>
+<li>高效：占用资源少，操作速度快</li>
+<li>安全：在高并发和多线程环境下要保证数据的正确性</li>
+</ol>
+<p>对于是需要简单的递增或者递减的需求场景，<strong>使用synchronized关键字和lock固然可以实现，但代码写的会略显冗余，且性能会有影响，此时用原子类更加方便</strong>。</p>
+<p>原子类相比锁的优势：</p>
+<ul>
+<li>粒度更细：原子变量可以把竞争范围缩小到变量级别（锁一般是几行代码或者一个方法）</li>
+<li>通常效率更高，除了高度竞争</li>
+</ul>
+<h2 id="原子类的使用"><a href="#原子类的使用" class="headerlink" title="原子类的使用"></a>原子类的使用</h2><p>几个常用的API：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> addAndGet（<span class="keyword">int</span> delta）<span class="comment">// // 以原子方式将给定值与当前值相加（返回更新的值）</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> getAndAdd（<span class="keyword">int</span> delta）<span class="comment">// 以原子方式将给定值与当前值相加（返回以前的值）</span></span><br><span class="line"></span><br><span class="line">Boolean compareAndSet（<span class="keyword">int</span> expect，<span class="keyword">int</span> update）<span class="comment">//如果expect=原子类中的值，则以原子方式将该update值设置为输入</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">incrementAndGet</span><span class="params">()</span><span class="comment">// 以原子方式将当前值加 1（返回更新的值）</span></span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">getAndIncrement</span><span class="params">()</span> <span class="comment">// 以原子方式将当前值加 1（返回以前的值）</span></span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">getAndSet</span><span class="params">(<span class="keyword">int</span> newValue)</span><span class="comment">// 以原子方式设置为给定值（返回旧值）</span></span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">decrementAndGet</span><span class="params">()</span> <span class="comment">// 以原子方式将当前值减 1（返回更新的值）</span></span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">getAndDecrement</span><span class="params">()</span> <span class="comment">// 以原子方式将当前值减 1（返回以前的值）</span></span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function"><span class="title">get</span><span class="params">()</span> <span class="comment">// 获取当前值</span></span></span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>AtomicInteger的使用</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"> <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">   			<span class="comment">// 初始值：123</span></span><br><span class="line">        AtomicInteger atomicInteger = <span class="keyword">new</span> AtomicInteger(<span class="number">123</span>);</span><br><span class="line">        System.out.println(atomicInteger.get());</span><br><span class="line">        <span class="keyword">int</span> expectedValue = <span class="number">123</span>;</span><br><span class="line">        <span class="keyword">int</span> newValue  = <span class="number">234</span>;</span><br><span class="line">        Boolean b =atomicInteger.compareAndSet(expectedValue, newValue);</span><br><span class="line">        System.out.println(b);</span><br><span class="line">        System.out.println(atomicInteger);</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 输出结果为： 0 false 0</span></span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>Atomic*Array的使用</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> chapter3.atomicintegerarray;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.atomic.AtomicIntegerArray;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AtomicIntegerArrayTest</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="comment">//1、创建给定长度的新 AtomicIntegerArray。</span></span><br><span class="line">        AtomicIntegerArray atomicIntegerArray = <span class="keyword">new</span> AtomicIntegerArray(<span class="number">10</span>);</span><br><span class="line">        <span class="comment">//2、将位置 i 的元素设置为给定值,默认值为0</span></span><br><span class="line">        atomicIntegerArray.set(<span class="number">9</span>,<span class="number">10</span>);</span><br><span class="line">        System.out.println(<span class="string">&quot;Value: &quot;</span> + atomicIntegerArray.get(<span class="number">9</span>) + <span class="string">&quot;默认值：&quot;</span> + atomicIntegerArray.get(<span class="number">0</span>));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>AtomicIntegerFieldUpdate的使用</strong></p>
+<blockquote>
+<p> 对普通变量进行升级</p>
+</blockquote>
+<p>使用场景：</p>
+<ul>
+<li><strong>偶尔</strong>用一个原子get-set操作</li>
+</ul>
+<p>注意点：</p>
+<ol>
+<li>保证可见性可见性，原子类负责原子性</li>
+<li>不能使用tatic修饰的变量</li>
+<li>不能使final变量</li>
+</ol>
+<h2 id="Adder累加器-—-Long举例"><a href="#Adder累加器-—-Long举例" class="headerlink" title="Adder累加器 — Long举例"></a>Adder累加器 — Long举例</h2><ul>
+<li><strong>在Java8中</strong>,Doug Lea大师在java.util.concurrent.atomic包中添加了几个新的类,其中有一个是LongAdder。</li>
+<li>高并发下LongAddr比AtomicLong效率高，其<strong>本质是空间换时间</strong></li>
+</ul>
+<p><strong>AtomicLong的画图</strong></p>
+<p><img src="https://gitee.com/StuartYang/bpic/raw/master/20210730191050.png" alt="image.png"></p>
+<p>AtomicLong的实现原理：<strong>每一次</strong>累加都需要做同步（从本地内存刷新到共享内存），所以在高并发下会导致冲突比较多，从而会降低效率。</p>
+<p><strong>LongAdder画图</strong></p>
+<p><img src="https://gitee.com/StuartYang/bpic/raw/master/20210730191344.png" alt="image.png"></p>
+<p>LongAdder的实现原理：</p>
+<ul>
+<li><p><strong>每个线程会有一个计时器</strong>（只用来在自己线程内计时，不与其他线程的计时相互干扰）。</p>
+</li>
+<li><p>如图中，第一个线程的计时器<code>ctr = 1</code> ， 第二个线程的计时器<code>ctr = 3</code> 。它们之间不存在竞争关系，所以在加的过程中，不需要同步机制，从而也就不需要AtomicLong中的flush和refresh。也不需要一个公共的counter来给所有的线程计时。</p>
+</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">longAdderTest</span><span class="params">()</span></span>&#123;</span><br><span class="line">        LongAdder longAdder = <span class="keyword">new</span> LongAdder();</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">1024</span>; i++) &#123;</span><br><span class="line">            longAdder.add(<span class="number">1</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    <span class="comment">// 返回当下值</span></span><br><span class="line">        <span class="keyword">return</span> longAdder.sum()();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>在LongAdder的sum中引入分段累加的概念，内部有一个base变量和一个Cell[]数组共同参与计时：</p>
+<ul>
+<li>base变量：竞争不激烈，直接加上该变量</li>
+<li>Cell[]数组：竞争激烈，各个线程分散到自己的槽Cell[i]中</li>
+</ul>
+<p><strong>低竞争的并发环境下 <code>AtomicInteger</code> 的性能是要比 <code>LongAdder</code> 的性能好，而高竞争环境下 <code>LongAdder</code> 的性能比 <code>AtomicInteger</code> 好</strong>，LongAdder的Cell[]中没有加锁，所以在高并发下返回值中可能存在旧值。</p>
+<p>longAdder适合的行就就是统计求和和计时的场景，并且LongAdder基本只提供了add方法。</p>
+
+    </article>
+  </div>
+
+</div>
+
+
+<div class="footer-wrapper container">
+  <footer class="footer clearfix">
+    <div class="clearfix">
+      <a href="https://www.yangxudong.site" class="footer-logo">
+        <i class="fa iconfont icon-baiyangzuo" style="font-size: 24px;"></i>
+      </a>
+      <ul class="footer-social-link">
+        <li>© 2019 旭东同学</li>
+        <li><a href="https://www.yangxudong.site">Home</a></li>
+        
+        <li><a target="_blank" rel="noopener" href="https://github.com/StuartYang">Github</a></li>
+        
+      </ul>
+      <div class="footer-theme-info">
+        Theme Based on <a target="_blank" rel="noopener" href="//github.com/sabrinaluo/hexo-theme-replica">Replica</a> ❤ Powered by Hexo
+      </div>
+    </div>
+  </footer>
+</div>
+<script src="/js/main.js"></script>
+
+</body>
+</html>
