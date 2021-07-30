@@ -165,12 +165,12 @@
             28
           </span></a>
       </li>
-      <li class="selected">
+      <li class="">
         <a href="/categories">归档 <span class="counter">
             10
           </span></a>
       </li>
-      <li class="">
+      <li class="selected">
         <a href="/tags">标签 <span class="counter">
             31
           </span></a>
@@ -182,36 +182,29 @@
       <ul class="archive-list">
         
         <li class="archive-list-item">
-          <h2><a href="/2021/07/22/%E7%BD%91%E7%BB%9CIO%E6%A8%A1%E5%9E%8B/">网络IO模型</a></h2>
+          <h2><a href="/2021/07/30/ThreadLocal/">ThreadLocal</a></h2>
           <p>
-               
-   绪  
- 参考： 
- 《100%弄明白5种IO模型》： https://zhuanlan.zhihu.com/p/115912936  
- BGM：《好好》— 五月天 
+               ThreadLocal的两个作用  
+ 让某个需要用到的对象在线程之间隔离（每个线程都有自己的对立对象） 
+ 在任何方法中都可以轻松获取到该对象 
  
-   案例：应用A 发消息给应用B 的过程  
-
-  第一步 ：应用A把消息发送到 TCP发送缓冲区。 
-  第...
+   ThreadLocal简单使用       1   2   3   4   5   6   7   8   9   10   11   ...
           </p>
           <ul class="tag-list clearfix">
             
-            <li class="tag-list-item"><a href="/tags/Java/">Java</a></li>
+            <li class="tag-list-item"><a href="/tags/JUC/">JUC</a></li>
             
-            <li class="tag-list-item"><a href="/tags/%E7%BD%91%E7%BB%9C/">网络</a></li>
-            
-            <li class="tag-list-item"><a href="/tags/IO/">IO</a></li>
+            <li class="tag-list-item"><a href="/tags/ThreadLocal/">ThreadLocal</a></li>
             
           </ul>
           <div class="post-info">
             <span>
               
-              <a class="category-link" href="/categories/%E7%BD%91%E7%BB%9C/"><i class="fa fa-folder-open"></i> 网络</a>
+              <a class="category-link" href="/categories/JUC/"><i class="fa fa-folder-open"></i> JUC</a>
               
             </span>
-            <span><i class="fa fa-tag"></i> 3 </span>
-            <span>Published {{moment(1626957496000).fromNow()}}</span>
+            <span><i class="fa fa-tag"></i> 2 </span>
+            <span>Published {{moment(1627582982000).fromNow()}}</span>
           </div>
         </li>
         
