@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>
+      锁 | YangXudong&#39;s Blog
+    </title>
+    <meta name="description" content="“ 君子藏剑于身，待时而动 ”">
+    
+      <meta name="keywords" content="
+  JUC,锁，Java
+  ">
+      
+        <meta name="author" content="旭东同学">
+
+        <meta http-equiv="Cache-Control" content="no-transform" />
+        <meta http-equiv="Cache-Control" content="no-siteapp">
+        <meta name="theme-color" content="#1e2327">
+        <link rel="apple-touch-icon" href="https://github.githubassets.com/apple-touch-icon.png">
+        <link rel="apple-touch-icon" sizes="180x180"
+          href="https://github.githubassets.com/apple-touch-icon-180x180.png">
+
+        <link rel="icon" type="image/x-icon" href="https://gitee.com/StuartYang/bpic/raw/master/20210722154537.png">
+
+        <link rel="stylesheet" href="/css/main.css">
+        
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+        <link rel="stylesheet" href="//at.alicdn.com/t/font_2570198_c1noxsh7ksn.css">
+        </link>
+
+        <script src="//cdnjs.cloudflare.com/ajax/libs/vue/1.0.25-csp/vue.min.js"></script>
+        <!-- JavaScript 日期处理类库 -->
+        <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.11.2/moment.min.js"></script>
+  <meta name="generator" content="Hexo 5.4.0"></head>
+
+<body id="replica-app">
+
+<nav class="navbar-wrapper">
+  <div class="navbar">
+    <div class="container clearfix">
+      <a href="/" class="navbar-logo"><i class="fa iconfont icon-baiyangzuo" style="font-size: 32px;"></i></a>
+
+      <ul class="navbar-nav float-left">
+        
+        <li><a href="/archives">文章</a></li>
+        
+        
+        <li><a href="/categories">归档</a></li>
+        
+        
+        <li><a href="/tags">标签</a></li>
+        
+      </ul>
+
+      <ul class="navbar-nav user-nav float-right desktop-only">
+        <li class="user-nav-notification">
+          <a><span class="user-nav-unread"></span><i class="fa fa-bell"></i></a>
+        </li>
+        <li>
+          <a><i class="fa fa-plus"></i> <i class="fa fa-caret-down"></i></a>
+        </li>
+        <li class="user-nav-logo">
+          <a><img src="https://gitee.com/StuartYang/bpic/raw/master/20210722154532.jpg"> <i class="fa fa-caret-down"></i></i></a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="main-container">
+
+  <header class="header-wrapper desktop-only">
+  <div class="container header-site-detail">
+    <ul class="header-toolbar">
+      <li class="clearfix">
+        <a href="/archives" class="header-toolbar-left"><i
+                  class="fa fa-file-text"></i> 文章 </a>
+        <a href="/archives"
+           class="header-toolbar-right"> 29 </a>
+      </li>
+      <li>
+        <a href="/tags" class="header-toolbar-left"><i
+                  class="fa fa-tags"></i> 标签 </a>
+        <a href="/tags"
+           class="header-toolbar-right"> 32 </a>
+      </li>
+      <li>
+        <a href="/categories" class="header-toolbar-left"><i
+                  class="fa fa-folder-open"></i> 归档 </a>
+        <a href="/categories"
+           class="header-toolbar-right"> 10 </a>
+      </li>
+    </ul>
+    
+    <h2 class="header-title">
+      <i class="fa fa-book text-muted"></i>
+      <a href="/">YangXudong&#39;s Blog</a>
+    </h2>
+  </div>
+</header>
+
+
+  <div class="post-container container">
+    <h3>
+      <i class="fa fa-user-o"></i>
+      旭东同学
+
+        <span class="post-date float-right"
+          title="{{moment(1627638532000).format('MMM DD, YYYY, h:mm:ss A')}}">
+          <i class="fa fa-pencil-square-o"></i>
+          {{moment(1627638532000).fromNow()}}
+        </span>
+    </h3>
+
+    <article class="post-content">
+      <h1>
+        锁
+      </h1>
+      <h2 id="绪"><a href="#绪" class="headerlink" title="绪"></a>绪</h2><blockquote>
+<p>参考：</p>
+<p>​    《 Java中的锁分类与使用》：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/hustzzl/p/9343797.html">https://www.cnblogs.com/hustzzl/p/9343797.html</a></p>
+</blockquote>
+<h1 id="锁的理论部分"><a href="#锁的理论部分" class="headerlink" title="锁的理论部分"></a>锁的理论部分</h1><h2 id="锁的分类"><a href="#锁的分类" class="headerlink" title="锁的分类"></a>锁的分类</h2><blockquote>
+<p>这些分类，是从各个不同角度触发看的</p>
+</blockquote>
+<ul>
+<li>乐观锁/悲观锁</li>
+<li>独享锁/共享锁</li>
+<li>互斥锁/读写锁</li>
+<li>可重入锁/不可重入锁</li>
+<li>公平锁/非公平锁</li>
+<li>分段锁</li>
+<li>偏向锁/轻量级锁/重量级锁</li>
+<li>自旋锁(CAS)</li>
+</ul>
+<h2 id="乐观锁-悲观锁"><a href="#乐观锁-悲观锁" class="headerlink" title="乐观锁/悲观锁"></a>乐观锁/悲观锁</h2><blockquote>
+<p> 区分的核心： 要不要一上来不加判断就锁住资源</p>
+</blockquote>
+<h4 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h4><ul>
+<li><strong>悲观锁</strong>：总是假设最坏的情况，认为每次去拿数据的时候都认为别人会修改，所以每次在拿数据的时候都会上锁，这样别人想拿这个数据就会阻塞直到它拿到锁。<ul>
+<li>Java的实现：Lock和关键字synchronized</li>
+<li>悲观锁的问题：<ul>
+<li>阻塞和唤起线程是很消耗资源的（一次操作中）</li>
+<li>死锁问题</li>
+<li>饥饿</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>乐观锁</strong>：总是假设最好的情况，每次去拿数据的时候都认为别人不会修改，所以在更新的时候会利用使用版本号等机制判断一下在此期间别人有没有去更新这个数据。<ul>
+<li>Java的实现：CAS</li>
+<li>可观锁的问题：<ul>
+<li>ABA问题——时间戳/版本号（Git）</li>
+<li>循环等待时间太长——自旋锁</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h4 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h4><ul>
+<li>乐观锁：适合并发写入少，大部分是读取是读取的场景；<ul>
+<li>git</li>
+<li>数据库 版本号控制，没取一次version+1</li>
+</ul>
+</li>
+<li>悲观锁：适合，线程数多（竞争大），切在<strong>临界区比较长时间的情况</strong><ul>
+<li>数据库：select ……… for update就是悲观锁</li>
+<li>临界区有IO</li>
+<li>临界区代码赋值或者循环</li>
+<li>对临界区竞争非常激烈</li>
+</ul>
+</li>
+</ul>
+<h2 id="独享锁-共享锁"><a href="#独享锁-共享锁" class="headerlink" title="独享锁/共享锁"></a>独享锁/共享锁</h2><ul>
+<li><p>独享锁：是指该锁一次只能被一个线程所持有。</p>
+<ul>
+<li><p>对于Java ReentrantLock而言，其是独享锁。</p>
+</li>
+<li><p>对于Synchronized而言，当然是独享锁。</p>
+</li>
+</ul>
+</li>
+<li><p>共享锁：是指该锁可被多个线程所持有。</p>
+<ul>
+<li>是对于Lock的另一个实现类ReadWriteLock，其读锁是共享锁，其写锁是独享锁。</li>
+<li>特点：<ul>
+<li>可保证并发读是非常高效的。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p><strong>独享锁与共享锁也是通过AQS来实现的，通过实现不同的方法，来实现独享或者共享。</strong></p>
+<h2 id="互斥锁-读写锁"><a href="#互斥锁-读写锁" class="headerlink" title="互斥锁/读写锁"></a>互斥锁/读写锁</h2><p>上面讲的独享锁/共享锁就是一种<strong>广义的说法</strong>，<strong>互斥锁/读写锁是独享锁/共享锁具体的实现。</strong></p>
+<ul>
+<li><p>互斥锁在Java中的具体实现就是ReentrantLock。</p>
+</li>
+<li><p>读写锁在Java中的具体实现就是ReadWriteLock。</p>
+</li>
+</ul>
+<h2 id="可重入锁-不可重入锁"><a href="#可重入锁-不可重入锁" class="headerlink" title="可重入锁/不可重入锁"></a>可重入锁/不可重入锁</h2><blockquote>
+<p>是否可以再次对同一个对象加锁。可重入锁的一个好处是可一定程度避免死锁。</p>
+</blockquote>
+<ul>
+<li>对于Java ReetrantLock而言，从名字就可以看出是一个重入锁，其名字是Re entrant Lock 重新进入锁。<ul>
+<li>核心实现是：AQS</li>
+</ul>
+</li>
+<li>对于Synchronized而言，也是一个可重入锁。</li>
+</ul>
+<h2 id="公平锁-非公平锁"><a href="#公平锁-非公平锁" class="headerlink" title="公平锁/非公平锁"></a>公平锁/非公平锁</h2><ul>
+<li>公平锁：指多个线程按照申请锁的顺序来获取锁。<ul>
+<li>会判断是否阻塞队列有线程别阻塞</li>
+</ul>
+</li>
+<li>非公平锁：指多个线程获取锁的顺序并不是按照申请锁的顺序，有可能后申请的线程比先申请的线程优先获取锁。<ul>
+<li>对于Synchronized而言，也是一种非公平锁。</li>
+<li>ReetrantLock默认是非公平锁，可修改【构造函数传true是公平，false/不传就是非公平】</li>
+<li>缺点：可能会造成优先级反转或者饥饿现象。</li>
+</ul>
+</li>
+</ul>
+<h2 id="分段锁"><a href="#分段锁" class="headerlink" title="分段锁"></a>分段锁</h2><blockquote>
+<p>分段锁其实是一种锁的设计，并不是具体的一种锁，对于ConcurrentHashMap而言，其并发的实现就是通过分段锁的形式来实现高效的并发操作。</p>
+</blockquote>
+<p>我们以ConcurrentHashMap来说一下分段锁的含义以及设计思想，ConcurrentHashMap中的分段锁称为Segment，它即类似于HashMap（JDK7和JDK8中HashMap的实现）的结构，即内部拥有一个Entry数组，数组中的每个元素又是一个链表；同时又是一个ReentrantLock（Segment继承了ReentrantLock）。</p>
+<ul>
+<li>当需要put元素的时候，并不是对整个hashmap进行加锁，而是先通过hashcode来知道他要放在哪一个分段中，然后对这个分段进行加锁，所以当多线程put的时候，只要不是放在一个分段中，就实现了真正的并行的插入。</li>
+<li>但是，在统计size的时候，可就是获取hashmap全局信息的时候，就需要获取所有的分段锁才能统计。</li>
+</ul>
+<p>分段锁的设计目的是细化锁的粒度，当操作不需要更新整个数组的时候，就仅仅针对数组中的一项进行加锁操作。</p>
+<h2 id="偏向锁-轻量级锁-重量级锁"><a href="#偏向锁-轻量级锁-重量级锁" class="headerlink" title="偏向锁/轻量级锁/重量级锁"></a>偏向锁/轻量级锁/重量级锁</h2><blockquote>
+<p>在Java 5通过引入<strong>锁升级</strong>的机制来实现高效Synchronized。这三种锁的状态是通过对象监视器在对象头中的字段来表明的。</p>
+</blockquote>
+<ul>
+<li>偏向锁：指一段同步代码一直被一个线程所访问，那么该线程会自动获取锁。降低获取锁的代价。</li>
+<li>轻量级锁：指当锁是偏向锁的时候，被另一个线程所访问，偏向锁就会升级为轻量级锁，其他线程会通过自旋的形式尝试获取锁，不会阻塞，提高性能。</li>
+<li>重量级锁是指当锁为轻量级锁的时候，另一个线程虽然是自旋，但自旋不会一直持续下去，当自旋一定次数的时候，还没有获取到锁，就会进入阻塞，该锁膨胀为重量级锁。重量级锁会让他申请的线程进入阻塞，性能降低。</li>
+</ul>
+<h2 id="自旋锁"><a href="#自旋锁" class="headerlink" title="自旋锁"></a>自旋锁</h2><blockquote>
+<p> 在Java中，自旋锁是指尝试获取锁的线程不会立即阻塞，而是采用循环的方式去尝试获取锁，这样的好处是减少线程上下文切换的消耗，缺点是循环会消耗CPU。</p>
+</blockquote>
+<h2 id="JVM的锁优化"><a href="#JVM的锁优化" class="headerlink" title="JVM的锁优化"></a>JVM的锁优化</h2><ol>
+<li>自适应自旋</li>
+</ol>
+<ul>
+<li><ul>
+<li>自适应：根据上次自旋的时间，去判定本次自旋的时间长，超过这个时间，就转变为悲观锁，进入阻塞状态。</li>
+</ul>
+</li>
+</ul>
+<ol start="2">
+<li>锁消除</li>
+</ol>
+<ul>
+<li><ul>
+<li>不必要的地方，例如在一个方法中对操作方法内的变量进行加锁，JVM会取消这个锁。</li>
+</ul>
+</li>
+</ul>
+<ol start="3">
+<li>锁粗化</li>
+</ol>
+<ul>
+<li><ul>
+<li>频繁的加锁解锁代码块，会合并。</li>
+</ul>
+</li>
+</ul>
+<h2 id="个人开发对锁的优化"><a href="#个人开发对锁的优化" class="headerlink" title="个人开发对锁的优化"></a>个人开发对锁的优化</h2><ul>
+<li>缩小同步代码块</li>
+<li>尽量不要锁方法</li>
+<li>减少请求锁的次数</li>
+</ul>
+<ol>
+<li><ul>
+<li>多个线程的请求，归结给一个线程让其完成（例如日志）</li>
+</ul>
+</li>
+</ol>
+<ul>
+<li>避免人为制造“热点”</li>
+</ul>
+<ol>
+<li><ul>
+<li>热点:某些数据是共享的。</li>
+</ul>
+</li>
+</ol>
+<ul>
+<li><p>锁中尽量不要再包含锁</p>
+</li>
+<li><p>选择合适的锁类型或合适的工具类</p>
+</li>
+</ul>
+<h1 id="锁的使用"><a href="#锁的使用" class="headerlink" title="锁的使用"></a>锁的使用</h1><h2 id="预备知识"><a href="#预备知识" class="headerlink" title="预备知识"></a>预备知识</h2><h3 id="CAS"><a href="#CAS" class="headerlink" title="CAS"></a>CAS</h3><blockquote>
+<p>CAS（Compare and Swap 比较并交换）是乐观锁技术，当多个线程尝试使用CAS同时更新同一个变量时，只有其中一个线程能更新变量的值，而其他线程都失败，失败的线程并不会被挂起，而是被告知这次竞争中失败，并可以再次尝试。</p>
+</blockquote>
+<p>JAVA对CAS的支持：</p>
+<p>在JDK1.5中新增<strong>java.util.concurrent包就是建立在CAS之上的</strong>。相对于synchronized这种阻塞算法，CAS是非阻塞算法的一种常见实现。所以java.util.concurrent包中的AtomicInteger为例，看一下在不使用锁的情况下是如何保证线程安全的。主要理解<code>getAndIncrement</code>方法，该方法的作用相当于++i操作。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AtomicInteger</span></span>&#123;</span><br><span class="line">　　<span class="keyword">private</span> <span class="keyword">volatile</span> <span class="keyword">int</span> value;</span><br><span class="line">　</span><br><span class="line"></span><br><span class="line">　　 <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">int</span> <span class="title">getAndIncrement</span><span class="params">()</span></span>&#123;</span><br><span class="line">　　　　<span class="keyword">for</span> (;;)&#123;</span><br><span class="line">　　　　　　<span class="keyword">int</span> current = get();</span><br><span class="line">　　　　　　<span class="keyword">int</span> next = current + <span class="number">1</span>;</span><br><span class="line">　　　　　　<span class="keyword">if</span> (compareAndSet(current, next))</span><br><span class="line">　　　　　　<span class="keyword">return</span> current;</span><br><span class="line">　　　　&#125;</span><br><span class="line">　　&#125;</span><br><span class="line"></span><br><span class="line">  　<span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">int</span> <span class="title">get</span><span class="params">()</span></span>&#123;</span><br><span class="line">　　　　<span class="keyword">return</span> value;</span><br><span class="line">　　&#125;</span><br><span class="line">  <span class="comment">// CAS </span></span><br><span class="line">　　<span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">boolean</span> <span class="title">compareAndSet</span><span class="params">(<span class="keyword">int</span> expect, <span class="keyword">int</span> update)</span></span>&#123;</span><br><span class="line">　　　　<span class="keyword">return</span> unsafe.compareAndSwapInt(<span class="keyword">this</span>, valueOffset, expect, update);</span><br><span class="line">　　&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="AQS"><a href="#AQS" class="headerlink" title="AQS"></a>AQS</h3><p>背景：锁和协作类的共同点：闸门</p>
+<ul>
+<li><ul>
+<li>我们学过了ReentrantLock和Semaphore，他们有很多相似点</li>
+<li>事实上，不仅仅是reentrantLock和Semaphore，包括CoutDownLatch，reentrantLockReadWriteLock都有这样类似的“协作”（或叫同步）功能。其实，他们底层都用了共同的基类——AQS</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>因为上面那些协作类，他们很多工作都是类似的，所以如果能提取一个工具类，那么就可以直接用，对于reentrantLock和Semaphore而言就可以屏蔽很多细节，只关注它们的“业务逻辑”就可以。</p>
+</blockquote>
+<h4 id="Semaphore和AQS的关系为例"><a href="#Semaphore和AQS的关系为例" class="headerlink" title="Semaphore和AQS的关系为例"></a>Semaphore和AQS的关系为例</h4><blockquote>
+<p> 内部有一个Sync类，继承了AQS</p>
+</blockquote>
+<p><img src="https://gitee.com/StuartYang/bpic/raw/master/20210730183529.png" alt="image.png"></p>
+<p>CountDownLatch也同上，内部有一个Sync类，sync类继承了AQS</p>
+<p>ReentrantLock也同上，内部有一个Sync类，sync类继承了AQS</p>
+<h4 id="AQS内部原理解析"><a href="#AQS内部原理解析" class="headerlink" title="AQS内部原理解析"></a>AQS内部原理解析</h4><p>AQS最核心的三大部分</p>
+<ul>
+<li>State</li>
+<li>控制线程抢锁和配合的FIFO队列。</li>
+<li>期望协作工具类去实现的获取/释放等重要方法。</li>
+</ul>
+<p><img src="https://gitee.com/StuartYang/bpic/raw/master/20210730183138.png" alt="img"></p>
+<h5 id="State"><a href="#State" class="headerlink" title="State"></a>State</h5><blockquote>
+<p>这里Sate的具体含义，会根据具体实现类不同而不同，比如在Semaphore里，它表示“剩余的许可证的数量”，而在CountDownLatch里，它表示“还需要倒数的数量”。</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">volatile</span> <span class="keyword">int</span> state</span><br></pre></td></tr></table></figure>
+
+<p>state的访问方式有三种:</p>
+<ul>
+<li>getState()</li>
+<li>setState()：采用CAS的方式去修改State</li>
+<li>compareAndSetState()：使用了Unsafe类的compareAndSwapInt</li>
+</ul>
+<h5 id="控制线程抢锁和配合的FIFO队列"><a href="#控制线程抢锁和配合的FIFO队列" class="headerlink" title="控制线程抢锁和配合的FIFO队列"></a>控制线程抢锁和配合的FIFO队列</h5><ul>
+<li>这个队列用来存放“等待的线程”。<ul>
+<li><strong>AQS就是“排队管理器”</strong>：当多个线程争用同一把锁时，必须有排队机制将那些没能拿到锁的线程串在一起，当锁释放时，锁管理器就会挑选一个合适的线程来占用这个刚刚释放的锁。</li>
+</ul>
+</li>
+<li>AQS会维护一个<strong>等待的线程队列</strong>，吧线程都放在这个队列里。</li>
+<li>这就是一个<strong>双向形式的队列</strong>。</li>
+</ul>
+<p><img src="https://gitee.com/StuartYang/bpic/raw/master/20210730184215.png" alt="image.png"></p>
+<h5 id="期望协作工具类单独去实现的获取-释放等重要方法"><a href="#期望协作工具类单独去实现的获取-释放等重要方法" class="headerlink" title="期望协作工具类单独去实现的获取/释放等重要方法"></a>期望协作工具类单独去实现的获取/释放等重要方法</h5><p>什么是期望协作工具类？</p>
+<blockquote>
+<p>上文提到的reentrantLock，Semaphore，CoutDownLatch，reentrantLockReadWriteLock等</p>
+</blockquote>
+<p>获取方法</p>
+<ul>
+<li><strong>其中获取方法会依赖state变量，经常会阻塞（比如获取不到锁的时候）</strong></li>
+<li>在Semaphore中，获取就是acquire方法，作用是获取一个许可证。</li>
+<li>在Countdownlatch中，获取就是await方法，作用是“等待，知道倒数结束”。</li>
+</ul>
+<p>释放方法</p>
+<ul>
+<li><strong>释放操作不会阻塞</strong></li>
+<li>在Semaphore中，释放就是release方法，作用是释放一个许可证</li>
+<li>在CountdownLatch中，释放就countDown（）方法，作用就是“倒计时1个数”</li>
+</ul>
+<h5 id="自己写一个countdownLatch，用一下AQS"><a href="#自己写一个countdownLatch，用一下AQS" class="headerlink" title="自己写一个countdownLatch，用一下AQS"></a>自己写一个countdownLatch，用一下AQS</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> aqs;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.locks.AbstractQueuedSynchronizer;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">OneShotLatch</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Sync sync = <span class="keyword">new</span> Sync();</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">signal</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        sync.releaseShared(<span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">await</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        sync.acquireShared(<span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// AQS </span></span><br><span class="line">    <span class="keyword">private</span> <span class="class"><span class="keyword">class</span> <span class="title">Sync</span> <span class="keyword">extends</span> <span class="title">AbstractQueuedSynchronizer</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">      <span class="comment">// 书写方法即可</span></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">protected</span> <span class="keyword">int</span> <span class="title">tryAcquireShared</span><span class="params">(<span class="keyword">int</span> arg)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> (getState() == <span class="number">1</span>) ? <span class="number">1</span> : -<span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">protected</span> <span class="keyword">boolean</span> <span class="title">tryReleaseShared</span><span class="params">(<span class="keyword">int</span> arg)</span> </span>&#123;</span><br><span class="line">           setState(<span class="number">1</span>);</span><br><span class="line">           <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">  <span class="comment">/*</span></span><br><span class="line"><span class="comment">  使用</span></span><br><span class="line"><span class="comment">  */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">        OneShotLatch oneShotLatch = <span class="keyword">new</span> OneShotLatch();</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10</span>; i++) &#123;</span><br><span class="line">            <span class="keyword">new</span> Thread(<span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">                <span class="meta">@Override</span></span><br><span class="line">                <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                    System.out.println(Thread.currentThread().getName()+<span class="string">&quot;尝试获取latch，获取失败那就等待&quot;</span>);</span><br><span class="line">                    oneShotLatch.await();</span><br><span class="line">                    System.out.println(<span class="string">&quot;开闸放行&quot;</span>+Thread.currentThread().getName()+<span class="string">&quot;继续运行&quot;</span>);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;).start();</span><br><span class="line">        &#125;</span><br><span class="line">        Thread.sleep(<span class="number">5000</span>);</span><br><span class="line">      </span><br><span class="line">        oneShotLatch.signal();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">new</span> Thread(<span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                System.out.println(Thread.currentThread().getName()+<span class="string">&quot;尝试获取latch，获取失败那就等待&quot;</span>);</span><br><span class="line">                oneShotLatch.await();</span><br><span class="line">                System.out.println(<span class="string">&quot;开闸放行&quot;</span>+Thread.currentThread().getName()+<span class="string">&quot;继续运行&quot;</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;).start();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="实战"><a href="#实战" class="headerlink" title="实战"></a>实战</h2><h3 id="synchronized"><a href="#synchronized" class="headerlink" title="synchronized"></a>synchronized</h3><ul>
+<li>get()方法中顺利进入了set()方法，说明synchronized的确是可重入锁。</li>
+<li>thread-0先进入get方法体，这个时候thread-1、thread-2、thread-3等待进入，但当thread-0离开时，thread-2却先进入了方法体，没有按照thread-1、thread-2、thread-3的顺序进入get方法体，说明sychronized的确是非公平锁。</li>
+<li>在一个线程进入get方法体后，其他线程只能等待，无法同时进入，验证了synchronized是独占锁。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyLockTest</span> <span class="keyword">implements</span> <span class="title">Runnable</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">get</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;2 enter thread name--&gt;&quot;</span> + Thread.currentThread().getName());</span><br><span class="line">        System.out.println(<span class="string">&quot;3 get thread name--&gt;&quot;</span> + Thread.currentThread().getName());</span><br><span class="line">        <span class="comment">// 再使用synchronized set方法</span></span><br><span class="line">      	set();</span><br><span class="line">        System.out.println(<span class="string">&quot;5 leave run thread name--&gt;&quot;</span> + Thread.currentThread().getName());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">set</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;4 set thread name--&gt;&quot;</span> + Thread.currentThread().getName());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;1 run thread name--&gt;&quot;</span> + Thread.currentThread().getName());</span><br><span class="line">        get();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        MyLockTest test = <span class="keyword">new</span> MyLockTest();</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10</span>; i++) &#123;</span><br><span class="line">            <span class="keyword">new</span> Thread(test, <span class="string">&quot;thread-&quot;</span> + i).start();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="ReentrantLock非公平模式"><a href="#ReentrantLock非公平模式" class="headerlink" title="ReentrantLock非公平模式"></a>ReentrantLock非公平模式</h3><p>ReentrantLock既可以构造公平锁又可以构造非公平锁，默认为非公平锁，将上面的代码改为用ReentrantLock实现，再次运行。</p>
+<ul>
+<li>ReentrantLock是可重入锁</li>
+<li>默认的确是非公平锁</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.concurrent.locks.ReentrantLock;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyLockTest</span> <span class="keyword">implements</span> <span class="title">Runnable</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 默认非公平模式</span></span><br><span class="line">    <span class="keyword">private</span> ReentrantLock reentrantLock = <span class="keyword">new</span> ReentrantLock();</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">get</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;2 enter thread name--&gt;&quot;</span> + Thread.currentThread().getName());</span><br><span class="line">        reentrantLock.lock();</span><br><span class="line">        System.out.println(<span class="string">&quot;3 get thread name--&gt;&quot;</span> + Thread.currentThread().getName());</span><br><span class="line">        set();</span><br><span class="line">        reentrantLock.unlock();</span><br><span class="line">        System.out.println(<span class="string">&quot;5 leave run thread name--&gt;&quot;</span> + Thread.currentThread().getName());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">set</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        reentrantLock.lock();</span><br><span class="line">        System.out.println(<span class="string">&quot;4 set thread name--&gt;&quot;</span> + Thread.currentThread().getName());</span><br><span class="line">        reentrantLock.unlock();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;1 run thread name--&gt;&quot;</span> + Thread.currentThread().getName());</span><br><span class="line">        get();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        MyLockTest test = <span class="keyword">new</span> MyLockTest();</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10</span>; i++) &#123;</span><br><span class="line">            <span class="keyword">new</span> Thread(test, <span class="string">&quot;thread-&quot;</span> + i).start();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="ReentrantLock公平模式"><a href="#ReentrantLock公平模式" class="headerlink" title="ReentrantLock公平模式"></a>ReentrantLock公平模式</h3><p>只要在构造器传入boolean值true即可改为公平模式</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Creates an instance of &#123;<span class="doctag">@code</span> ReentrantLock&#125; with the</span></span><br><span class="line"><span class="comment">     * given fairness policy.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> fair &#123;<span class="doctag">@code</span> true&#125; if this lock should use a fair ordering policy</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ReentrantLock</span><span class="params">(<span class="keyword">boolean</span> fair)</span> </span>&#123;</span><br><span class="line">        sync = fair ? <span class="keyword">new</span> FairSync() : <span class="keyword">new</span> NonfairSync();</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.concurrent.locks.ReentrantLock;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyLockTest</span> <span class="keyword">implements</span> <span class="title">Runnable</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 改为公平模式</span></span><br><span class="line">    <span class="keyword">private</span> ReentrantLock reentrantLock = <span class="keyword">new</span> ReentrantLock(<span class="keyword">true</span>);</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">get</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;2 enter thread name--&gt;&quot;</span> + Thread.currentThread().getName());</span><br><span class="line">        reentrantLock.lock();</span><br><span class="line">        System.out.println(<span class="string">&quot;3 get thread name--&gt;&quot;</span> + Thread.currentThread().getName());</span><br><span class="line">        set();</span><br><span class="line">        reentrantLock.unlock();</span><br><span class="line">        System.out.println(<span class="string">&quot;5 leave run thread name--&gt;&quot;</span> + Thread.currentThread().getName());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">set</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        reentrantLock.lock();</span><br><span class="line">        System.out.println(<span class="string">&quot;4 set thread name--&gt;&quot;</span> + Thread.currentThread().getName());</span><br><span class="line">        reentrantLock.unlock();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;1 run thread name--&gt;&quot;</span> + Thread.currentThread().getName());</span><br><span class="line">        get();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        MyLockTest test = <span class="keyword">new</span> MyLockTest();</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10</span>; i++) &#123;</span><br><span class="line">            <span class="keyword">new</span> Thread(test, <span class="string">&quot;thread-&quot;</span> + i).start();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>公平锁在多个线程想要同时获取锁的时候，会发现再排队，按照先来后到的顺序进行。</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1</span> run thread name--&gt;thread-<span class="number">0</span></span><br><span class="line"><span class="number">2</span> enter thread name--&gt;thread-<span class="number">0</span></span><br><span class="line"><span class="number">3</span> get thread name--&gt;thread-<span class="number">0</span></span><br><span class="line"><span class="number">1</span> run thread name--&gt;thread-<span class="number">2</span></span><br><span class="line"><span class="number">2</span> enter thread name--&gt;thread-<span class="number">2</span></span><br><span class="line"><span class="number">4</span> set thread name--&gt;thread-<span class="number">0</span></span><br><span class="line"><span class="number">1</span> run thread name--&gt;thread-<span class="number">3</span></span><br><span class="line"><span class="number">2</span> enter thread name--&gt;thread-<span class="number">3</span></span><br><span class="line"><span class="number">1</span> run thread name--&gt;thread-<span class="number">1</span></span><br><span class="line"><span class="number">2</span> enter thread name--&gt;thread-<span class="number">1</span></span><br><span class="line"><span class="number">1</span> run thread name--&gt;thread-<span class="number">5</span></span><br><span class="line"><span class="number">2</span> enter thread name--&gt;thread-<span class="number">5</span></span><br><span class="line"><span class="number">3</span> get thread name--&gt;thread-<span class="number">2</span></span><br><span class="line"><span class="number">4</span> set thread name--&gt;thread-<span class="number">2</span></span><br><span class="line"><span class="number">5</span> leave run thread name--&gt;thread-<span class="number">2</span></span><br><span class="line"><span class="number">5</span> leave run thread name--&gt;thread-<span class="number">0</span></span><br><span class="line"><span class="number">3</span> get thread name--&gt;thread-<span class="number">3</span></span><br><span class="line"><span class="number">4</span> set thread name--&gt;thread-<span class="number">3</span></span><br><span class="line"><span class="number">5</span> leave run thread name--&gt;thread-<span class="number">3</span></span><br><span class="line"><span class="number">1</span> run thread name--&gt;thread-<span class="number">9</span></span><br><span class="line"><span class="number">2</span> enter thread name--&gt;thread-<span class="number">9</span></span><br><span class="line"><span class="number">3</span> get thread name--&gt;thread-<span class="number">1</span></span><br><span class="line"><span class="number">4</span> set thread name--&gt;thread-<span class="number">1</span></span><br><span class="line"><span class="number">5</span> leave run thread name--&gt;thread-<span class="number">1</span></span><br><span class="line"><span class="number">3</span> get thread name--&gt;thread-<span class="number">5</span></span><br><span class="line"><span class="number">4</span> set thread name--&gt;thread-<span class="number">5</span></span><br><span class="line"><span class="number">5</span> leave run thread name--&gt;thread-<span class="number">5</span></span><br><span class="line"><span class="number">3</span> get thread name--&gt;thread-<span class="number">9</span></span><br><span class="line"><span class="number">4</span> set thread name--&gt;thread-<span class="number">9</span></span><br><span class="line"><span class="number">5</span> leave run thread name--&gt;thread-<span class="number">9</span></span><br><span class="line"><span class="number">1</span> run thread name--&gt;thread-<span class="number">6</span></span><br><span class="line"><span class="number">2</span> enter thread name--&gt;thread-<span class="number">6</span></span><br><span class="line"><span class="number">3</span> get thread name--&gt;thread-<span class="number">6</span></span><br><span class="line"><span class="number">4</span> set thread name--&gt;thread-<span class="number">6</span></span><br><span class="line"><span class="number">1</span> run thread name--&gt;thread-<span class="number">7</span></span><br><span class="line"><span class="number">5</span> leave run thread name--&gt;thread-<span class="number">6</span></span><br><span class="line"><span class="number">2</span> enter thread name--&gt;thread-<span class="number">7</span></span><br><span class="line"><span class="number">3</span> get thread name--&gt;thread-<span class="number">7</span></span><br><span class="line"><span class="number">4</span> set thread name--&gt;thread-<span class="number">7</span></span><br><span class="line"><span class="number">5</span> leave run thread name--&gt;thread-<span class="number">7</span></span><br><span class="line"><span class="number">1</span> run thread name--&gt;thread-<span class="number">4</span></span><br><span class="line"><span class="number">2</span> enter thread name--&gt;thread-<span class="number">4</span></span><br><span class="line"><span class="number">3</span> get thread name--&gt;thread-<span class="number">4</span></span><br><span class="line"><span class="number">1</span> run thread name--&gt;thread-<span class="number">8</span></span><br><span class="line"><span class="number">2</span> enter thread name--&gt;thread-<span class="number">8</span></span><br><span class="line"><span class="number">4</span> set thread name--&gt;thread-<span class="number">4</span></span><br><span class="line"><span class="number">5</span> leave run thread name--&gt;thread-<span class="number">4</span></span><br><span class="line"><span class="number">3</span> get thread name--&gt;thread-<span class="number">8</span></span><br><span class="line"><span class="number">4</span> set thread name--&gt;thread-<span class="number">8</span></span><br><span class="line"><span class="number">5</span> leave run thread name--&gt;thread-<span class="number">8</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="ReentrantReadWriteLock"><a href="#ReentrantReadWriteLock" class="headerlink" title="ReentrantReadWriteLock"></a>ReentrantReadWriteLock</h3><p>读写锁的性能都会比排他锁要好，因为大多数场<strong>景读是多于写的</strong>。在读多于写的情况下，读写锁能够提供比排它锁更好的并发性和吞吐量。Java并发包提供读写锁的实现是ReentrantReadWriteLock。</p>
+<table>
+<thead>
+<tr>
+<th align="left">特性</th>
+<th align="left">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">公平性选择</td>
+<td align="left">支持非公平(默认)和公平的锁获取方式，吞吐量还是非公平优于公平</td>
+</tr>
+<tr>
+<td align="left">重进入</td>
+<td align="left">该锁支持重进入，以读写线程为例：读线程在获取了读锁之后，能够再次获取读锁。而写线程在获取了写锁之后能够再次获取写锁，同时也可以获取读锁</td>
+</tr>
+<tr>
+<td align="left">锁降级</td>
+<td align="left">遵循获取写锁、获取读锁再释放写锁的次序，写锁能够降级成为读锁</td>
+</tr>
+</tbody></table>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.HashMap;</span><br><span class="line"><span class="keyword">import</span> java.util.Map;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.locks.Lock;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.locks.ReentrantReadWriteLock;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyLockTest</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10</span>; i++) &#123;</span><br><span class="line">            <span class="keyword">new</span> Thread(<span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">                <span class="meta">@Override</span></span><br><span class="line">                <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                    Cache.put(<span class="string">&quot;key&quot;</span>, <span class="keyword">new</span> String(Thread.currentThread().getName() + <span class="string">&quot; joke&quot;</span>));</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;, <span class="string">&quot;threadW-&quot;</span> + i).start();</span><br><span class="line">            <span class="keyword">new</span> Thread(<span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">                <span class="meta">@Override</span></span><br><span class="line">                <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                    System.out.println(Cache.get(<span class="string">&quot;key&quot;</span>));</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;, <span class="string">&quot;threadR-&quot;</span> + i).start();</span><br><span class="line">            <span class="keyword">new</span> Thread(<span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">                <span class="meta">@Override</span></span><br><span class="line">                <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                    Cache.clear();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;, <span class="string">&quot;threadC-&quot;</span> + i).start();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Cache</span> </span>&#123;</span><br><span class="line">    <span class="keyword">static</span> Map&lt;String, Object&gt; map = <span class="keyword">new</span> HashMap&lt;String, Object&gt;();</span><br><span class="line">  <span class="comment">// 读写锁</span></span><br><span class="line">    <span class="keyword">static</span> ReentrantReadWriteLock rwl = <span class="keyword">new</span> ReentrantReadWriteLock();</span><br><span class="line">  <span class="comment">// 读锁</span></span><br><span class="line">    <span class="keyword">static</span> Lock r = rwl.readLock();</span><br><span class="line">  <span class="comment">// 写锁</span></span><br><span class="line">    <span class="keyword">static</span> Lock w = rwl.writeLock();</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 使用读锁</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> Object <span class="title">get</span><span class="params">(String key)</span> </span>&#123;</span><br><span class="line">        r.lock();</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            System.out.println(<span class="string">&quot;get &quot;</span> + Thread.currentThread().getName());</span><br><span class="line">            <span class="keyword">return</span> map.get(key);</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            r.unlock();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 使用写锁</span></span><br><span class="line">    <span class="comment">// 设置key对应的value，并返回旧有的value</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> Object <span class="title">put</span><span class="params">(String key, Object value)</span> </span>&#123;</span><br><span class="line">        w.lock();</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            System.out.println(<span class="string">&quot;put &quot;</span> + Thread.currentThread().getName());</span><br><span class="line">            <span class="keyword">return</span> map.put(key, value);</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            w.unlock();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 清空所有的内容</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">void</span> <span class="title">clear</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        w.lock();</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            System.out.println(<span class="string">&quot;clear &quot;</span> + Thread.currentThread().getName());</span><br><span class="line">            map.clear();</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            w.unlock();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+    </article>
+  </div>
+
+</div>
+
+
+<div class="footer-wrapper container">
+  <footer class="footer clearfix">
+    <div class="clearfix">
+      <a href="https://www.yangxudong.site" class="footer-logo">
+        <i class="fa iconfont icon-baiyangzuo" style="font-size: 24px;"></i>
+      </a>
+      <ul class="footer-social-link">
+        <li>© 2019 旭东同学</li>
+        <li><a href="https://www.yangxudong.site">Home</a></li>
+        
+        <li><a target="_blank" rel="noopener" href="https://github.com/StuartYang">Github</a></li>
+        
+      </ul>
+      <div class="footer-theme-info">
+        Theme Based on <a target="_blank" rel="noopener" href="//github.com/sabrinaluo/hexo-theme-replica">Replica</a> ❤ Powered by Hexo
+      </div>
+    </div>
+  </footer>
+</div>
+<script src="/js/main.js"></script>
+
+</body>
+</html>
