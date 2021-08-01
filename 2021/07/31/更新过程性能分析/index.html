@@ -8,12 +8,12 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>
-      starUML的使用 | YangXudong&#39;s Blog
+      更新过程性能分析 | YangXudong&#39;s Blog
     </title>
     <meta name="description" content="“ 君子藏剑于身，待时而动 ”">
     
       <meta name="keywords" content="
-  starUML
+  Mysql
   ">
       
         <meta name="author" content="旭东同学">
@@ -112,32 +112,72 @@
       旭东同学
 
         <span class="post-date float-right"
-          title="{{moment(1627154424000).format('MMM DD, YYYY, h:mm:ss A')}}">
+          title="{{moment(1627681260000).format('MMM DD, YYYY, h:mm:ss A')}}">
           <i class="fa fa-pencil-square-o"></i>
-          {{moment(1627154424000).fromNow()}}
+          {{moment(1627681260000).fromNow()}}
         </span>
     </h3>
 
     <article class="post-content">
       <h1>
-        starUML的使用
+        更新过程性能分析
       </h1>
-      <h2 id="UML"><a href="#UML" class="headerlink" title="UML"></a>UML</h2><p><strong>UML：</strong> Unified Modeling Language，直接翻译就是<strong>统一建模语言</strong>，简单地说就是<strong>一种有特殊用途的语言</strong>。</p>
+      <p><strong>当需要更新一个数据页时：</strong></p>
 <ul>
-<li>用例图（Use Case Diagram）：角色使用的各个方法【比如用户拿来干嘛，后台拿来用来干嘛】；</li>
-<li>类图（Class Diagram）：所有类之间的关系；</li>
-<li>流程/活动图（Activity Diagram）：用户使用方法，登录与否？然后进行分叉；</li>
-<li>时序图 （Sequence Diagram） ：IDE中Controller、Service、Impl、Entity之间的关系；</li>
+<li>如果数据页在内存中就直接更新</li>
+<li>果这个数据页还没有在内存中的话，在不影响数据一致性的前提下，InooDB 会将这些更新操作缓存在 change buffer 中，这样就不需要从磁盘中读入这个数据页了。</li>
+<li>在下次查询需要访问这个数据页的时候，将数据页读入内存，然后执行 change buffer 中与这个页有关的操作。通过这种方式就能保证这个数据逻辑的正确性。</li>
 </ul>
-<h2 id="主界面简介"><a href="#主界面简介" class="headerlink" title="主界面简介"></a>主界面简介</h2><h2 id="StarUML的使用"><a href="#StarUML的使用" class="headerlink" title="StarUML的使用"></a>StarUML的使用</h2><ol>
-<li>建工程</li>
-<li>建模型</li>
-<li>建包</li>
-<li>建类图</li>
-<li>在model中设置Java环境</li>
+<p>需要说明的是，change buffer 在内存中有拷贝，也会被写入到磁盘上。将 change buffer 中的操作应用到原数据页，得到最新结果的过程称为 merge。除了访问这个数据页会触发 merge 外，系统有后台线程会定期 <strong>merge</strong>。</p>
+<p><strong>在数据库正常关闭（shutdown）的过程中，也会执行 merge 操作。</strong></p>
+<p>显然，如果能够将更新操作先记录在 change buffer，减少读磁盘，语句的执行速度会得到明显的提升。</p>
+<p><strong>什么条件下可以使用 change buffer 呢？</strong></p>
+<p>对于唯一索引来说，所有的更新操作都要先判断这个操作<strong>是否违反唯一性约束</strong>。比如，要插入 (4,400) 这个记录，就要先判断现在表中是否已经存在 k=4 的记录，而这必须要将数据页读入内存才能判断。如果都已经读入到内存了，那直接更新内存会更快，就没必要使用 change buffer 了。</p>
+<p>因此，<strong>唯一索引的更新就不能使用 change buffer，实际上也只有普通索引可以使用。</strong>Change buffer用的是buffer pool（用于读磁盘数据到内存的缓存）里的内存，因此不能无限增大，change buffer的大小，可以通过参数innodb_change_buffer_max_size来动态设置</p>
+<p><strong>如果要在这张表中插入一个新纪录，InnoDB的处理流程是怎样的？</strong></p>
+<ol>
+<li><p>第一种情况，这个记录要更新的数据页在内存中：</p>
+<ol>
+<li>唯一索引：找到插入位置，<strong>判断有没有冲突</strong>，插入这个值，语句执行结束</li>
+<li>普通索引：找到插入位置，插入这个值，语句执行结束</li>
 </ol>
-<h3 id="时序图（系统交互）Sequence-Diagram"><a href="#时序图（系统交互）Sequence-Diagram" class="headerlink" title="时序图（系统交互）Sequence Diagram"></a>时序图（系统交互）Sequence Diagram</h3><img src="https://gitee.com/StuartYang/bpic/raw/master/20210725233020.png" alt="image-20210725034709785" style="zoom:50%;" />
-
+</li>
+<li><p>第二种情况：这个记录要更新的目标页不在内存中</p>
+<ol>
+<li><p>唯一索引：<strong>需要将数据页读入内存中，判断有没有冲突</strong>，插入这个值，语句执行结束</p>
+<p>普通索引：将更新记录在change buffer中，语句执行结束。</p>
+</li>
+</ol>
+</li>
+</ol>
+<p>将数据从磁盘读入内存涉及随机IO的访问，是数据库里面成本最高的操作之一，Change buffer因为减少了随机磁盘访问，所以对更新性能的提升是明显的</p>
+<blockquote>
+<p><strong>Change buffer的使用场景</strong></p>
+<ol>
+<li>适用于<strong>写多读少</strong>的场景，例如账单类，日志类系统</li>
+<li>假设一个业务写入后马上查询，由于要访问数据页，则立即出发merge过程，这样随机访问IO的次数不会减少，反而增加了change buffer的维护代价。</li>
+</ol>
+</blockquote>
+<p><strong>索引的选择：尽量使用普通索引</strong></p>
+<blockquote>
+<p>Redo log和Change buffer的对比：</p>
+<ul>
+<li><p>Redo log：主要节省的是随机写磁盘的IO消耗【转成顺序写】</p>
+</li>
+<li><p>Change buffer主要节省的是随机读磁盘的IO消耗</p>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<p><strong>如果主机异常重启，是否会丢失change buffer和数据？</strong></p>
+<p>虽然只更新内存，但是在事务提交的时候，我们会把change buffer的操作也记录到redo log里，所以崩溃恢复的时候，change buffer也能找回来</p>
+</blockquote>
+<p><strong>merge的执行流程：</strong></p>
+<ol>
+<li>从磁盘（Mysql）读入数据页到内存【老版本的数据页】</li>
+<li>从change buffer里找出这个数据页的change buffer记录，依次应用，得到新版数据页</li>
+<li> 写redo log，这个redo log包含了数据的变更和change buffer的变更</li>
+</ol>
 
     </article>
   </div>

@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>
+      YangXudong&#39;s Blog
+    </title>
+    <meta name="description" content="“ 君子藏剑于身，待时而动 ”">
+    
+      <meta name="keywords" content="
+  Mysql,锁
+  ">
+      
+        <meta name="author" content="旭东同学">
+
+        <meta http-equiv="Cache-Control" content="no-transform" />
+        <meta http-equiv="Cache-Control" content="no-siteapp">
+        <meta name="theme-color" content="#1e2327">
+        <link rel="apple-touch-icon" href="https://github.githubassets.com/apple-touch-icon.png">
+        <link rel="apple-touch-icon" sizes="180x180"
+          href="https://github.githubassets.com/apple-touch-icon-180x180.png">
+
+        <link rel="icon" type="image/x-icon" href="https://gitee.com/StuartYang/bpic/raw/master/20210722154537.png">
+
+        <link rel="stylesheet" href="/css/main.css">
+        
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+        <link rel="stylesheet" href="//at.alicdn.com/t/font_2570198_c1noxsh7ksn.css">
+        </link>
+
+        <script src="//cdnjs.cloudflare.com/ajax/libs/vue/1.0.25-csp/vue.min.js"></script>
+        <!-- JavaScript 日期处理类库 -->
+        <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.11.2/moment.min.js"></script>
+  <meta name="generator" content="Hexo 5.4.0"></head>
+
+<body id="replica-app">
+
+<nav class="navbar-wrapper">
+  <div class="navbar">
+    <div class="container clearfix">
+      <a href="/" class="navbar-logo"><i class="fa iconfont icon-baiyangzuo" style="font-size: 32px;"></i></a>
+
+      <ul class="navbar-nav float-left">
+        
+        <li><a href="/archives">文章</a></li>
+        
+        
+        <li><a href="/categories">归档</a></li>
+        
+        
+        <li><a href="/tags">标签</a></li>
+        
+      </ul>
+
+      <ul class="navbar-nav user-nav float-right desktop-only">
+        <li class="user-nav-notification">
+          <a><span class="user-nav-unread"></span><i class="fa fa-bell"></i></a>
+        </li>
+        <li>
+          <a><i class="fa fa-plus"></i> <i class="fa fa-caret-down"></i></a>
+        </li>
+        <li class="user-nav-logo">
+          <a><img src="https://gitee.com/StuartYang/bpic/raw/master/20210722154532.jpg"> <i class="fa fa-caret-down"></i></i></a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="main-container">
+
+  <header class="header-wrapper desktop-only">
+  <div class="container header-site-detail">
+    <ul class="header-toolbar">
+      <li class="clearfix">
+        <a href="/archives" class="header-toolbar-left"><i
+                  class="fa fa-file-text"></i> 文章 </a>
+        <a href="/archives"
+           class="header-toolbar-right"> 39 </a>
+      </li>
+      <li>
+        <a href="/tags" class="header-toolbar-left"><i
+                  class="fa fa-tags"></i> 标签 </a>
+        <a href="/tags"
+           class="header-toolbar-right"> 39 </a>
+      </li>
+      <li>
+        <a href="/categories" class="header-toolbar-left"><i
+                  class="fa fa-folder-open"></i> 归档 </a>
+        <a href="/categories"
+           class="header-toolbar-right"> 12 </a>
+      </li>
+    </ul>
+    
+    <h2 class="header-title">
+      <i class="fa fa-book text-muted"></i>
+      <a href="/">YangXudong&#39;s Blog</a>
+    </h2>
+  </div>
+</header>
+
+
+  <div class="post-container container">
+    <h3>
+      <i class="fa fa-user-o"></i>
+      旭东同学
+
+        <span class="post-date float-right"
+          title="{{moment(1627678464000).format('MMM DD, YYYY, h:mm:ss A')}}">
+          <i class="fa fa-pencil-square-o"></i>
+          {{moment(1627678464000).fromNow()}}
+        </span>
+    </h3>
+
+    <article class="post-content">
+      <h1>
+        Untitle
+      </h1>
+      <p><strong>根据加锁的范围，MySQL 里面的锁大致可以分成全局锁、表级锁和行锁三类</strong>。</p>
+<h2 id="全局锁"><a href="#全局锁" class="headerlink" title="全局锁"></a>全局锁</h2><p>全局锁就是<strong>对整个数据库实例加锁</strong>。</p>
+<p>MySQL 提供了一个加全局读锁的命令是 <code>Flush tables with read lock (FTWRL)</code>。当你需要<strong>让整个库处于只读状态</strong>的时候。</p>
+<p>使用这个命令之后其他线程的以下语句会被阻塞：</p>
+<ol>
+<li>数据更新语句（数据的增删改）</li>
+<li>数据定义语句（包括建表、修改表结构等）</li>
+</ol>
+<p><strong>全局锁的典型使用场景是，做全库逻辑备份（把整库每个表都 select 出来存成文本）。</strong></p>
+<h3 id="关于备份需不需要加全局锁的讨论"><a href="#关于备份需不需要加全局锁的讨论" class="headerlink" title="关于备份需不需要加全局锁的讨论"></a>关于备份需不需要加全局锁的讨论</h3><p><strong>如果整库是只读状态会出现什么情况：</strong></p>
+<ul>
+<li>在主库上备份，那么在备份期间都不能执行更新，业务阻塞</li>
+<li> 在从库上备份，那么在备份期间从库不能执行主库同步过来的bin log，导致主从同步延迟。</li>
+</ul>
+<p><strong>备份如果不加锁会出现哪些情况<em>？</em></strong></p>
+<p>备份系统备份得到的库不是一个逻辑时间点，这个视图是逻辑不一致的。</p>
+<p><strong>那么如何解决备份加锁的问题呢？</strong></p>
+<ul>
+<li>如果表使用InnoDB引擎，则使用可重复读隔离级别，在导数据之前启动一个事务，确保拿到一致性视图；</li>
+<li>如果是其他引擎，可以使用FTWRL命令。<ul>
+<li>如果在执行FTWRL命令之后由于客户端发送异常断开，那Mysql会自动释放这个全局锁，整个库回到可以正常更新的状态。<ul>
+<li>不推荐使用 set global readonly=true 的方式达到<strong>全库只读的功能</strong>，因为客户端如果忘记设置回来或者异常断开链接，数据库会保持readonly=true，导致整个库处于不可写状态。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="表级锁（表锁，元数据锁-MetaData-Lock-）"><a href="#表级锁（表锁，元数据锁-MetaData-Lock-）" class="headerlink" title="表级锁（表锁，元数据锁[MetaData Lock]）"></a>表级锁（表锁，元数据锁[MetaData Lock]）</h2><ul>
+<li>表锁的语法：<code>lock tables ... read/write</code></li>
+<li>释放锁的语言：<code>unlock tables</code></li>
+</ul>
+<p>表级锁的作用：锁住整张表，保证读写的正确性。</p>
+<p>MySql5.5版本之后引入表级锁，当对一张表做增删改查操作的时候，加自动加上表级读锁；当要对表做结构变更操作的时候，加表级写锁。</p>
+<p><strong>优点：读锁之间不互斥；读写锁之间，写锁之间互斥，保证变更表结构操作的安全性</strong></p>
+<p>注意：事务中的MDL锁，在语句执行开始时申请，但是语句结束后并不会马上释放，而会等到整个事务提交后再释放。</p>
+<p><strong>如何安全的给小表加字段？</strong></p>
+<ol>
+<li>使用短链接链接服务器</li>
+<li>然后再alter table语句里面设定等待时，如果等待时间内拿到MDL写锁则执行操作，如果没有拿到就先放弃，之后进行命令重复。</li>
+</ol>
+<h2 id="行锁"><a href="#行锁" class="headerlink" title="行锁"></a>行锁</h2><p>MySQL 的行锁是在引擎层由各个引擎自己实现的。但并不是所有的引擎都支持行锁，</p>
+<ul>
+<li>比如 MyISAM 引擎就不支持行锁。不支持行锁意味着并发控制只能使用表锁，对于这种引擎的表，同一张表上任何时刻只能有一个更新在执行，这就会影响到业务并发度。</li>
+<li>InnoDB是支持行锁的，这也是 MyISAM 被 InnoDB 替代的重要原因之一。</li>
+</ul>
+<p>行锁：就是针对数据表中<strong>行记录的锁</strong>，</p>
+<ul>
+<li>事务 A 更新了一行，而这时候事务 B 也要更新同一行，则必须等事务 A 的操作完成后才能进行更新。</li>
+<li>如果事务A，B更新不同的行，则相互不影响。</li>
+</ul>
+<p>在 InnoDB 事务中，行锁是在<strong>需要的时候才加上的</strong>，但并不是不需要了就立刻释放，而是要<strong>等到事务结束时才释放</strong>。这个就是<strong>两阶段锁协议</strong>。</p>
+<p><strong>如何减少锁冲突来提升业务并发度？</strong></p>
+<p>将最有可能<strong>造成锁冲突，影响并发度的锁</strong>尽量<strong>往后放</strong></p>
+<h2 id="死锁和死锁检查"><a href="#死锁和死锁检查" class="headerlink" title="死锁和死锁检查"></a>死锁和死锁检查</h2><p>当出现死锁以后，有两种策略：</p>
+<ul>
+<li>一种策略是，直接进入等待，直到超时。这个超时时间可以通过参数innodb_lock_wait_timeout 来设置。<ul>
+<li>当出现死锁以后，第一个被锁住的线程要过 50s 才会超时退出，然后其他线程才有可能继续执行。对于在线服务来说，这个等待时间往往是无法接受的。</li>
+</ul>
+</li>
+<li>另一种策略是，发起死锁检测，发现死锁后，主动回滚死锁链条中的某一个事务，让其他事务得以继续执行。将参数 innodb_deadlock_detect 设置为 on（默认开启），表示开启这个逻辑。<ul>
+<li>正常情况采用第二种策略，主动死锁检测。</li>
+<li>缺点：每当一个事务被锁的时候，都要查看它所依赖的线程有没有被锁住，如此循环，最后判断是否出现了循环等待，也就是死锁；假设更新同一行数据，那么时间复杂度为O(N)，消耗大量CPU，但执行很少的事务。</li>
+</ul>
+</li>
+</ul>
+<p><strong>怎么解决由这种热点行更新导致的性能问题呢？</strong></p>
+<ol>
+<li>确保业务不会出现死锁，将死锁检测关闭，关闭死锁检测会出现大量事务超时，导致业务受损；打开死锁检测，当发生死锁时，进行回滚，后期通过业务重试，保证业务无损</li>
+<li>控制并发度：通过数据库服务端，中间件，修改数据库源码解决，基本思路：对于同一行更新，在进入引擎之前排队，这样就可以避免大量的死锁检测工作</li>
+<li>数据库设计优化：通过将一行改成逻辑上的多行来减少锁冲突</li>
+</ol>
+<p><strong>减少死锁的主要方向：通过控制访问相同资源的并发事务量</strong></p>
+
+    </article>
+  </div>
+
+</div>
+
+
+<div class="footer-wrapper container">
+  <footer class="footer clearfix">
+    <div class="clearfix">
+      <a href="https://www.yangxudong.site" class="footer-logo">
+        <i class="fa iconfont icon-baiyangzuo" style="font-size: 24px;"></i>
+      </a>
+      <ul class="footer-social-link">
+        <li>© 2019 旭东同学</li>
+        <li><a href="https://www.yangxudong.site">Home</a></li>
+        
+        <li><a target="_blank" rel="noopener" href="https://github.com/StuartYang">Github</a></li>
+        
+      </ul>
+      <div class="footer-theme-info">
+        Theme Based on <a target="_blank" rel="noopener" href="//github.com/sabrinaluo/hexo-theme-replica">Replica</a> ❤ Powered by Hexo
+      </div>
+    </div>
+  </footer>
+</div>
+<script src="/js/main.js"></script>
+
+</body>
+</html>
