@@ -167,7 +167,7 @@
       </li>
       <li class="selected">
         <a href="/categories">归档 <span class="counter">
-            12
+            10
           </span></a>
       </li>
       <li class="">
@@ -245,17 +245,17 @@
         </li>
         
         <li class="archive-list-item">
-          <h2><a href="/2021/07/22/redis%E9%9D%A2%E8%AF%95/">redis面试</a></h2>
+          <h2><a href="/2021/04/24/redis%E5%AE%9E%E7%8E%B0%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/">redis实现分布式锁</a></h2>
           <p>
-              什么是redis  
+               分布式锁需要满足的条件  为了确保分布式锁可用，我们至少要确保锁的实现同时满足以下四个条件： 
  
- 
- Redis就是一种运行速度快，基于内存运行的NoSql数据库。支持多种key-value类型的存储，可持久化。 
- Redis支持五种数据类型：string（字符串），hash（哈希），list（列表），set（集合）及zset(sorted set：有序集合)。...
+ 互斥性。在任意时刻，只有一个客户端能持有锁。 
+ 不会发生死锁。即使有一个客户端在持有锁的期间崩溃而没有主动解锁，也能保证后续其他客户端能加锁。 
+ 具有容错性。只要大部分的Redis节点正常...
           </p>
           <ul class="tag-list clearfix">
             
-            <li class="tag-list-item"><a href="/tags/%E9%9D%A2%E8%AF%95/">面试</a></li>
+            <li class="tag-list-item"><a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/">分布式锁</a></li>
             
             <li class="tag-list-item"><a href="/tags/redis/">redis</a></li>
             
@@ -267,7 +267,7 @@
               
             </span>
             <span><i class="fa fa-tag"></i> 2 </span>
-            <span>Published {{moment(1626956308000).fromNow()}}</span>
+            <span>Published {{moment(1619249556000).fromNow()}}</span>
           </div>
         </li>
         
@@ -284,9 +284,9 @@
           </p>
           <ul class="tag-list clearfix">
             
-            <li class="tag-list-item"><a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a></li>
-            
             <li class="tag-list-item"><a href="/tags/redis/">redis</a></li>
+            
+            <li class="tag-list-item"><a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a></li>
             
             <li class="tag-list-item"><a href="/tags/%E9%9B%86%E7%BE%A4/">集群</a></li>
             
