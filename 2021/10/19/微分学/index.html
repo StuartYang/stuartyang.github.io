@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>
+      微分学应用 | YangXudong&#39;s Blog
+    </title>
+    <meta name="description" content="“ 君子藏剑于身，待时而动 ”">
+    
+      <meta name="keywords" content="
+  高等数学
+  ">
+      
+        <meta name="author" content="旭东同学">
+
+        <meta http-equiv="Cache-Control" content="no-transform" />
+        <meta http-equiv="Cache-Control" content="no-siteapp">
+        <meta name="theme-color" content="#1e2327">
+        <link rel="apple-touch-icon" href="https://github.githubassets.com/apple-touch-icon.png">
+        <link rel="apple-touch-icon" sizes="180x180"
+          href="https://github.githubassets.com/apple-touch-icon-180x180.png">
+
+        <link rel="icon" type="image/x-icon" href="https://gitee.com/StuartYang/bpic/raw/master/20210722154537.png">
+
+        <link rel="stylesheet" href="/css/main.css">
+        
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+        <link rel="stylesheet" href="//at.alicdn.com/t/font_2570198_c1noxsh7ksn.css">
+        </link>
+
+        <script src="//cdnjs.cloudflare.com/ajax/libs/vue/1.0.25-csp/vue.min.js"></script>
+        <!-- JavaScript 日期处理类库 -->
+        <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.11.2/moment.min.js"></script>
+  <meta name="generator" content="Hexo 5.4.0"></head>
+
+<body id="replica-app">
+
+<nav class="navbar-wrapper">
+  <div class="navbar">
+    <div class="container clearfix">
+      <a href="/" class="navbar-logo"><i class="fa iconfont icon-baiyangzuo" style="font-size: 32px;"></i></a>
+
+      <ul class="navbar-nav float-left">
+        
+        <li><a href="/archives">文章</a></li>
+        
+        
+        <li><a href="/categories">归档</a></li>
+        
+        
+        <li><a href="/tags">标签</a></li>
+        
+      </ul>
+
+      <ul class="navbar-nav user-nav float-right desktop-only">
+        <li class="user-nav-notification">
+          <a><span class="user-nav-unread"></span><i class="fa fa-bell"></i></a>
+        </li>
+        <li>
+          <a><i class="fa fa-plus"></i> <i class="fa fa-caret-down"></i></a>
+        </li>
+        <li class="user-nav-logo">
+          <a><img src="https://gitee.com/StuartYang/bpic/raw/master/20210722154532.jpg"> <i class="fa fa-caret-down"></i></i></a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="main-container">
+
+  <header class="header-wrapper desktop-only">
+  <div class="container header-site-detail">
+    <ul class="header-toolbar">
+      <li class="clearfix">
+        <a href="/archives" class="header-toolbar-left"><i
+                  class="fa fa-file-text"></i> 文章 </a>
+        <a href="/archives"
+           class="header-toolbar-right"> 43 </a>
+      </li>
+      <li>
+        <a href="/tags" class="header-toolbar-left"><i
+                  class="fa fa-tags"></i> 标签 </a>
+        <a href="/tags"
+           class="header-toolbar-right"> 43 </a>
+      </li>
+      <li>
+        <a href="/categories" class="header-toolbar-left"><i
+                  class="fa fa-folder-open"></i> 归档 </a>
+        <a href="/categories"
+           class="header-toolbar-right"> 13 </a>
+      </li>
+    </ul>
+    
+    <h2 class="header-title">
+      <i class="fa fa-book text-muted"></i>
+      <a href="/">YangXudong&#39;s Blog</a>
+    </h2>
+  </div>
+</header>
+
+
+  <div class="post-container container">
+    <h3>
+      <i class="fa fa-user-o"></i>
+      旭东同学
+
+        <span class="post-date float-right"
+          title="{{moment(1634644262000).format('MMM DD, YYYY, h:mm:ss A')}}">
+          <i class="fa fa-pencil-square-o"></i>
+          {{moment(1634644262000).fromNow()}}
+        </span>
+    </h3>
+
+    <article class="post-content">
+      <h1>
+        微分学应用
+      </h1>
+      <h2 id="严格单调性的证明"><a href="#严格单调性的证明" class="headerlink" title="严格单调性的证明"></a>严格单调性的证明</h2><ul>
+<li><p>定义法</p>
+<ul>
+<li>$$ 任取x1、x2∈D，且x1&lt;x2$$</li>
+<li>$$f(x_2)－f(x_1)\leq 0，说明函数在定义区间严格单调增$$</li>
+<li>$$f(x_2)－f(x_1)&lt; 0，说明函数为增函数,函数在定义区间单调不减$$</li>
+</ul>
+</li>
+<li><p>导数法</p>
+<ul>
+<li>$$f(x)在定义区间可导 $$</li>
+<li>$$f`(x) &gt; 0，说明函数在定义区间严格单调增$$</li>
+<li>$$f`(x) \geq 0，说明函数在定义区间单调不减$$</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>驻点：在<a target="_blank" rel="noopener" href="https://baike.baidu.com/item/%E5%BE%AE%E7%A7%AF%E5%88%86/6065">微积分</a>，驻点（Stationary Point）又称为平稳点、稳定点或临界点（Critical Point）是*<a target="_blank" rel="noopener" href="https://baike.baidu.com/item/%E5%87%BD%E6%95%B0/301912">函数</a>*的一阶导数为零，即在“这一点”，<strong>函数的输出值停止增加或减少</strong>。</p>
+<p><strong>单调区间</strong>：是指<a target="_blank" rel="noopener" href="https://baike.baidu.com/item/%E5%87%BD%E6%95%B0/301912">函数</a>在某一<a target="_blank" rel="noopener" href="https://baike.baidu.com/item/%E5%8C%BA%E9%97%B4/1273117">区间</a>内的<a target="_blank" rel="noopener" href="https://baike.baidu.com/item/%E5%87%BD%E6%95%B0%E5%80%BC/5017986">函数值</a>y，<strong>随自变量x的值增大而增大（或减小）恒成立</strong>。</p>
+<p>​    —— 所谓单调区间就是指单调递增，递减；</p>
+</blockquote>
+<h2 id="lim-frac-a-b-的一些说明"><a href="#lim-frac-a-b-的一些说明" class="headerlink" title="$$lim \frac{a}{b}的一些说明$$"></a>$$lim \frac{a}{b}的一些说明$$</h2><ul>
+<li>极限的运算法则<ul>
+<li>b的极限趋于0 , 整体极限存在  ==&gt; a的极限趋于0</li>
+<li>a的极限趋于0 , 整体极限存在且不为0  ==&gt; b的极限趋于0</li>
+</ul>
+</li>
+<li>极限的保号性<ul>
+<li>整体极限&gt;0  ==&gt; 在临近区间 a/b &gt; 0 ;</li>
+<li>整体极限 a/b &gt;= 0  ==&gt; 整体极限 &gt;= 0 ;</li>
+</ul>
+</li>
+</ul>
+<h2 id="曲线凹凸的判定"><a href="#曲线凹凸的判定" class="headerlink" title="曲线凹凸的判定"></a>曲线凹凸的判定</h2><ul>
+<li>定义法<ul>
+<li>$$f(\frac{x_1+x_2}{2}) &lt; (\frac{f(x_1)+f(x_2)}{2})  &lt;==&gt; 函数为凹函数$$</li>
+<li>$$f(\frac{x_1+x_2}{2}) &gt; (\frac{f(x_1)+f(x_2)}{2})  &lt;==&gt; 函数为凸函数$$</li>
+</ul>
+</li>
+<li>导数判定法：<ul>
+<li>在定义区间D中，f``(x) &gt; 0，==&gt; 函数f（x）在区间D上是凹函数；</li>
+<li>在定义区间D中，f``(x) &lt; 0，==&gt; 函数f（x）在区间D上是凸函数；</li>
+</ul>
+</li>
+</ul>
+<h2 id="拐点"><a href="#拐点" class="headerlink" title="拐点"></a>拐点</h2><ul>
+<li>一个函数，在（x，f（x））两侧凹凸性相反</li>
+<li>拐点是（x，f（x）），不光是x</li>
+</ul>
+<h2 id="渐近线"><a href="#渐近线" class="headerlink" title="渐近线"></a>渐近线</h2><ul>
+<li>有水平无斜</li>
+<li>水平渐进线：<ul>
+<li><img src="https://gitee.com/StuartYang/bpic/raw/master/20211019204359.png" alt="image-20211019204355836" style="zoom:50%;" /></li>
+</ul>
+</li>
+<li>斜渐进线：<ul>
+<li><img src="https://gitee.com/StuartYang/bpic/raw/master/20211019204537.png" alt="image-20211019204534259" style="zoom:50%;" /></li>
+</ul>
+</li>
+<li>垂直渐进线<ul>
+<li><img src="https://gitee.com/StuartYang/bpic/raw/master/20211019204631.png" alt="image-20211019204629301" style="zoom:50%;" /></li>
+<li>$x_0$的选取：无定义点</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>特别注意分左右的函数：$$arctan x , e^\frac{1}{x}$$</p>
+</blockquote>
+<h2 id="曲率"><a href="#曲率" class="headerlink" title="曲率"></a>曲率</h2><ul>
+<li>直角坐标系下计算曲率<ul>
+<li><img src="https://gitee.com/StuartYang/bpic/raw/master/20211019205003.png" alt="image-20211019204958957" style="zoom:50%;" /></li>
+</ul>
+</li>
+<li>参数坐标系下计算曲率<ul>
+<li><img src="/Users/yangxudong/Library/Application Support/typora-user-images/image-20211019205034698.png" alt="image-20211019205034698" style="zoom:50%;" /></li>
+</ul>
+</li>
+<li>曲率圆和曲率的关系：$$R = \frac{1}{K}$$</li>
+</ul>
+
+    </article>
+  </div>
+
+</div>
+
+
+<div class="footer-wrapper container">
+  <footer class="footer clearfix">
+    <div class="clearfix">
+      <a href="https://www.yangxudong.site" class="footer-logo">
+        <i class="fa iconfont icon-baiyangzuo" style="font-size: 24px;"></i>
+      </a>
+      <ul class="footer-social-link">
+        <li>© 2019 旭东同学</li>
+        <li><a href="https://www.yangxudong.site">Home</a></li>
+        
+        <li><a target="_blank" rel="noopener" href="https://github.com/StuartYang">Github</a></li>
+        
+      </ul>
+      <div class="footer-theme-info">
+        Theme Based on <a target="_blank" rel="noopener" href="//github.com/sabrinaluo/hexo-theme-replica">Replica</a> ❤ Powered by Hexo
+      </div>
+    </div>
+  </footer>
+</div>
+<script src="/js/main.js"></script>
+
+</body>
+</html>

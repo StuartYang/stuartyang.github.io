@@ -162,17 +162,17 @@
       </li>
       <li class="">
         <a href="/archives">文章 <span class="counter">
-            42
+            43
           </span></a>
       </li>
       <li class="">
         <a href="/categories">归档 <span class="counter">
-            12
+            13
           </span></a>
       </li>
       <li class="selected">
         <a href="/tags">标签 <span class="counter">
-            42
+            43
           </span></a>
       </li>
     </ul>
@@ -182,22 +182,42 @@
       <ul class="archive-list">
         
         <li class="archive-list-item">
-          <h2><a href="/2021/07/31/MySql%E5%9F%BA%E7%A1%80%E6%9E%B6%E6%9E%84/">MySql基础架构</a></h2>
+          <h2><a href="/2021/07/31/%E6%9B%B4%E6%96%B0%E8%BF%87%E7%A8%8B%E6%80%A7%E8%83%BD%E5%88%86%E6%9E%90/">更新过程性能分析</a></h2>
           <p>
-               绪  
- 参考： 
- 《MySQL实战45讲》： https://time.geekbang.org/column/intro/139  
+              当需要更新一个数据页时：  
  
-   整体架构    
- 大体来说，MySQL 可以分为 Server 层和存储引擎层两部分。 
- 
- Server 层包括连接器、查询缓存、分析器、...
+ 如果数据页在内存中就直接更新 
+ 果这个数据页还没有在内存中的话，在不影响数据一致性的前提下，InooDB 会将这些更新操作缓存在 change buffer 中，这样就不需要从磁盘中读入这个数据页了。 
+ 在下次查询需要访问这个数据页的时候，将数据页读入内存...
           </p>
           <ul class="tag-list clearfix">
             
-            <li class="tag-list-item"><a href="/tags/MySql/">MySql</a></li>
+            <li class="tag-list-item"><a href="/tags/Mysql/">Mysql</a></li>
             
-            <li class="tag-list-item"><a href="/tags/%E9%9D%A2%E8%AF%95/">面试</a></li>
+          </ul>
+          <div class="post-info">
+            <span>
+              
+              <a class="category-link" href="/categories/Mysql/"><i class="fa fa-folder-open"></i> Mysql</a>
+              
+            </span>
+            <span><i class="fa fa-tag"></i> 1 </span>
+            <span>Published {{moment(1627681260000).fromNow()}}</span>
+          </div>
+        </li>
+        
+        <li class="archive-list-item">
+          <h2><a href="/2021/07/31/Mysql%E4%B8%AD%E7%9A%84%E9%94%81/">Mysql中的锁</a></h2>
+          <p>
+              根据加锁的范围，MySQL 里面的锁大致可以分成全局锁、表级锁和行锁三类 。 
+   全局锁  全局锁就是 对整个数据库实例加锁 。 
+ MySQL 提供了一个加全局读锁的命令是  Flush tables with read lock (FTWRL) 。当你需要 让整个库处于只读状态 的时候。...
+          </p>
+          <ul class="tag-list clearfix">
+            
+            <li class="tag-list-item"><a href="/tags/Mysql/">Mysql</a></li>
+            
+            <li class="tag-list-item"><a href="/tags/%E9%94%81/">锁</a></li>
             
           </ul>
           <div class="post-info">
@@ -207,7 +227,87 @@
               
             </span>
             <span><i class="fa fa-tag"></i> 2 </span>
-            <span>Published {{moment(1627667714000).fromNow()}}</span>
+            <span>Published {{moment(1627678464000).fromNow()}}</span>
+          </div>
+        </li>
+        
+        <li class="archive-list-item">
+          <h2><a href="/2021/07/31/Mysql%E7%B4%A2%E5%BC%95/">Mysql索引</a></h2>
+          <p>
+               InnoDB 的索引模型  在 InnoDB 中，表都是根据主键顺序以索引的形式存放的，这种存储方式的表称为索引组织表。又因为前面我们提到的，InnoDB 使用了 B+ 树索引模型，所以数据都是存储在 B+树中的。 
+ 
+  每一个索引 在 InnoDB 里面对应 一棵 B+ 树 。 
+ 
+ ...
+          </p>
+          <ul class="tag-list clearfix">
+            
+            <li class="tag-list-item"><a href="/tags/Mysql/">Mysql</a></li>
+            
+            <li class="tag-list-item"><a href="/tags/%E7%B4%A2%E5%BC%95/">索引</a></li>
+            
+          </ul>
+          <div class="post-info">
+            <span>
+              
+              <a class="category-link" href="/categories/Mysql/"><i class="fa fa-folder-open"></i> Mysql</a>
+              
+            </span>
+            <span><i class="fa fa-tag"></i> 2 </span>
+            <span>Published {{moment(1627671133000).fromNow()}}</span>
+          </div>
+        </li>
+        
+        <li class="archive-list-item">
+          <h2><a href="/2021/07/31/Mysql%E4%BA%8B%E5%8A%A1/">Mysql事务</a></h2>
+          <p>
+               隔离性与隔离级别  事务，想到ACID（Atomicity、Consistency、Isolation、Durability，即原子性、一致性、隔离性、持久性），今天我们就来说说其中 I，也就是“隔离性”。 
+  事务隔离级别 ： 
+ 
+ 读未提交：一个事务还没提交时，做的修改可以被其他事务看...
+          </p>
+          <ul class="tag-list clearfix">
+            
+            <li class="tag-list-item"><a href="/tags/Mysql/">Mysql</a></li>
+            
+            <li class="tag-list-item"><a href="/tags/%E4%BA%8B%E5%8A%A1/">事务</a></li>
+            
+          </ul>
+          <div class="post-info">
+            <span>
+              
+              <a class="category-link" href="/categories/Mysql/"><i class="fa fa-folder-open"></i> Mysql</a>
+              
+            </span>
+            <span><i class="fa fa-tag"></i> 2 </span>
+            <span>Published {{moment(1627670854000).fromNow()}}</span>
+          </div>
+        </li>
+        
+        <li class="archive-list-item">
+          <h2><a href="/2021/07/31/Mysql%E7%9A%84%E6%95%B0%E6%8D%AE%E6%81%A2%E5%A4%8D%E6%97%A5%E5%BF%97/">Mysql的数据恢复日志</a></h2>
+          <p>
+               绪  
+ 参考： 
+ 《MySQL实战45讲》： https://time.geekbang.org/column/intro/139  
+ 
+ 如果每一次的更新操作都需要写进磁盘，然后磁盘也要找到对应的那条记录，然后再更新，整个过程 IO 成本、查找成本都很高。为了解决这个问题，MySQL ...
+          </p>
+          <ul class="tag-list clearfix">
+            
+            <li class="tag-list-item"><a href="/tags/Mysql/">Mysql</a></li>
+            
+            <li class="tag-list-item"><a href="/tags/%E6%95%B0%E6%8D%AE%E6%81%A2%E5%A4%8D/">数据恢复</a></li>
+            
+          </ul>
+          <div class="post-info">
+            <span>
+              
+              <a class="category-link" href="/categories/Mysql/"><i class="fa fa-folder-open"></i> Mysql</a>
+              
+            </span>
+            <span><i class="fa fa-tag"></i> 2 </span>
+            <span>Published {{moment(1627669322000).fromNow()}}</span>
           </div>
         </li>
         
